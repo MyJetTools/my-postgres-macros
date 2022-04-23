@@ -15,8 +15,12 @@ pub fn generate_field_values<'s, TIter: Iterator<Item = &'s StructProperty>>(
     properties: TIter,
 ) -> i32 {
     let mut no = 1;
-
+    let mut first = true;
     for prop in properties {
+        if !first {
+            result.push(',');
+        }
+
         if prop.ty.is_date_time() {
             result.push_str("'{");
             result.push_str(prop.name.as_str());
@@ -27,7 +31,8 @@ pub fn generate_field_values<'s, TIter: Iterator<Item = &'s StructProperty>>(
 
             no += 1;
         }
-        result.push_str(", ");
+
+        first = false;
     }
 
     no
@@ -37,13 +42,19 @@ pub fn generate_fields_as_params<'s, TIter: Iterator<Item = &'s StructProperty>>
     result: &mut String,
     fields: TIter,
 ) {
+    let mut first = true;
     for prop in fields {
         if !prop.ty.is_date_time() {
+            if !first {
+                result.push(',');
+            }
             result.push_str("&self.");
             result.push_str(prop.name.as_str());
-            result.push_str(",\n");
+            first = false;
         }
     }
+
+    result.push('\n');
 }
 
 pub fn generate_date_time_reading<'s, TIter: Iterator<Item = &'s StructProperty>>(
