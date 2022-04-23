@@ -20,7 +20,7 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
 
     crate::postgres_utils::generate_date_time_reading(
         result,
-        fields.iter().filter(|itm| !itm.is_key()),
+        fields.iter().filter(|itm| itm.is_key()),
     );
     result.push_str(");\n");
 
