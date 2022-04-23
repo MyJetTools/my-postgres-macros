@@ -1,8 +1,6 @@
 use crate::reflection::StructProperty;
 
-pub fn generate_single_record_reading(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("let row = rows.get(0)?;\n");
-
+pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
     for prop in fields {
         if prop.ty.is_date_time() {
             result.push_str("let dt: DateTime<Utc> = ");
@@ -30,7 +28,7 @@ pub fn generate_single_record_reading(result: &mut String, fields: &[StructPrope
         result.push_str(",\n");
     }
 
-    result.push_str("}.into()\n");
+    result.push_str("}\n");
 }
 
 fn generate_read_db_row_field(result: &mut String, prop: &StructProperty) {

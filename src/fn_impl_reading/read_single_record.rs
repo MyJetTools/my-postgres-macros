@@ -12,9 +12,14 @@ pub fn generate_read_single_row(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str("impl ");
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
-    result.push_str("pub fn read_single_row(rows: &[tokio_postgres::Row])->Option<Self>{");
-    super::generate_single_record_reading::generate_single_record_reading(&mut result, &fields);
+
+    result.push_str("pub fn from_db_row(row: &tokio_postgres::Row) -> Self {");
+    super::fn_from_db_row::fn_from_db_row(&mut result, &fields);
     result.push_str("}\n");
+
+    result.push_str(super::functions::QUERY_SINGLE_ROW);
+    result.push_str(super::functions::QUERY_ROWS);
+
     result.push_str("}\n");
 
     result.parse().unwrap()

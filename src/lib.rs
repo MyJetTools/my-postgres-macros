@@ -6,7 +6,7 @@ mod reflection;
 
 use syn;
 
-#[proc_macro_derive(PostgresModel, attributes(db_field_name,))]
+#[proc_macro_derive(PostgresSelectModel, attributes(db_field_name,))]
 pub fn my_postgres_read_single_row(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_reading::generate_read_single_row(&ast)
