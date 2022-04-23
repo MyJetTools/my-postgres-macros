@@ -43,7 +43,7 @@ fn generate_fields_to_insert(result: &mut String, fields: &[StructProperty]) {
         }
     }
 
-    result.push_str(")\");");
+    result.push_str(")");
 }
 
 fn generate_date_time_reading(result: &mut String, fields: &[StructProperty]) {
