@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 
-pub fn generate_read_single_row(ast: &syn::DeriveInput) -> TokenStream {
+pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
 
     let fields = crate::reflection::StructProperty::read(ast);
