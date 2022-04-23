@@ -31,16 +31,17 @@ fn generate_fields_to_insert(result: &mut String, fields: &[StructProperty]) {
     let mut no = 0;
 
     for prop in fields {
-        if !prop.ty.is_date_time() {
+        if prop.ty.is_date_time() {
             result.push_str("'{");
             result.push_str(prop.name.as_str());
             result.push_str("}'");
         } else {
             result.push_str("$");
             result.push_str(no.to_string().as_str());
-            result.push_str(", ");
+
             no += 1;
         }
+        result.push_str(", ");
     }
 
     result.push_str(")");
