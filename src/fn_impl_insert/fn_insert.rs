@@ -61,7 +61,7 @@ fn generate_date_time_reading(result: &mut String, fields: &[StructProperty]) {
 fn generate_fields_as_params(result: &mut String, fields: &[StructProperty]) {
     for prop in fields {
         if !prop.ty.is_date_time() {
-            result.push_str("self.");
+            result.push_str("&self.");
             result.push_str(prop.name.as_str());
             result.push_str(",\n");
         }
