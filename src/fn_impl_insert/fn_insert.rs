@@ -1,11 +1,11 @@
 use crate::reflection::StructProperty;
 
 pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("let sql = format!(\"INSERT INTO {table_name} ");
+    result.push_str("let sql = format!(\"INSERT INTO {__table_name} ");
 
     generate_fields_to_insert(result, fields);
 
-    result.push('"');
+    result.push_str("\", __table_name = table_name");
 
     generate_date_time_reading(result, fields);
     result.push_str(");\n");
