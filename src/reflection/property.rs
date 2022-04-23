@@ -36,10 +36,17 @@ impl StructProperty {
     }
 
     pub fn get_db_field_name(&self) -> &str {
-        if let Some(result) = self.attrs.get("db_field_name") {
-            return result.name.as_str();
+        if let Some(attr) = self.attrs.get("db_field_name") {
+            match attr.get_value("name") {
+                Some(result) => return result,
+                None => panic!("Attribute db_field_name must have a name"),
+            }
         }
 
         self.name.as_str()
+    }
+
+    pub fn is_key(&self) -> bool {
+        self.attrs.get("key").is_some()
     }
 }
