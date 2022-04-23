@@ -4,9 +4,15 @@ pub fn generate_field_names<'s, TIter: Iterator<Item = &'s StructProperty>>(
     result: &mut String,
     properties: TIter,
 ) {
+    let mut first = true;
     for prop in properties {
+        if !first {
+            result.push(',');
+        }
+
         result.push_str(prop.get_db_field_name());
-        result.push_str(", ");
+
+        first = false;
     }
 }
 
@@ -42,19 +48,13 @@ pub fn generate_fields_as_params<'s, TIter: Iterator<Item = &'s StructProperty>>
     result: &mut String,
     fields: TIter,
 ) {
-    let mut first = true;
     for prop in fields {
         if !prop.ty.is_date_time() {
-            if !first {
-                result.push(',');
-            }
             result.push_str("&self.");
             result.push_str(prop.name.as_str());
-            first = false;
+            result.push_str(",\n");
         }
     }
-
-    result.push('\n');
 }
 
 pub fn generate_date_time_reading<'s, TIter: Iterator<Item = &'s StructProperty>>(
