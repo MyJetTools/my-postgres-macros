@@ -39,13 +39,18 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
     result.push_str("Ok(())");
 }
 
-fn generate_where(result: &mut String, fields: &[StructProperty], no: i32) -> i32 {
+fn generate_where(result: &mut String, fields: &[StructProperty], mut no: i32) -> i32 {
+    let mut first = true;
     for prop in fields.iter().filter(|itm| itm.is_key()) {
+        if !first {
+            result.push_str(" AND ");
+        }
+
         result.push_str(prop.get_db_field_name());
         result.push_str(" = ");
-        result.push_str("$");
-        result.push_str(no.to_string().as_str());
-        result.push_str(" AND ");
+        no = crate::postgres_utils::generate_set_value(result, prop, no);
+
+        first = false;
     }
 
     no

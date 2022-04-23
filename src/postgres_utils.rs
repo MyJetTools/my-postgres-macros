@@ -27,18 +27,23 @@ pub fn generate_field_values<'s, TIter: Iterator<Item = &'s StructProperty>>(
             result.push(',');
         }
 
-        if prop.ty.is_date_time() {
-            result.push_str("'{");
-            result.push_str(prop.name.as_str());
-            result.push_str("}'");
-        } else {
-            result.push_str("$");
-            result.push_str(no.to_string().as_str());
-
-            no += 1;
-        }
-
+        no = generate_set_value(result, prop, no);
         first = false;
+    }
+
+    no
+}
+
+pub fn generate_set_value(result: &mut String, prop: &StructProperty, mut no: i32) -> i32 {
+    if prop.ty.is_date_time() {
+        result.push_str("'{");
+        result.push_str(prop.name.as_str());
+        result.push_str("}'");
+    } else {
+        result.push_str("$");
+        result.push_str(no.to_string().as_str());
+
+        no += 1;
     }
 
     no
