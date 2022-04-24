@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use super::{MyAttribute, PropertyType};
 
 pub const ATTR_KEY: &str = "key";
-pub const ATTR_DB_FIELD_NAME: &str = "key";
+pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
 pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
 
 pub struct StructProperty {

@@ -113,7 +113,7 @@ pub fn generte_where_with_ignore<'s, TIter: Iterator<Item = &'s StructProperty>>
         result.push_str(prop.get_db_field_name());
         result.push_str("\");\n");
 
-        result.push_str("sql.push(' = $');\n");
+        result.push_str("sql.push_str(\" = $\");\n");
         result.push_str("sql.push_str(no.to_string().as_str());\n");
         result.push_str("no += 1;\n");
     }
