@@ -40,12 +40,12 @@ pub fn generate_field_names_with_ignore<'s, TIter: Iterator<Item = &'s StructPro
 ) {
     for prop in properties {
         result.push_str("if !first_field{\n");
-        result.push_str(" first_field = false;\n");
+        result.push_str(" first_field = true;\n");
         result.push_str(" sql.push(',')\n");
         result.push_str("}\n");
 
         if prop.has_ignore_if_null_attr() {
-            result.push_str("if ");
+            result.push_str("if self.");
             result.push_str(prop.name.as_str());
             result.push_str(".is_some(){\n");
         }
