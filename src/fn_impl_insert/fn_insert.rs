@@ -1,6 +1,25 @@
 use crate::reflection::StructProperty;
 
 pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
+    if crate::postgres_utils::has_ignore_if_null_attributes(fields.iter()) {
+        fn_insert_with_ignore_fields(result, fields)
+    } else {
+        fn_insert_without_ignore_fields(result, fields)
+    }
+}
+
+fn fn_insert_with_ignore_fields(result: &mut String, fields: &[StructProperty]) {
+    result.push_str("let mut sql = my_postgres_utils::PosrgresInsertBuilder::new();\n");
+
+    crate::postgres_utils::generate_field_names_runtime(
+        result,
+        fields.iter().filter(|itm| !itm.is_key()),
+    );
+
+    crate::postgres_utils::generate_runtime_execution(result);
+}
+
+fn fn_insert_without_ignore_fields(result: &mut String, fields: &[StructProperty]) {
     result.push_str("let sql = format!(\"INSERT INTO {__table_name} ");
 
     generate_fields_to_insert(result, fields);

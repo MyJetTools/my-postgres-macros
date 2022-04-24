@@ -18,13 +18,7 @@ fn fn_update_with_ignore_fields(result: &mut String, fields: &[StructProperty]) 
 
     crate::postgres_utils::generate_where_runtime(result, fields.iter().filter(|itm| itm.is_key()));
 
-    result.push_str("let sql_line = sql.get_sql_line(table_name);");
-
-    result.push_str("let values_data = sql.get_values_data();");
-
-    result.push_str("client.execute(sql_line.as_str(),values_data).await?;\n");
-
-    result.push_str("Ok(())");
+    crate::postgres_utils::generate_runtime_execution(result);
 }
 
 fn fn_update_without_ignore_fields(result: &mut String, fields: &[StructProperty]) {

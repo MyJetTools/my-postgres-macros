@@ -146,3 +146,13 @@ pub fn has_ignore_if_null_attributes<'s, TIter: Iterator<Item = &'s StructProper
 
     false
 }
+
+pub fn generate_runtime_execution(result: &mut String) {
+    result.push_str("let sql_line = sql.get_sql_line(table_name);");
+
+    result.push_str("let values_data = sql.get_values_data();");
+
+    result.push_str("client.execute(sql_line.as_str(),values_data).await?;\n");
+
+    result.push_str("Ok(())");
+}
