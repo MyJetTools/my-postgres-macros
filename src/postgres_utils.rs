@@ -47,8 +47,6 @@ pub fn generate_field_names_with_ignore<'s, TIter: Iterator<Item = &'s StructPro
 
         if prop.ty.is_date_time() {
             result.push_str("sql.append_field_raw(\"");
-
-            result.push_str("\"");
             result.push_str(prop.get_db_field_name());
             result.push_str("\", &");
             result.push_str("self.");
@@ -57,7 +55,6 @@ pub fn generate_field_names_with_ignore<'s, TIter: Iterator<Item = &'s StructPro
         } else {
             result.push_str("sql.append_field(\"");
 
-            result.push_str("\"");
             result.push_str(prop.get_db_field_name());
             result.push_str("\", &");
             result.push_str("self.");
