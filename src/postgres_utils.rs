@@ -64,9 +64,9 @@ pub fn generate_field_values_with_ignore<'s, TIter: Iterator<Item = &'s StructPr
     result: &mut String,
     properties: TIter,
 ) {
-    result.push_str("let mut no = 1;");
+    result.push_str("let mut first_field = false;\n");
     for prop in properties {
-        result.push_str("if !first_field{\n");
+        result.push_str("if !first_field{");
         result.push_str(" first_field = true;\n");
         result.push_str(" sql.push(',')\n");
         result.push_str("}\n");
@@ -94,6 +94,28 @@ pub fn generate_field_values_with_ignore<'s, TIter: Iterator<Item = &'s StructPr
         if prop.has_ignore_if_null_attr() {
             result.push_str("}\n");
         }
+    }
+}
+
+pub fn generte_where_with_ignore<'s, TIter: Iterator<Item = &'s StructProperty>>(
+    result: &mut String,
+    properties: TIter,
+) {
+    result.push_str("let mut first_field = false;\n");
+
+    for prop in properties {
+        result.push_str("if !first_field{");
+        result.push_str(" first_field = true;\n");
+        result.push_str(" sql.push_str(\" AND \")\n");
+        result.push_str("}");
+
+        result.push_str("sql.push_str(\"");
+        result.push_str(prop.get_db_field_name());
+        result.push_str("\");\n");
+
+        result.push_str("sql.push(' = $');\n");
+        result.push_str("sql.push_str(no.to_string().as_str());\n");
+        result.push_str("no += 1;\n");
     }
 }
 
