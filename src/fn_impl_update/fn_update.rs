@@ -11,7 +11,7 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
 fn fn_update_with_ignore_fields(result: &mut String, fields: &[StructProperty]) {
     result.push_str("let mut sql = my_postgres_utils::PosrgresUpdateBuilder::new();\n");
 
-    crate::postgres_utils::generate_where_runtime(
+    crate::postgres_utils::generate_field_names_runtime(
         result,
         fields.iter().filter(|itm| !itm.is_key()),
     );
