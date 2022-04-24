@@ -33,7 +33,7 @@ fn fn_update_with_ignore_fields(result: &mut String, fields: &[StructProperty]) 
         fields.iter().filter(|itm| !itm.is_key()),
     );
 
-    result.push_str("sql.push_str(\") WHERE \"");
+    result.push_str("sql.push_str(\") WHERE (\");");
 
     crate::postgres_utils::generte_where_with_ignore(
         result,
