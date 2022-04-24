@@ -78,10 +78,6 @@ pub fn generate_field_values_with_ignore<'s, TIter: Iterator<Item = &'s StructPr
         }
 
         if prop.ty.is_date_time() {
-            result.push_str("sql.push('$');\n");
-            result.push_str("sql.push_str(no.to_string().as_str());\n");
-            result.push_str("no += 1;\n");
-        } else {
             result.push_str("sql.push_str(\"'");
 
             result.push_str("sql.push_str(self.");
@@ -89,6 +85,10 @@ pub fn generate_field_values_with_ignore<'s, TIter: Iterator<Item = &'s StructPr
             result.push_str(".to_rfc3339()");
 
             result.push_str("'\");\n");
+        } else {
+            result.push_str("sql.push('$');\n");
+            result.push_str("sql.push_str(no.to_string().as_str());\n");
+            result.push_str("no += 1;\n");
         }
 
         if prop.has_ignore_if_null_attr() {
