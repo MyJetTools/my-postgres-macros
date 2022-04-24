@@ -9,48 +9,18 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
 }
 
 fn fn_update_with_ignore_fields(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("let mut sql = String::new();\n");
-
-    result.push_str("sql.push_str(\"UPDATE \");\n");
-
-    result.push_str("sql.push_str(table_name);\n");
-
-    result.push_str("sql.push_str(\" SET (\");\n");
-
-    result.push_str("let mut first_field = false;\n");
+    result.push_str("let mut sql = my_postgres_utils::PosrgresUpdateBuilder::new();\n");
 
     crate::postgres_utils::generate_field_names_with_ignore(
         result,
         fields.iter().filter(|itm| !itm.is_key()),
     );
 
-    result.push_str("sql.push_str(\") = (\");");
+    result.push_str("let sql_line = sql.get_sql_line(table_name);");
 
-    result.push_str("let mut no = 1;");
+    result.push_str("let values_data = sql.get_values_data();");
 
-    crate::postgres_utils::generate_field_values_with_ignore(
-        result,
-        fields.iter().filter(|itm| !itm.is_key()),
-    );
-
-    result.push_str("sql.push_str(\") WHERE \");");
-
-    crate::postgres_utils::generte_where_with_ignore(
-        result,
-        fields.iter().filter(|itm| itm.is_key()),
-    );
-
-    result.push_str("client.execute(sql.as_str(),");
-    result.push_str("&[");
-    crate::postgres_utils::generate_fields_as_params(
-        result,
-        fields.iter().filter(|itm| !itm.is_key()),
-    );
-    crate::postgres_utils::generate_fields_as_params(
-        result,
-        fields.iter().filter(|itm| itm.is_key()),
-    );
-    result.push_str("],).await?;\n");
+    result.push_str("client.execute(sql_line.as_str(),values_data).await?;\n");
 
     result.push_str("Ok(())");
 }
