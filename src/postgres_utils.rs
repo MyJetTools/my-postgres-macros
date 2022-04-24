@@ -34,6 +34,32 @@ pub fn generate_field_values<'s, TIter: Iterator<Item = &'s StructProperty>>(
     no
 }
 
+pub fn generate_field_names_with_ignore<'s, TIter: Iterator<Item = &'s StructProperty>>(
+    result: &mut String,
+    properties: TIter,
+) {
+    for prop in properties {
+        result.push_str("if !first_field{\n");
+        result.push_str(" first_field = false;\n");
+        result.push_str(" sql.push(',')\n");
+        result.push_str("}\n");
+
+        if prop.has_ignore_if_null_attr() {
+            result.push_str("if ");
+            result.push_str(prop.name.as_str());
+            result.push_str(".is_some(){\n");
+        }
+
+        result.push_str("sql.push_str(\"");
+        result.push_str(prop.get_db_field_name());
+        result.push_str("\");\n");
+
+        if prop.has_ignore_if_null_attr() {
+            result.push_str("}\n");
+        }
+    }
+}
+
 pub fn generate_set_value(result: &mut String, prop: &StructProperty, mut no: i32) -> i32 {
     if prop.ty.is_date_time() {
         result.push_str("'{");
@@ -75,4 +101,16 @@ pub fn generate_date_time_reading<'s, TIter: Iterator<Item = &'s StructProperty>
             result.push_str(".to_rfc3339()");
         }
     }
+}
+
+pub fn has_ignore_if_null_attributes<'s, TIter: Iterator<Item = &'s StructProperty>>(
+    fields: TIter,
+) -> bool {
+    for prop in fields {
+        if prop.has_ignore_if_null_attr() {
+            return true;
+        }
+    }
+
+    false
 }

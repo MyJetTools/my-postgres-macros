@@ -2,6 +2,10 @@ use std::collections::HashMap;
 
 use super::{MyAttribute, PropertyType};
 
+pub const ATTR_KEY: &str = "key";
+pub const ATTR_DB_FIELD_NAME: &str = "key";
+pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
+
 pub struct StructProperty {
     pub name: String,
     pub ty: PropertyType,
@@ -36,7 +40,7 @@ impl StructProperty {
     }
 
     pub fn get_db_field_name(&self) -> &str {
-        if let Some(attr) = self.attrs.get("db_field_name") {
+        if let Some(attr) = self.attrs.get(ATTR_DB_FIELD_NAME) {
             match attr.get_value("name") {
                 Some(result) => return result,
                 None => panic!("Attribute db_field_name must have a name"),
@@ -47,6 +51,10 @@ impl StructProperty {
     }
 
     pub fn is_key(&self) -> bool {
-        self.attrs.get("key").is_some()
+        self.attrs.get(ATTR_KEY).is_some()
+    }
+
+    pub fn has_ignore_if_null_attr(&self) -> bool {
+        self.attrs.get(ATTR_IGNORE_IF_NULL).is_some()
     }
 }
