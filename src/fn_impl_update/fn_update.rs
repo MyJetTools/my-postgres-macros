@@ -25,6 +25,12 @@ fn fn_update_with_ignore_fields(result: &mut String, fields: &[StructProperty]) 
     );
 
     result.push_str("sql.push_str(\") = (\");");
+    result.push_str("let mut first_field = false;\n");
+
+    crate::postgres_utils::generate_field_values_with_ignore(
+        result,
+        fields.iter().filter(|itm| !itm.is_key()),
+    );
 
     result.push_str("sql.push_str(\") WHERE \"");
 

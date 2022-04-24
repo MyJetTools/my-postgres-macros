@@ -60,6 +60,43 @@ pub fn generate_field_names_with_ignore<'s, TIter: Iterator<Item = &'s StructPro
     }
 }
 
+pub fn generate_field_values_with_ignore<'s, TIter: Iterator<Item = &'s StructProperty>>(
+    result: &mut String,
+    properties: TIter,
+) {
+    result.push_str("let mut no = 1;");
+    for prop in properties {
+        result.push_str("if !first_field{\n");
+        result.push_str(" first_field = true;\n");
+        result.push_str(" sql.push(',')\n");
+        result.push_str("}\n");
+
+        if prop.has_ignore_if_null_attr() {
+            result.push_str("if self.");
+            result.push_str(prop.name.as_str());
+            result.push_str(".is_some(){\n");
+        }
+
+        if prop.ty.is_date_time() {
+            result.push_str("sql.push('$');\n");
+            result.push_str("sql.push_str(no.to_string().as_str());\n");
+            result.push_str("no += 1;\n");
+        } else {
+            result.push_str("sql.push_str(\"'");
+
+            result.push_str("sql.push_str(self.");
+            result.push_str(prop.name.as_str());
+            result.push_str(".to_rfc3339()");
+
+            result.push_str("'\");\n");
+        }
+
+        if prop.has_ignore_if_null_attr() {
+            result.push_str("}\n");
+        }
+    }
+}
+
 pub fn generate_set_value(result: &mut String, prop: &StructProperty, mut no: i32) -> i32 {
     if prop.ty.is_date_time() {
         result.push_str("'{");
