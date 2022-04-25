@@ -18,7 +18,7 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
 
             if !property.is_key() {
                 insert_or_update
-                    .add_insert_field_value(property.get_db_field_name(), property.name.as_str());
+                    .add_update_field_value(property.get_db_field_name(), property.name.as_str());
             }
         }
     }
