@@ -6,14 +6,14 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
     let mut sql_params = ", __table_name = table_name, __pk_name = pk_name".to_string();
 
     for property in fields {
-        generate_date_time_reading(result, property);
-
-        sql_params.push_str(", _");
-        sql_params.push_str(property.name.as_str());
-        sql_params.push_str(" = ");
-        sql_params.push_str(property.name.as_str());
-
         if property.ty.is_date_time() {
+            generate_date_time_reading(result, property);
+
+            sql_params.push_str(", _");
+            sql_params.push_str(property.name.as_str());
+            sql_params.push_str(" = ");
+            sql_params.push_str(property.name.as_str());
+
             insert_or_update
                 .add_insert_field_with_raw_value(property.get_db_field_name(), "DateTime");
 
