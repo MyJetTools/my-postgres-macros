@@ -37,9 +37,14 @@ this macros generates the method which we can use
 
 let client: tokio_postgres::Client = ...
 
-let db_model = KeyValueDto
-        db_model
-            .insert_db_entity(&client, TABLE_NAME)
+let insert_entity = KeyValueDto {
+            client_id,
+            key,
+            value,
+        };
+
+            
+insert_entity.insert_db_entity(self.client.as_ref(), TABLE_NAME)
             .await?;
             
 ```
@@ -69,13 +74,40 @@ which generates the code possible to use:
 
 let client: tokio_postgres::Client = ...
 
-let db_model = KeyValueDto
-        db_model
-            .update_db_entity(&client, TABLE_NAME)
+let update_entity = KeyValueDto {
+            client_id,
+            key,
+            value,
+        };
+
+update_entity
+            .update_db_entity(self.client.as_ref(), TABLE_NAME)
             .await?;
             
 ```
 
+### Insert or Update use-case
+Primary Key - is not participated in update operations as fields to update but used to identify the record we want to update;
+
+To mark primary keys attr #[primary_key] is used
+
+as well requred the name of PartitionKey
+
+```rust
+
+let client: tokio_postgres::Client = ...
+
+let insert_or_update_entity = KeyValueDto {
+            client_id,
+            key,
+            value,
+        };
+
+insert_or_update_entity
+            .insert_or_update_db_entity(self.client.as_ref(), TABLE_NAME, PK_NAME)
+            .await?;
+            
+```
 
 
 ### Select use-case
