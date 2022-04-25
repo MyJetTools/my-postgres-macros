@@ -62,7 +62,7 @@ pub struct KeyValueDto {
 }
 ```
 
-which generates the code
+which generates the code possible to use:
 
 
 ```rust
