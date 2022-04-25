@@ -43,3 +43,35 @@ let db_model = KeyValueDto
             .await?;
             
 ```
+
+
+### Update use-case
+
+Primary Key - is not participated in update operations as fields to update but used to identify the record we want to update;
+
+To mark primary keys attr #[primary_key] is used
+
+```rust
+#[derive(PostgresUpdateModel)]
+pub struct KeyValueDto {
+    #[primary_key]
+    pub client_id: String,
+    #[primary_key]
+    pub key: String,
+    pub value: String,
+}
+```
+
+which generates the code
+
+
+```rust
+
+let client: tokio_postgres::Client = ...
+
+let db_model = KeyValueDto
+        db_model
+            .update_db_entity(&client, TABLE_NAME)
+            .await?;
+            
+```
