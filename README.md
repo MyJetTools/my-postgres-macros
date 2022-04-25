@@ -75,3 +75,40 @@ let db_model = KeyValueDto
             .await?;
             
 ```
+
+
+
+### Select use-case
+
+works as simple SQL Request with Fields
+
+#### to get single row
+
+```rust
+
+let client: tokio_postgres::Client = ...
+
+let query = format!("SELECT * FROM {TABLE_NAME} WHERE client_id=$1 AND key=$2");
+let result = KeyValueDto::query_single_row(
+            self.client.as_ref(),
+            query.as_str(),
+            &[&client_id, &key],
+        )
+        .await?;
+            
+```
+
+
+#### to get rows
+
+```rust
+
+let client: tokio_postgres::Client = ...
+
+let query = format!("SELECT * FROM {TABLE_NAME} WHERE client_id=$1");
+let result =
+            KeyValueDto::query_rows(self.client.as_ref(), query.as_str(), &[&client_id])
+                .await?;
+            
+```
+
