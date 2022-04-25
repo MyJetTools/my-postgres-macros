@@ -19,28 +19,26 @@ impl InsertOrUpdateGenerator {
         }
     }
 
-    pub fn add_insert_field_value(&mut self, field_name: &str, value: &str) {
+    pub fn add_insert_field_value(&mut self, field_name: &str, struct_name: &str) {
         self.insert_fields.add(field_name);
-        let no = self.numbered_params.add_or_get(field_name);
+        let no = self.numbered_params.add_or_get(struct_name);
         self.insert_values.add(&format!("${}", no));
     }
 
     pub fn add_insert_field_with_raw_value(&mut self, field_name: &str, value: &str) {
         self.insert_fields.add(field_name);
-        let no = self.numbered_params.add_or_get(field_name);
         self.insert_values.add(value);
     }
 
-    pub fn add_update_field_value(&mut self, field_name: &str, value: &str) {
-        self.insert_fields.add(field_name);
-        let no = self.numbered_params.add_or_get(field_name);
-        self.insert_values.add(&format!("${}", no));
+    pub fn add_update_field_value(&mut self, field_name: &str, struct_name: &str) {
+        self.update_fields.add(field_name);
+        let no = self.numbered_params.add_or_get(struct_name);
+        self.update_values.add(&format!("${}", no));
     }
 
     pub fn add_update_field_with_raw_value(&mut self, field_name: &str, value: &str) {
-        self.insert_fields.add(field_name);
-        let no = self.numbered_params.add_or_get(field_name);
-        self.insert_values.add(value);
+        self.update_fields.add(field_name);
+        self.update_values.add(value);
     }
 
     pub fn generate_sql(&self, result: &mut String, table_name: &str, pk_name: &str) {
