@@ -24,7 +24,10 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
     crate::fn_impl_insert::generate(&ast)
 }
 
-#[proc_macro_derive(PostgresUpdateModel, attributes(db_field_name, key, ignore_if_null))]
+#[proc_macro_derive(
+    PostgresUpdateModel,
+    attributes(db_field_name, primary_key, ignore_if_null)
+)]
 pub fn postgres_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_update::generate(&ast)
@@ -32,7 +35,7 @@ pub fn postgres_update_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     PostgresInsertOrUpdateModel,
-    attributes(db_field_name, key, ignore_if_null)
+    attributes(db_field_name, primary_key, ignore_if_null)
 )]
 pub fn postgres_insert_or_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

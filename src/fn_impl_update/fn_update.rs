@@ -13,10 +13,13 @@ fn fn_update_with_ignore_fields(result: &mut String, fields: &[StructProperty]) 
 
     crate::postgres_utils::generate_field_names_runtime(
         result,
-        fields.iter().filter(|itm| !itm.is_key()),
+        fields.iter().filter(|itm| !itm.is_primary_key()),
     );
 
-    crate::postgres_utils::generate_where_runtime(result, fields.iter().filter(|itm| itm.is_key()));
+    crate::postgres_utils::generate_where_runtime(
+        result,
+        fields.iter().filter(|itm| itm.is_primary_key()),
+    );
 
     crate::postgres_utils::generate_runtime_execution(result);
 }
@@ -24,13 +27,16 @@ fn fn_update_with_ignore_fields(result: &mut String, fields: &[StructProperty]) 
 fn fn_update_without_ignore_fields(result: &mut String, fields: &[StructProperty]) {
     result.push_str("let sql = format!(\"UPDATE {__table_name} SET (");
 
-    crate::postgres_utils::generate_field_names(result, fields.iter().filter(|itm| !itm.is_key()));
+    crate::postgres_utils::generate_field_names(
+        result,
+        fields.iter().filter(|itm| !itm.is_primary_key()),
+    );
 
     result.push_str(") = (");
 
     let no = crate::postgres_utils::generate_field_values(
         result,
-        fields.iter().filter(|itm| !itm.is_key()),
+        fields.iter().filter(|itm| !itm.is_primary_key()),
     );
 
     result.push_str(") WHERE ");
@@ -41,7 +47,7 @@ fn fn_update_without_ignore_fields(result: &mut String, fields: &[StructProperty
 
     crate::postgres_utils::generate_date_time_reading(
         result,
-        fields.iter().filter(|itm| itm.is_key()),
+        fields.iter().filter(|itm| itm.is_primary_key()),
     );
     result.push_str(");\n");
 
@@ -49,11 +55,11 @@ fn fn_update_without_ignore_fields(result: &mut String, fields: &[StructProperty
     result.push_str("&[");
     crate::postgres_utils::generate_fields_as_params(
         result,
-        fields.iter().filter(|itm| !itm.is_key()),
+        fields.iter().filter(|itm| !itm.is_primary_key()),
     );
     crate::postgres_utils::generate_fields_as_params(
         result,
-        fields.iter().filter(|itm| itm.is_key()),
+        fields.iter().filter(|itm| itm.is_primary_key()),
     );
     result.push_str("],).await?;\n");
 
@@ -62,7 +68,7 @@ fn fn_update_without_ignore_fields(result: &mut String, fields: &[StructProperty
 
 fn generate_where(result: &mut String, fields: &[StructProperty], mut no: i32) -> i32 {
     let mut first = true;
-    for prop in fields.iter().filter(|itm| itm.is_key()) {
+    for prop in fields.iter().filter(|itm| itm.is_primary_key()) {
         if !first {
             result.push_str(" AND ");
         }

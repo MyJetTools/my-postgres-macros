@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::{MyAttribute, PropertyType};
 
-pub const ATTR_KEY: &str = "key";
+pub const ATTR_PRIMARY_KEY: &str = "primary_key";
 pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
 pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
 
@@ -50,8 +50,8 @@ impl StructProperty {
         self.name.as_str()
     }
 
-    pub fn is_key(&self) -> bool {
-        self.attrs.get(ATTR_KEY).is_some()
+    pub fn is_primary_key(&self) -> bool {
+        self.attrs.get(ATTR_PRIMARY_KEY).is_some()
     }
 
     pub fn has_ignore_if_null_attr(&self) -> bool {

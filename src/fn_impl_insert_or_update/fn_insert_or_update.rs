@@ -12,7 +12,7 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
             insert_or_update
                 .add_insert_field_with_raw_value(property.get_db_field_name(), set_value.as_str());
 
-            if !property.is_key() {
+            if !property.is_primary_key() {
                 insert_or_update.add_update_field_with_raw_value(
                     property.get_db_field_name(),
                     set_value.as_str(),
@@ -22,7 +22,7 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
             insert_or_update
                 .add_insert_field_value(property.get_db_field_name(), property.name.as_str());
 
-            if !property.is_key() {
+            if !property.is_primary_key() {
                 insert_or_update
                     .add_update_field_value(property.get_db_field_name(), property.name.as_str());
             }

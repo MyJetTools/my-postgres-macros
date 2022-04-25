@@ -13,7 +13,7 @@ fn fn_insert_with_ignore_fields(result: &mut String, fields: &[StructProperty]) 
 
     crate::postgres_utils::generate_field_names_runtime(
         result,
-        fields.iter().filter(|itm| !itm.is_key()),
+        fields.iter().filter(|itm| !itm.is_primary_key()),
     );
 
     crate::postgres_utils::generate_runtime_execution(result);
