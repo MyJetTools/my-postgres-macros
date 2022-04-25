@@ -7,19 +7,16 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
 
     for property in fields {
         if property.ty.is_date_time() {
-            generate_date_time_reading(result, property);
-
-            sql_params.push_str(", _");
-            sql_params.push_str(property.name.as_str());
-            sql_params.push_str(" = ");
-            sql_params.push_str(property.name.as_str());
+            let set_value = generate_date_time_reading(result, &mut sql_params, property);
 
             insert_or_update
-                .add_insert_field_with_raw_value(property.get_db_field_name(), "DateTime");
+                .add_insert_field_with_raw_value(property.get_db_field_name(), set_value.as_str());
 
             if !property.is_key() {
-                insert_or_update
-                    .add_update_field_with_raw_value(property.get_db_field_name(), "DateTime");
+                insert_or_update.add_update_field_with_raw_value(
+                    property.get_db_field_name(),
+                    set_value.as_str(),
+                );
             }
         } else {
             insert_or_update
@@ -56,10 +53,21 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
     result.push_str("Ok(())");
 }
 
-fn generate_date_time_reading(result: &mut String, property: &StructProperty) {
-    result.push_str("let _");
+fn generate_date_time_reading(
+    result: &mut String,
+    sql_params: &mut String,
+    property: &StructProperty,
+) -> String {
+    result.push_str("let ");
     result.push_str(property.name.as_str());
     result.push_str(" = self.");
     result.push_str(property.name.as_str());
     result.push_str(".to_rfc3339();");
+
+    sql_params.push_str(", ");
+    sql_params.push_str(property.name.as_str());
+    sql_params.push_str(" = ");
+    sql_params.push_str(property.name.as_str());
+
+    format!("{{{}}}", property.name)
 }
