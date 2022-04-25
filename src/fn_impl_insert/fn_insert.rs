@@ -37,7 +37,7 @@ fn fn_insert_without_ignore_fields(result: &mut String, fields: &[StructProperty
     result.push_str("Ok(())");
 }
 
-fn generate_fields_to_insert(result: &mut String, fields: &[StructProperty]) {
+pub fn generate_fields_to_insert(result: &mut String, fields: &[StructProperty]) {
     result.push_str("(");
 
     crate::postgres_utils::generate_field_names(result, fields.iter());
