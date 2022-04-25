@@ -58,4 +58,8 @@ impl InsertOrUpdateGenerator {
         result.push_str(self.update_values.as_str());
         result.push_str(")");
     }
+
+    pub fn get_numbred_fields<'s>(&'s self) -> impl Iterator<Item = &'s String> {
+        self.numbered_params.params.iter().map(|s| s)
+    }
 }

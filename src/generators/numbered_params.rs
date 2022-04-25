@@ -1,5 +1,5 @@
 pub struct NumberedParams {
-    params: Vec<String>,
+    pub params: Vec<String>,
 }
 
 impl NumberedParams {
