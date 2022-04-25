@@ -37,6 +37,9 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
     insert_or_update.generate_sql(result, "{__table_name}", "{__pk_name}");
 
     result.push_str("\"");
+
+    result.push_str(sql_params.as_str());
+
     result.push_str(");\n");
 
     result.push_str("client.execute(sql.as_str(),");
