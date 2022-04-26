@@ -32,5 +32,5 @@ pub fn impl_bulk_insert(result: &mut String, fields: &[StructProperty]) {
     }
     result.push_str("}");
 
-    crate::postgres_utils::generate_runtime_execution(result);
+    crate::postgres_utils::generate_runtime_execution(result, fields);
 }

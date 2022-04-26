@@ -57,4 +57,8 @@ impl StructProperty {
     pub fn has_ignore_if_null_attr(&self) -> bool {
         self.attrs.get(ATTR_IGNORE_IF_NULL).is_some()
     }
+
+    pub fn is_debug(&self) -> bool {
+        self.attrs.get("debug_sql").is_some()
+    }
 }

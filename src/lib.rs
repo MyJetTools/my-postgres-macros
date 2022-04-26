@@ -14,13 +14,16 @@ mod reflection;
 
 use syn;
 
-#[proc_macro_derive(PostgresSelectModel, attributes(db_field_name))]
+#[proc_macro_derive(PostgresSelectModel, attributes(db_field_name, debug_sql))]
 pub fn postgres_select_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_reading::generate(&ast)
 }
 
-#[proc_macro_derive(PostgresInsertModel, attributes(db_field_name, ignore_if_null))]
+#[proc_macro_derive(
+    PostgresInsertModel,
+    attributes(db_field_name, ignore_if_null, debug_sql)
+)]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_insert::generate(&ast)
@@ -28,7 +31,7 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     PostgresUpdateModel,
-    attributes(db_field_name, primary_key, ignore_if_null)
+    attributes(db_field_name, primary_key, ignore_if_null, debug_sql)
 )]
 pub fn postgres_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -37,7 +40,7 @@ pub fn postgres_update_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     PostgresInsertOrUpdateModel,
-    attributes(db_field_name, primary_key, ignore_if_null)
+    attributes(db_field_name, primary_key, ignore_if_null, debug_sql)
 )]
 pub fn postgres_insert_or_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -46,7 +49,7 @@ pub fn postgres_insert_or_update_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     PostgresBulkInsertModel,
-    attributes(db_field_name, primary_key, ignore_if_null)
+    attributes(db_field_name, primary_key, ignore_if_null, debug_sql)
 )]
 pub fn postgres_bulk_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -55,7 +58,7 @@ pub fn postgres_bulk_insert_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     PostgresBulkInsertOrUpdateModel,
-    attributes(db_field_name, primary_key, ignore_if_null)
+    attributes(db_field_name, primary_key, ignore_if_null, debug_sql)
 )]
 pub fn postgres_bulk_insert_or_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

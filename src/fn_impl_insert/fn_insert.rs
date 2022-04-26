@@ -16,7 +16,7 @@ fn fn_insert_with_ignore_fields(result: &mut String, fields: &[StructProperty]) 
         fields.iter().filter(|itm| !itm.is_primary_key()),
     );
 
-    crate::postgres_utils::generate_runtime_execution(result);
+    crate::postgres_utils::generate_runtime_execution(result, fields);
 }
 
 fn fn_insert_without_ignore_fields(result: &mut String, fields: &[StructProperty]) {

@@ -20,6 +20,12 @@ pub fn fn_bulk_insert_or_update(result: &mut String, fields: &[StructProperty]) 
 
     result.push_str("}");
 
+    for field in fields {
+        if field.is_debug() {
+            result.push_str("println!(\"{}\", sql);");
+        }
+    }
+
     result.push_str("client.execute(sql.as_str(),&Vec::new()).await?;\n");
 
     result.push_str("Ok(())");
