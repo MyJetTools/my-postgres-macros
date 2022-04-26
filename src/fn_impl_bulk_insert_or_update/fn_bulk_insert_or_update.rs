@@ -13,7 +13,9 @@ pub fn fn_bulk_insert_or_update(result: &mut String, fields: &[StructProperty]) 
         read_value(result, property);
     }
 
-    result.push_str("sql.push_str(sql.get_sql_line(table_name, pk_name).as_str());");
+    result
+        .push_str("sql.push_str(sql_insert_or_update.get_sql_line(table_name, pk_name).as_str());");
+
     result.push_str("sql.push(';');");
 
     result.push_str("}");
