@@ -1,7 +1,8 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
 
-mod fn_impl_bukl_insert;
+mod fn_impl_bulk_insert;
+mod fn_impl_bulk_insert_or_update;
 mod fn_impl_insert;
 mod fn_impl_insert_or_update;
 mod fn_impl_reading;
@@ -49,5 +50,14 @@ pub fn postgres_insert_or_update_model(input: TokenStream) -> TokenStream {
 )]
 pub fn postgres_bulk_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::fn_impl_bukl_insert::generate(&ast)
+    crate::fn_impl_bulk_insert::generate(&ast)
+}
+
+#[proc_macro_derive(
+    PostgresBulkInsertOrUpdateModel,
+    attributes(db_field_name, primary_key, ignore_if_null)
+)]
+pub fn postgres_bulk_insert_or_update_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::fn_impl_bulk_insert_or_update::generate(&ast)
 }
