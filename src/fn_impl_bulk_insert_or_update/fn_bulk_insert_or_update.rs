@@ -96,7 +96,7 @@ fn add_str(result: &mut String, property: &StructProperty, as_str: &str) {
     result.push_str("sql_insert_or_update.append_insert_field_raw_no_quotes(\"");
     result.push_str(property.get_db_field_name());
     result.push_str("\", ");
-    result.push_str("db_entity");
+    result.push_str("db_entity.");
     result.push_str(property.name.as_str());
     result.push_str(as_str);
     result.push_str(");");
