@@ -11,11 +11,9 @@ pub fn fn_bulk_insert_or_update(result: &mut String, fields: &[StructProperty]) 
 
     for property in fields {
         read_value(result, property);
-
-        result.push_str("let sql_line = sql.get_sql_line(table_name, pk_name);\n");
     }
 
-    result.push_str("sql.push_str(sql_line.as_str());");
+    result.push_str("sql.push_str(sql.get_sql_line(table_name, pk_name).as_str());");
     result.push_str("sql.push(';');");
 
     result.push_str("}");
