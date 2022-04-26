@@ -2,7 +2,6 @@ use crate::reflection::StructProperty;
 
 pub fn fn_bulk_insert_or_update(result: &mut String, fields: &[StructProperty]) {
     result.push_str("let mut sql = String::new();");
-    result.push_str("let mut values_data = Vec::new();");
 
     result.push_str("for db_entity in entities {");
 
@@ -21,7 +20,7 @@ pub fn fn_bulk_insert_or_update(result: &mut String, fields: &[StructProperty]) 
 
     result.push_str("}");
 
-    result.push_str("client.execute(sql,values_data).await?;\n");
+    result.push_str("client.execute(sql.as_str(),&Vec::new()).await?;\n");
 
     result.push_str("Ok(())");
 }
