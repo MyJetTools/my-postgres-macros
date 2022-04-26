@@ -14,11 +14,19 @@ pub fn impl_bulk_insert(result: &mut String, fields: &[StructProperty]) {
     for property in fields {
         if property.ty.is_date_time() {
             result.push_str(
-                format!("sql.append_value_raw(self.{}.to_rfc3339());", property.name).as_str(),
+                format!(
+                    "sql.append_value_raw(&db_entity.{}.to_rfc3339());",
+                    property.name
+                )
+                .as_str(),
             );
         } else {
             result.push_str(
-                format!("sql.append_value(self.{});", property.get_db_field_name()).as_str(),
+                format!(
+                    "sql.append_value(&db_entity.{});",
+                    property.get_db_field_name()
+                )
+                .as_str(),
             );
         }
     }
