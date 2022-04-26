@@ -60,9 +60,9 @@ fn generate_date_time_reading(
 ) -> String {
     result.push_str("let ");
     result.push_str(property.name.as_str());
-    result.push_str(" = self.");
-    result.push_str(property.name.as_str());
-    result.push_str(".to_rfc3339();");
+    result.push_str(" = ");
+
+    crate::postgres_utils::generate_reading_value_from_model_field(result, property);
 
     sql_params.push_str(", ");
     sql_params.push_str(property.name.as_str());
