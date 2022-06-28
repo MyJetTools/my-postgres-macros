@@ -208,6 +208,8 @@ pub fn read_value(result: &mut String, property: &StructProperty) {
         }
         crate::reflection::PropertyType::OptionOf(_) => {
             result.push_str("String(sql_value");
+            result.push_str(");");
+            return;
         }
         crate::reflection::PropertyType::VecOf(_) => {
             panic!("Vec not supported");
