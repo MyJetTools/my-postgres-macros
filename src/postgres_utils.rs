@@ -49,7 +49,7 @@ pub fn generate_field_names_runtime<'s, TIter: Iterator<Item = &'s StructPropert
 
         result.push_str("sql.append_field(\"");
         result.push_str(prop.get_db_field_name());
-        result.push_str("\", sql_value\");");
+        result.push_str("\", sql_value);");
 
         if prop.has_ignore_if_null_attr() {
             result.push_str("}\n");
