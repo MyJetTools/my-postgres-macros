@@ -62,22 +62,11 @@ pub fn generate_where_runtime<'s, TIter: Iterator<Item = &'s StructProperty>>(
     properties: TIter,
 ) {
     for prop in properties {
-        if prop.ty.is_date_time() {
-            result.push_str("sql.append_where_raw(\"");
-            result.push_str(prop.get_db_field_name());
-            result.push_str("\", &");
-            result.push_str("self.");
-            result.push_str(prop.name.as_str());
-            result.push_str("..to_rfc3339().as_str());");
-        } else {
-            result.push_str("sql.append_where(\"");
+        read_value(result, prop);
+        result.push_str("sql.append_where(\"");
 
-            result.push_str(prop.get_db_field_name());
-            result.push_str("\", &");
-            result.push_str("self.");
-            result.push_str(prop.name.as_str());
-            result.push_str(");");
-        }
+        result.push_str(prop.get_db_field_name());
+        result.push_str("\", sql_value);");
     }
 }
 

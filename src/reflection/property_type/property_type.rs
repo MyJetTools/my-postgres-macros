@@ -7,8 +7,6 @@ pub struct PropertyType {
 
 use syn::TypePath;
 
-use super::AsStr;
-
 pub const U8: &str = "u8";
 pub const I8: &str = "i8";
 pub const U16: &str = "u16";
@@ -22,7 +20,6 @@ pub const I_SIZE: &str = "isize";
 pub const BOOL: &str = "bool";
 pub const STRING: &str = "String";
 pub const DATETIME: &str = "DateTimeAsMicroseconds";
-pub const STR: &str = "&str";
 
 pub enum PropertyType {
     U8,
@@ -90,83 +87,8 @@ impl PropertyType {
         }
     }
 
-    pub fn as_str(&self) -> AsStr {
-        match self {
-            PropertyType::U8 => AsStr::create_as_str(U8),
-            PropertyType::I8 => AsStr::create_as_str(I8),
-            PropertyType::U16 => AsStr::create_as_str(U16),
-            PropertyType::I16 => AsStr::create_as_str(I16),
-            PropertyType::U32 => AsStr::create_as_str(U32),
-            PropertyType::I32 => AsStr::create_as_str(I32),
-            PropertyType::U64 => AsStr::create_as_str(U64),
-            PropertyType::I64 => AsStr::create_as_str(I64),
-            PropertyType::USize => AsStr::create_as_str(U_SIZE),
-            PropertyType::ISize => AsStr::create_as_str(I_SIZE),
-            PropertyType::String => AsStr::create_as_str(STRING),
-            PropertyType::Str => AsStr::create_as_str(STR),
-            PropertyType::Bool => AsStr::create_as_str(BOOL),
-            PropertyType::DateTime => AsStr::create_as_str(DATETIME),
-            PropertyType::OptionOf(generic_type) => {
-                AsStr::create_as_string(format!("Option<{}>", generic_type.as_str()))
-            }
-            PropertyType::VecOf(generic_type) => {
-                AsStr::create_as_string(format!("Vec<{}>", generic_type.as_str()))
-            }
-            PropertyType::Struct(name) => AsStr::create_as_str(name.as_str()),
-        }
-    }
-
-    pub fn is_simple_type(&self) -> bool {
-        match self {
-            PropertyType::U8 => true,
-            PropertyType::I8 => true,
-            PropertyType::U16 => true,
-            PropertyType::I16 => true,
-            PropertyType::U32 => true,
-            PropertyType::I32 => true,
-            PropertyType::U64 => true,
-            PropertyType::I64 => true,
-            PropertyType::String => true,
-            PropertyType::Str => false,
-            PropertyType::Bool => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_string(&self) -> bool {
-        if let PropertyType::String = self {
-            return true;
-        }
-
-        false
-    }
-
-    pub fn is_boolean(&self) -> bool {
-        if let PropertyType::Bool = self {
-            return true;
-        }
-
-        false
-    }
-
-    pub fn is_option(&self) -> bool {
-        if let PropertyType::OptionOf(_) = self {
-            return true;
-        }
-
-        false
-    }
-
     pub fn is_date_time(&self) -> bool {
         if let PropertyType::DateTime = self {
-            return true;
-        }
-
-        false
-    }
-
-    pub fn is_u8(&self) -> bool {
-        if let PropertyType::U8 = self {
             return true;
         }
 
