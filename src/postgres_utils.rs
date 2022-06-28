@@ -40,9 +40,9 @@ pub fn generate_field_names_runtime<'s, TIter: Iterator<Item = &'s StructPropert
 ) {
     for prop in properties {
         if prop.has_ignore_if_null_attr() {
-            result.push_str("if self.");
+            result.push_str("if let Some(sql_value)=self.");
             result.push_str(prop.name.as_str());
-            result.push_str(".is_some(){\n");
+            result.push_str("{\n");
         }
 
         read_value(result, prop);
@@ -207,7 +207,7 @@ pub fn read_value(result: &mut String, property: &StructProperty) {
             result.push_str("DateTime(entity.");
         }
         crate::reflection::PropertyType::OptionOf(_) => {
-            result.push_str("String(entity.");
+            result.push_str("String(sql_value");
         }
         crate::reflection::PropertyType::VecOf(_) => {
             panic!("Vec not supported");
