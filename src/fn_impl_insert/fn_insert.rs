@@ -9,7 +9,7 @@ pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
 }
 
 fn fn_insert_with_ignore_fields(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("let mut sql = my_postgres_utils::PosrgresInsertBuilder::new();\n");
+    result.push_str("let mut sql = my_postgres_utils::insert::InsertBuilder::new();\n");
 
     crate::postgres_utils::generate_field_names_runtime(
         result,

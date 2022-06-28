@@ -45,22 +45,11 @@ pub fn generate_field_names_runtime<'s, TIter: Iterator<Item = &'s StructPropert
             result.push_str(".is_some(){\n");
         }
 
-        if prop.ty.is_date_time() {
-            result.push_str("sql.append_field_raw(\"");
-            result.push_str(prop.get_db_field_name());
-            result.push_str("\", &");
-            result.push_str("self.");
-            result.push_str(prop.name.as_str());
-            result.push_str(".to_rfc3339().as_str());");
-        } else {
-            result.push_str("sql.append_field(\"");
+        read_value(result, prop);
 
-            result.push_str(prop.get_db_field_name());
-            result.push_str("\", &");
-            result.push_str("self.");
-            result.push_str(prop.name.as_str());
-            result.push_str(");");
-        }
+        result.push_str("sql.append_field(\"");
+        result.push_str(prop.get_db_field_name());
+        result.push_str("\", sql_value\");");
 
         if prop.has_ignore_if_null_attr() {
             result.push_str("}\n");
