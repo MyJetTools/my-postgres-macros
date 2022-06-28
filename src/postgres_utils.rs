@@ -207,7 +207,7 @@ pub fn read_value(result: &mut String, property: &StructProperty) {
             result.push_str("DateTime(entity.");
         }
         crate::reflection::PropertyType::OptionOf(_) => {
-            panic!("Option not supported");
+            result.push_str("String(entity.");
         }
         crate::reflection::PropertyType::VecOf(_) => {
             panic!("Vec not supported");
