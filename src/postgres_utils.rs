@@ -170,3 +170,65 @@ pub fn generate_reading_value_from_model_field(result: &mut String, property: &S
         result.push_str(".to_rfc3339();");
     }
 }
+
+pub fn read_value(result: &mut String, property: &StructProperty) {
+    result.push_str("let sql_value = my_postgres_utils::SqlValue::");
+
+    match &property.ty {
+        crate::reflection::PropertyType::U8 => {
+            result.push_str("U8(");
+        }
+        crate::reflection::PropertyType::I8 => {
+            result.push_str("I8(");
+        }
+        crate::reflection::PropertyType::U16 => {
+            result.push_str("U16(");
+        }
+        crate::reflection::PropertyType::I16 => {
+            result.push_str("I16(entity.");
+        }
+        crate::reflection::PropertyType::U32 => {
+            result.push_str("U32(entity.");
+        }
+        crate::reflection::PropertyType::I32 => {
+            result.push_str("I32(entity.");
+        }
+        crate::reflection::PropertyType::U64 => {
+            result.push_str("U64(entity.");
+        }
+        crate::reflection::PropertyType::I64 => {
+            result.push_str("I64(entity.");
+        }
+        crate::reflection::PropertyType::USize => {
+            result.push_str("USize(entity.");
+        }
+        crate::reflection::PropertyType::ISize => {
+            result.push_str("ISize(entity.");
+        }
+        crate::reflection::PropertyType::String => {
+            result.push_str("String(entity.");
+        }
+        crate::reflection::PropertyType::Str => {
+            result.push_str("String(entity.");
+        }
+        crate::reflection::PropertyType::Bool => {
+            result.push_str("Bool(entity.");
+        }
+        crate::reflection::PropertyType::DateTime => {
+            result.push_str("DateTime(entity.");
+        }
+        crate::reflection::PropertyType::OptionOf(_) => {
+            panic!("Option not supported");
+        }
+        crate::reflection::PropertyType::VecOf(_) => {
+            panic!("Vec not supported");
+        }
+        crate::reflection::PropertyType::Struct(_) => {
+            panic!("Struct not supported");
+        }
+    }
+
+    result.push_str(property.name.as_str());
+
+    result.push_str(");");
+}
