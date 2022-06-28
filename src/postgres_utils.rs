@@ -137,7 +137,7 @@ pub fn has_ignore_if_null_attributes<'s, TIter: Iterator<Item = &'s StructProper
 }
 
 pub fn generate_runtime_execution(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("let sql_line = sql.get_sql_line(table_name);");
+    result.push_str("let sql_line = sql.build(table_name);");
 
     for field in fields {
         if field.is_debug() {
