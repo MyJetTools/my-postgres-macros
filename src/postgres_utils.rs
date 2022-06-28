@@ -45,7 +45,7 @@ pub fn generate_field_names_runtime<'s, TIter: Iterator<Item = &'s StructPropert
             result.push_str("{\n");
         }
 
-        read_value(result, prop);
+        read_value(result, prop, "self");
 
         result.push_str("sql.append_field(\"");
         result.push_str(prop.get_db_field_name());
@@ -62,7 +62,7 @@ pub fn generate_where_runtime<'s, TIter: Iterator<Item = &'s StructProperty>>(
     properties: TIter,
 ) {
     for prop in properties {
-        read_value(result, prop);
+        read_value(result, prop, "self");
         result.push_str("sql.append_where(\"");
 
         result.push_str(prop.get_db_field_name());
@@ -149,51 +149,79 @@ pub fn generate_reading_value_from_model_field(result: &mut String, property: &S
     }
 }
 
-pub fn read_value(result: &mut String, property: &StructProperty) {
+pub fn read_value(result: &mut String, property: &StructProperty, structure_name: &str) {
     result.push_str("let sql_value = my_postgres_utils::SqlValue::");
 
     match &property.ty {
         crate::reflection::PropertyType::U8 => {
             result.push_str("U8(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::I8 => {
             result.push_str("I8(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::U16 => {
             result.push_str("U16(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::I16 => {
-            result.push_str("I16(entity.");
+            result.push_str("I16(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::U32 => {
-            result.push_str("U32(entity.");
+            result.push_str("U32(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::I32 => {
-            result.push_str("I32(entity.");
+            result.push_str("I32(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::U64 => {
-            result.push_str("U64(entity.");
+            result.push_str("U64(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::I64 => {
-            result.push_str("I64(entity.");
+            result.push_str("I64(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::USize => {
-            result.push_str("USize(entity.");
+            result.push_str("USize(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::ISize => {
-            result.push_str("ISize(entity.");
+            result.push_str("ISize(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::String => {
-            result.push_str("String(entity.");
+            result.push_str("String(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::Str => {
-            result.push_str("String(entity.");
+            result.push_str("String(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::Bool => {
-            result.push_str("Bool(entity.");
+            result.push_str("Bool(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::DateTime => {
-            result.push_str("DateTime(entity.");
+            result.push_str("DateTime(");
+            result.push_str(structure_name);
+            result.push('.');
         }
         crate::reflection::PropertyType::OptionOf(_) => {
             result.push_str("String(sql_value");

@@ -12,7 +12,7 @@ pub fn fn_bulk_insert_or_update(result: &mut String, fields: &[StructProperty]) 
     );
 
     for property in fields {
-        crate::postgres_utils::read_value(result, property);
+        crate::postgres_utils::read_value(result, property, "entity");
         result.push_str(" sql_builder.add_field(\"");
         result.push_str(property.get_db_field_name());
         result.push_str("\", sql_value, ");
