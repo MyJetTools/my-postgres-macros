@@ -223,9 +223,13 @@ pub fn read_value(result: &mut String, property: &StructProperty, structure_name
             result.push_str(structure_name);
             result.push('.');
         }
-        crate::reflection::PropertyType::OptionOf(_) => {
-            result.push_str("String(sql_value");
-            result.push_str(");");
+        crate::reflection::PropertyType::OptionOf(sub_ty) => {
+            if sub_ty.is_date_time() {
+                result.push_str("DateTime(sql_value);");
+            } else {
+                result.push_str("String(sql_value);");
+            }
+
             return;
         }
         crate::reflection::PropertyType::VecOf(_) => {
