@@ -8,9 +8,9 @@ pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
         result.push_str("\", sql_value, ");
 
         if property.is_primary_key() {
-            result.push_str("\", sql_value, true);");
+            result.push_str(" true);");
         } else {
-            result.push_str("\", sql_value, false);");
+            result.push_str(" false);");
         }
     }
 }
