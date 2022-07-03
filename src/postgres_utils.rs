@@ -141,14 +141,6 @@ pub fn generate_runtime_execution(result: &mut String, fields: &[StructProperty]
     result.push_str("Ok(())");
 }
 
-pub fn generate_reading_value_from_model_field(result: &mut String, property: &StructProperty) {
-    result.push_str("self.");
-    result.push_str(property.name.as_str());
-    if property.ty.is_date_time() {
-        result.push_str(".to_rfc3339();");
-    }
-}
-
 pub fn read_value(result: &mut String, property: &StructProperty, structure_name: &str) {
     result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
 
