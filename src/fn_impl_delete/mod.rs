@@ -1,3 +1,3 @@
-mod fn_bulk_delete;
+mod fn_delete;
 mod generate;
 pub use generate::generate;

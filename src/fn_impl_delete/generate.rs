@@ -9,12 +9,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let mut result = String::new();
 
-    result.push_str("impl ");
+    result.push_str("impl my_postgres::DeleteEntity for ");
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("pub async fn bulk_delete(entities: Vec<Self>, client: &tokio_postgres::Client, table_name: &str) -> Result<(), tokio_postgres::Error> {");
-    super::fn_bulk_delete::fn_bulk_delete(&mut result, &fields);
+    result.push_str("pub async fn bulk_delete(&self, sql_builder: &mut my_postgres::code_gens::delete::BulkDeleteBuilder){");
+    super::fn_delete::fn_delete(&mut result, &fields);
     result.push_str("}\n");
 
     result.push_str("}\n");

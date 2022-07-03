@@ -1,9 +1,8 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
 
-mod fn_impl_bulk_delete;
 mod fn_impl_bulk_insert;
-mod fn_impl_bulk_insert_or_update;
+mod fn_impl_delete;
 mod fn_impl_insert;
 mod fn_impl_insert_or_update;
 mod fn_impl_select;
@@ -72,5 +71,5 @@ pub fn postgres_bulk_insert_or_update_model(input: TokenStream) -> TokenStream {
 )]
 pub fn postgres_bulk_delete(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::fn_impl_bulk_delete::generate(&ast)
+    crate::fn_impl_delete::generate(&ast)
 }
