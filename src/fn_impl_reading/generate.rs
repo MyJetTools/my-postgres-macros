@@ -9,16 +9,13 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let mut result = String::new();
 
-    result.push_str("impl ");
+    result.push_str("impl my_postgres::SelectEntity for");
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("pub fn from_db_row(row: &tokio_postgres::Row) -> Self {");
+    result.push_str("fn from_db_row(row: &tokio_postgres::Row) -> Self {");
     super::fn_from_db_row::fn_from_db_row(&mut result, &fields);
     result.push_str("}\n");
-
-    result.push_str(super::functions::QUERY_SINGLE_ROW);
-    result.push_str(super::functions::QUERY_ROWS);
 
     result.push_str("}\n");
 
