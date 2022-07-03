@@ -46,7 +46,7 @@ pub fn postgres_insert_or_update_model(input: TokenStream) -> TokenStream {
     DeleteDbEntity,
     attributes(db_field_name, primary_key, ignore_if_null, debug_sql)
 )]
-pub fn postgres_bulk_delete(input: TokenStream) -> TokenStream {
+pub fn delete_db_entity(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_delete::generate(&ast)
 }
