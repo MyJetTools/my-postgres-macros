@@ -13,7 +13,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("fn populate(&self, sql_builder: &mut my_postgres::code_gens::insert_or_update::InsertOrUpdateBuilder) {");
+    result.push_str("fn populate(self, sql_builder: &mut my_postgres::code_gens::insert_or_update::InsertOrUpdateBuilder) {");
     super::fn_insert_or_update::fn_insert_or_update(&mut result, &fields);
     result.push_str("}\n");
 
