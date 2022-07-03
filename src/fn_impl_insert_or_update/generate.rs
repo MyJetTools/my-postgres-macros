@@ -9,11 +9,11 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let mut result = String::new();
 
-    result.push_str("impl ");
+    result.push_str("impl InsertOrUpdateEntity for ");
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("pub async fn insert_or_update_db_entity(&self, client: &tokio_postgres::Client, table_name: &str, pk_name: &str,) -> Result<(), tokio_postgres::Error> {");
+    result.push_str("pub fn populate(&self, sql_builder: &mut InsertOrUpdateBuilder) {");
     super::fn_insert_or_update::fn_insert_or_update(&mut result, &fields);
     result.push_str("}\n");
 
