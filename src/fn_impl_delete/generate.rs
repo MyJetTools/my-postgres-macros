@@ -13,7 +13,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("pub async fn bulk_delete(&self, sql_builder: &mut my_postgres::code_gens::delete::BulkDeleteBuilder){");
+    result.push_str("async fn bulk_delete(&self, sql_builder: &mut dyn crate::code_gens::delete::DeleteCodeGen){");
     super::fn_delete::fn_delete(&mut result, &fields);
     result.push_str("}\n");
 
