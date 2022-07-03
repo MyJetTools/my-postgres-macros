@@ -150,7 +150,7 @@ pub fn generate_reading_value_from_model_field(result: &mut String, property: &S
 }
 
 pub fn read_value(result: &mut String, property: &StructProperty, structure_name: &str) {
-    result.push_str("let sql_value = my_postgres_utils::SqlValue::");
+    result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
 
     match &property.ty {
         crate::reflection::PropertyType::U8 => {
