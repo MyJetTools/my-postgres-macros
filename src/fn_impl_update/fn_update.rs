@@ -9,13 +9,25 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
             crate::postgres_utils::read_value(result, property, "value");
             result.push_str("sql_builder.append_field(\"");
             result.push_str(&property.name);
-            result.push_str("\", sql_value);\n ");
+            result.push_str("\", sql_value,");
+            if property.is_primary_key() {
+                result.push_str(" true);");
+            } else {
+                result.push_str(" false);");
+            }
+            result.push_str(");");
             result.push_str("}");
         } else {
             crate::postgres_utils::read_value(result, property, "self");
             result.push_str("sql_builder.append_field(\"");
             result.push_str(&property.name);
-            result.push_str("\", sql_value);\n ");
+            result.push_str("\", sql_value,");
+            if property.is_primary_key() {
+                result.push_str(" true);");
+            } else {
+                result.push_str(" false);");
+            }
+            result.push_str(");\n ");
         }
     }
 }
