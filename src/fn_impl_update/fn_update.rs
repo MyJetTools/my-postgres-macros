@@ -15,7 +15,6 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
             } else {
                 result.push_str(" false);");
             }
-            result.push_str(");");
             result.push_str("}");
         } else {
             crate::postgres_utils::read_value(result, property, "self");
@@ -27,7 +26,6 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
             } else {
                 result.push_str(" false);");
             }
-            result.push_str(");\n ");
         }
     }
 }
