@@ -18,6 +18,6 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     );
     super::fn_insert::fn_insert(&mut result, &fields);
     result.push_str("}\n");
-
+    result.push_str("}\n");
     result.parse().unwrap()
 }
