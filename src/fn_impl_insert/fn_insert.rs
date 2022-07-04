@@ -1,47 +1,21 @@
 use crate::reflection::StructProperty;
 
 pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
-    if crate::postgres_utils::has_ignore_if_null_attributes(fields.iter()) {
-        fn_insert_with_ignore_fields(result, fields)
-    } else {
-        fn_insert_without_ignore_fields(result, fields)
+    for property in fields {
+        if property.has_ignore_if_null_attr() {
+            result.push_str("if let Some(value) = &self.");
+            result.push_str(&property.name);
+            result.push_str("{");
+            crate::postgres_utils::read_value(result, property, "value");
+            result.push_str("sql_builder.append_field(\"");
+            result.push_str(&property.name);
+            result.push_str("\", sql_value);\n ");
+            result.push_str("}");
+        } else {
+            crate::postgres_utils::read_value(result, property, "self");
+            result.push_str("sql_builder.append_field(\"");
+            result.push_str(&property.name);
+            result.push_str("\", sql_value);\n ");
+        }
     }
-}
-
-fn fn_insert_with_ignore_fields(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("let mut sql = my_postgres_utils::insert::InsertBuilder::new();\n");
-
-    crate::postgres_utils::generate_field_names_runtime(result, fields.iter());
-
-    crate::postgres_utils::generate_runtime_execution(result, fields);
-}
-
-fn fn_insert_without_ignore_fields(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("let sql = format!(\"INSERT INTO {__table_name} ");
-
-    generate_fields_to_insert(result, fields);
-
-    result.push_str("\", __table_name = table_name");
-
-    crate::postgres_utils::generate_date_time_reading(result, fields.iter());
-    result.push_str(");\n");
-
-    result.push_str("client.execute(sql.as_str(),");
-    result.push_str("&[");
-    crate::postgres_utils::generate_fields_as_params(result, fields.iter());
-    result.push_str("],).await?;\n");
-
-    result.push_str("Ok(())");
-}
-
-pub fn generate_fields_to_insert(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("(");
-
-    crate::postgres_utils::generate_field_names(result, fields.iter());
-
-    result.push_str(") VALUES (");
-
-    crate::postgres_utils::generate_field_values(result, fields.iter());
-
-    result.push_str(")");
 }
