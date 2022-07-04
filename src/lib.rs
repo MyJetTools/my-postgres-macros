@@ -18,7 +18,7 @@ pub fn postgres_select_model(input: TokenStream) -> TokenStream {
     crate::fn_impl_select::generate(&ast)
 }
 
-#[proc_macro_derive(InsertDbEntty, attributes(db_field_name, ignore_if_null, debug_sql))]
+#[proc_macro_derive(InsertDbEntity, attributes(db_field_name, ignore_if_null, debug_sql))]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_insert::generate(&ast)
