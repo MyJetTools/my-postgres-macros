@@ -15,6 +15,8 @@ pub const U32: &str = "u32";
 pub const I32: &str = "i32";
 pub const U64: &str = "u64";
 pub const I64: &str = "i64";
+pub const F32: &str = "f32";
+pub const F64: &str = "f64";
 pub const U_SIZE: &str = "usize";
 pub const I_SIZE: &str = "isize";
 pub const BOOL: &str = "bool";
@@ -30,6 +32,8 @@ pub enum PropertyType {
     I32,
     U64,
     I64,
+    F32,
+    F64,
     USize,
     ISize,
     String,
@@ -76,6 +80,8 @@ impl PropertyType {
             I32 => PropertyType::I32,
             U64 => PropertyType::U64,
             I64 => PropertyType::I64,
+            F32 => PropertyType::F32,
+            F64 => PropertyType::F64,
             U_SIZE => PropertyType::USize,
             I_SIZE => PropertyType::ISize,
             BOOL => PropertyType::Bool,
