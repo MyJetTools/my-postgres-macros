@@ -14,7 +14,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(" {\n");
 
     result.push_str(
-        "fn populate(self, sql_builder: &mut my_postgres::code_gens::insert::InsertCodeGen){",
+        "fn populate(self, sql_builder: &mut dyn my_postgres::code_gens::insert::InsertCodeGen){",
     );
     super::fn_insert::fn_insert(&mut result, &fields);
     result.push_str("}\n");
