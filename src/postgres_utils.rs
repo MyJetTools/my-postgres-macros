@@ -105,5 +105,9 @@ pub fn read_value(result: &mut String, property: &StructProperty, structure_name
 
     result.push_str(property.name.as_str());
 
+    if let crate::reflection::PropertyType::String = &property.ty {
+        result.push_str(".as_str()")
+    }
+
     result.push_str(");");
 }
