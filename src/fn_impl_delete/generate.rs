@@ -14,7 +14,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(" {\n");
 
     result.push_str(
-        "fn populate<'s>(&'s self, sql_builder: &'s mut dyn my_postgres::code_gens::delete::DeleteCodeGen){",
+        "fn populate<'s>(&'s self, sql_builder: &mut dyn my_postgres::code_gens::delete::DeleteCodeGen<'s>){",
     );
     super::fn_delete::fn_delete(&mut result, &fields);
     result.push_str("}\n");
