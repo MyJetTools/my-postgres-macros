@@ -90,7 +90,7 @@ pub fn read_value(result: &mut String, property: &StructProperty, structure_name
             if sub_ty.is_date_time() {
                 result.push_str("DateTime(sql_value);");
             } else {
-                result.push_str("String(sql_value.as_str());");
+                result.push_str("String(sql_value);");
             }
 
             return;
