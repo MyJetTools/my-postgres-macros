@@ -3,6 +3,7 @@ use crate::reflection::StructProperty;
 pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
     for property in fields {
         if property.has_ignore_if_null_attr() || property.ty.is_option() {
+            println!("{}:{:?}", property.name, property.ty);
             if property.ty.is_string() {
                 result.push_str("if let Some(sql_value) = &self.");
             } else {
