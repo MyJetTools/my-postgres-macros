@@ -110,6 +110,14 @@ impl PropertyType {
         false
     }
 
+    pub fn is_option_of_string(&self) -> bool {
+        if let PropertyType::OptionOf(sub_type) = self {
+            return sub_type.is_string();
+        }
+
+        false
+    }
+
     pub fn is_option(&self) -> bool {
         if let PropertyType::OptionOf(_) = self {
             return true;
