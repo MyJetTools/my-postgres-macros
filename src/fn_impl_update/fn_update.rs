@@ -1,10 +1,15 @@
-use crate::reflection::StructProperty;
+use crate::reflection::{PropertyType, StructProperty};
 
 pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
     for property in fields {
-        if property.has_ignore_if_null_attr() {
+        if let PropertyType::OptionOf(sub_ty) = &property.ty {
             result.push_str("if let Some(sql_value) = self.");
             result.push_str(&property.name);
+
+            if sub_ty.is_string() {
+                result.push_str(".as_ref()");
+            }
+
             result.push_str("{");
             crate::postgres_utils::read_value(result, property, "value");
             result.push_str("sql_builder.append_field(\"");
