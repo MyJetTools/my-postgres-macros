@@ -15,13 +15,11 @@ pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
             result.push_str(&property.name);
             result.push_str("{");
 
-            if sub_type.is_string() {
-                crate::postgres_utils::read_value(
-                    result,
-                    sub_type,
-                    ReadingSoruce::Variable("sql_value"),
-                );
-            }
+            crate::postgres_utils::read_value(
+                result,
+                sub_type,
+                ReadingSoruce::Variable("sql_value"),
+            );
 
             result.push_str("sql_builder.append_field(\"");
             result.push_str(&property.name);
