@@ -1,9 +1,14 @@
-use crate::reflection::StructProperty;
+use crate::reflection::PropertyType;
 
-pub fn read_value(result: &mut String, property: &StructProperty, structure_name: &str) {
+pub fn read_value(
+    result: &mut String,
+    property_name: &str,
+    ty: &PropertyType,
+    structure_name: &str,
+) {
     result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
 
-    match &property.ty {
+    match ty {
         crate::reflection::PropertyType::U8 => {
             result.push_str("U8(");
             result.push_str(structure_name);
@@ -103,9 +108,9 @@ pub fn read_value(result: &mut String, property: &StructProperty, structure_name
         }
     }
 
-    result.push_str(property.name.as_str());
+    result.push_str(property_name);
 
-    if property.ty.is_string() {
+    if ty.is_string() {
         result.push_str(".as_str()")
     }
 
