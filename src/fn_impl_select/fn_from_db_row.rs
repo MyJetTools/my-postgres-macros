@@ -33,7 +33,7 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
                     generate_read_db_row_field(result, prop);
                     result.push_str(";\n");
 
-                    result.push_str("if Some(dt)=dt{Some(DateTimeAsMicroseconds::new(dt.timestamp_millis() * 1000))}else{None}},\n");
+                    result.push_str("if let Some(dt)=dt{Some(DateTimeAsMicroseconds::new(dt.timestamp_millis() * 1000))}else{None}},\n");
                     continue;
                 } else {
                     result.push_str(prop.name.as_str());
