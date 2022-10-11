@@ -1,116 +1,201 @@
-use crate::reflection::PropertyType;
+use crate::reflection::{PropertyType, StructProperty};
 
-pub enum ReadingSoruce<'s> {
-    ItSelf(&'s str),
-    Variable(&'s str),
-    ItSelfAsStr(&'s str),
-}
-
-impl<'s> ReadingSoruce<'s> {
-    pub fn populate_reading_from(&self, result: &mut String) {
-        match self {
-            ReadingSoruce::ItSelf(property_name) => {
-                result.push_str("self.");
-                result.push_str(&property_name)
-            }
-            ReadingSoruce::ItSelfAsStr(property_name) => {
-                result.push_str("self.");
-                result.push_str(&property_name);
-                result.push_str(".as_str()");
-            }
-            ReadingSoruce::Variable(name) => result.push_str(name),
-        }
-    }
-}
-
-pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: ReadingSoruce) {
+pub fn read_value(
+    result: &mut String,
+    property: &StructProperty,
+    sub_property: Option<&PropertyType>,
+) {
     result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
+
+    let ty = if let Some(sub_property) = sub_property {
+        sub_property
+    } else {
+        &property.ty
+    };
 
     match ty {
         crate::reflection::PropertyType::U8 => {
             result.push_str("U8(");
-            reading_source.populate_reading_from(result);
+
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
+
             result.push_str(");");
         }
         crate::reflection::PropertyType::I8 => {
             result.push_str("I8(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::U16 => {
             result.push_str("U16(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::I16 => {
             result.push_str("I16(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::U32 => {
             result.push_str("U32(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::I32 => {
             result.push_str("I32(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::U64 => {
             result.push_str("U64(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::I64 => {
             result.push_str("I64(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
 
         crate::reflection::PropertyType::F32 => {
-            result.push_str("F32(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
 
         crate::reflection::PropertyType::F64 => {
             result.push_str("F64(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::USize => {
             result.push_str("USize(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::ISize => {
             result.push_str("ISize(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::String => {
             result.push_str("String(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+                result.push_str(".as_str()");
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::Str => {
             result.push_str("String(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::Bool => {
             result.push_str("Bool(");
-            reading_source.populate_reading_from(result);
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
             result.push_str(");");
         }
         crate::reflection::PropertyType::DateTime => {
-            result.push_str("DateTime(");
-            reading_source.populate_reading_from(result);
-            result.push_str(");");
+            if property.has_timestamp_attr() {
+                result.push_str("DateTime(");
+                if sub_property.is_some() {
+                    result.push_str("sql_value");
+                } else {
+                    result.push_str("self.");
+                    result.push_str(&property.name);
+                }
+                result.push_str(");");
+            } else if property.has_bigint_attr() {
+                result.push_str("DateTimeAsUnixMicroseconds(");
+                if sub_property.is_some() {
+                    result.push_str("sql_value");
+                } else {
+                    result.push_str("self.");
+                    result.push_str(&property.name);
+                }
+                result.push_str(");");
+            } else {
+                panic!(
+                    "Please specify type of datetime (timestamp or bigint) for property {}",
+                    property.name
+                );
+            }
         }
-        crate::reflection::PropertyType::OptionOf(_) => {
-            panic!("Not supported");
+        crate::reflection::PropertyType::OptionOf(sub_ty) => {
+            read_value(result, property, Some(sub_ty.as_ref()));
         }
         crate::reflection::PropertyType::VecOf(_) => {
             panic!("Vec not supported");

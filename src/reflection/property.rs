@@ -4,7 +4,10 @@ use super::{MyAttribute, PropertyType};
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
 pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
-pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
+//pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
+
+pub const ATTR_TIMESTAMP: &str = "timestamp";
+pub const ATTR_BIGINT: &str = "bigint";
 
 pub struct StructProperty {
     pub name: String,
@@ -54,7 +57,17 @@ impl StructProperty {
         self.attrs.get(ATTR_PRIMARY_KEY).is_some()
     }
 
+    pub fn has_timestamp_attr(&self) -> bool {
+        self.attrs.get(ATTR_TIMESTAMP).is_some()
+    }
+
+    pub fn has_bigint_attr(&self) -> bool {
+        self.attrs.get(ATTR_BIGINT).is_some()
+    }
+
+    /*
     pub fn has_ignore_if_null_attr(&self) -> bool {
         self.attrs.get(ATTR_IGNORE_IF_NULL).is_some()
     }
+     */
 }
