@@ -1,104 +1,110 @@
 use crate::reflection::PropertyType;
 
-pub fn read_value(
-    result: &mut String,
-    property_name: &str,
-    ty: &PropertyType,
-    structure_name: &str,
-) {
+pub enum ReadingSoruce<'s> {
+    ItSelf(&'s str),
+    Variable(&'s str),
+}
+
+impl<'s> ReadingSoruce<'s> {
+    pub fn populate_reading_from(&self, result: &mut String) {
+        match self {
+            ReadingSoruce::ItSelf(property_name) => {
+                result.push_str("self.");
+                result.push_str(&property_name)
+            }
+            ReadingSoruce::Variable(name) => result.push_str(name),
+        }
+    }
+}
+
+pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: ReadingSoruce) {
     result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
 
     match ty {
         crate::reflection::PropertyType::U8 => {
             result.push_str("U8(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::I8 => {
             result.push_str("I8(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::U16 => {
             result.push_str("U16(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::I16 => {
             result.push_str("I16(");
-            result.push_str(structure_name);
+            reading_source.populate_reading_from(result);
             result.push('.');
         }
         crate::reflection::PropertyType::U32 => {
             result.push_str("U32(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::I32 => {
             result.push_str("I32(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::U64 => {
             result.push_str("U64(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::I64 => {
             result.push_str("I64(");
-            result.push_str(structure_name);
+            reading_source.populate_reading_from(result);
             result.push('.');
         }
 
         crate::reflection::PropertyType::F32 => {
             result.push_str("F32(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
 
         crate::reflection::PropertyType::F64 => {
             result.push_str("F64(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::USize => {
             result.push_str("USize(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::ISize => {
             result.push_str("ISize(");
-            result.push_str(structure_name);
+            reading_source.populate_reading_from(result);
             result.push('.');
         }
         crate::reflection::PropertyType::String => {
             result.push_str("String(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::Str => {
             result.push_str("String(");
-            result.push_str(structure_name);
+            reading_source.populate_reading_from(result);
             result.push('.');
         }
         crate::reflection::PropertyType::Bool => {
             result.push_str("Bool(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
         crate::reflection::PropertyType::DateTime => {
             result.push_str("DateTime(");
-            result.push_str(structure_name);
-            result.push('.');
+            reading_source.populate_reading_from(result);
+            result.push_str(");");
         }
-        crate::reflection::PropertyType::OptionOf(sub_ty) => {
-            if sub_ty.is_date_time() {
-                result.push_str("DateTime(sql_value);");
-            } else {
-                result.push_str("String(sql_value);");
-            }
-
-            return;
+        crate::reflection::PropertyType::OptionOf(_) => {
+            panic!("Not supported");
         }
         crate::reflection::PropertyType::VecOf(_) => {
             panic!("Vec not supported");
@@ -107,12 +113,4 @@ pub fn read_value(
             panic!("Struct not supported");
         }
     }
-
-    result.push_str(property_name);
-
-    if ty.is_string() {
-        result.push_str(".as_str()")
-    }
-
-    result.push_str(");");
 }

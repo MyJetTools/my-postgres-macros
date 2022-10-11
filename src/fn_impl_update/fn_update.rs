@@ -1,4 +1,7 @@
-use crate::reflection::{PropertyType, StructProperty};
+use crate::{
+    postgres_utils::ReadingSoruce,
+    reflection::{PropertyType, StructProperty},
+};
 
 pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
     for property in fields {
@@ -11,7 +14,11 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
             }
 
             result.push_str("{");
-            crate::postgres_utils::read_value(result, &property.name.as_str(), &sub_ty, "value");
+            crate::postgres_utils::read_value(
+                result,
+                &sub_ty,
+                ReadingSoruce::Variable("sql_value"),
+            );
             result.push_str("sql_builder.append_field(\"");
             result.push_str(&property.name);
             result.push_str("\", sql_value,");
@@ -22,7 +29,11 @@ pub fn fn_update(result: &mut String, fields: &[StructProperty]) {
             }
             result.push_str("}");
         } else {
-            crate::postgres_utils::read_value(result, &property.name, &property.ty, "self");
+            crate::postgres_utils::read_value(
+                result,
+                &property.ty,
+                ReadingSoruce::ItSelf(&property.name),
+            );
             result.push_str("sql_builder.append_field(\"");
             result.push_str(&property.name);
             result.push_str("\", sql_value,");
