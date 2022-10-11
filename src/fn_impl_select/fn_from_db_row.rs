@@ -51,9 +51,15 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
         }
         if let PropertyType::OptionOf(sub_ty) = &prop.ty {
             if sub_ty.is_date_time() {
-                result.push_str(prop.name.as_str());
-                result.push_str(",\n");
-                continue;
+                if prop.has_timestamp_attr() {
+                    result.push_str(prop.name.as_str());
+                    result.push_str(",\n");
+                    continue;
+                } else {
+                    result.push_str("if let Some(value) = ");
+                    generate_read_db_row_field(result, prop);
+                    result.push_str("{Some(DateTimeAsMicroseconds::new(value)}else{None}},");
+                }
             }
         }
         result.push_str(prop.name.as_str());
