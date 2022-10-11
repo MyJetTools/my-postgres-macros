@@ -11,19 +11,16 @@ pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
 
             result.push_str(&property.name);
             result.push_str("{");
+        }
 
-            crate::postgres_utils::read_value(result, property, None);
+        crate::postgres_utils::read_value(result, property, None);
 
-            result.push_str("sql_builder.append_field(\"");
-            result.push_str(&property.name);
-            result.push_str("\", sql_value);\n ");
+        result.push_str("sql_builder.append_field(\"");
+        result.push_str(&property.name);
+        result.push_str("\", sql_value);\n ");
+
+        if property.ty.is_option() {
             result.push_str("}");
-        } else {
-            crate::postgres_utils::read_value(result, property, None);
-
-            result.push_str("sql_builder.append_field(\"");
-            result.push_str(&property.name);
-            result.push_str("\", sql_value);\n ");
         }
     }
 }

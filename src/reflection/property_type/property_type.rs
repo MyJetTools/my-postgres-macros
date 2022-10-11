@@ -109,4 +109,12 @@ impl PropertyType {
 
         false
     }
+
+    pub fn is_option(&self) -> bool {
+        if let PropertyType::OptionOf(_) = self {
+            return true;
+        }
+
+        false
+    }
 }
