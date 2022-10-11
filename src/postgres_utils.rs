@@ -3,6 +3,7 @@ use crate::reflection::PropertyType;
 pub enum ReadingSoruce<'s> {
     ItSelf(&'s str),
     Variable(&'s str),
+    ItSelfAsStr(&'s str),
 }
 
 impl<'s> ReadingSoruce<'s> {
@@ -11,6 +12,11 @@ impl<'s> ReadingSoruce<'s> {
             ReadingSoruce::ItSelf(property_name) => {
                 result.push_str("self.");
                 result.push_str(&property_name)
+            }
+            ReadingSoruce::ItSelfAsStr(property_name) => {
+                result.push_str("self.");
+                result.push_str(&property_name);
+                result.push_str(".as_str()");
             }
             ReadingSoruce::Variable(name) => result.push_str(name),
         }
@@ -91,7 +97,7 @@ pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: Readin
         crate::reflection::PropertyType::Str => {
             result.push_str("String(");
             reading_source.populate_reading_from(result);
-            result.push_str(".as_str());");
+            result.push_str(");");
         }
         crate::reflection::PropertyType::Bool => {
             result.push_str("Bool(");

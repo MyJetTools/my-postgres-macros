@@ -14,21 +14,33 @@ pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
 
             result.push_str(&property.name);
             result.push_str("{");
-            crate::postgres_utils::read_value(
-                result,
-                sub_type,
-                ReadingSoruce::Variable("sql_value"),
-            );
+
+            if sub_type.is_string() {
+                crate::postgres_utils::read_value(
+                    result,
+                    sub_type,
+                    ReadingSoruce::Variable("sql_value"),
+                );
+            }
+
             result.push_str("sql_builder.append_field(\"");
             result.push_str(&property.name);
             result.push_str("\", sql_value);\n ");
             result.push_str("}");
         } else {
-            crate::postgres_utils::read_value(
-                result,
-                &property.ty,
-                ReadingSoruce::ItSelf(&property.name),
-            );
+            if property.ty.is_string() {
+                crate::postgres_utils::read_value(
+                    result,
+                    &property.ty,
+                    ReadingSoruce::ItSelfAsStr(&property.name),
+                );
+            } else {
+                crate::postgres_utils::read_value(
+                    result,
+                    &property.ty,
+                    ReadingSoruce::ItSelf(&property.name),
+                );
+            }
             result.push_str("sql_builder.append_field(\"");
             result.push_str(&property.name);
             result.push_str("\", sql_value);\n ");
