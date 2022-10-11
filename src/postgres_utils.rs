@@ -39,7 +39,7 @@ pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: Readin
         crate::reflection::PropertyType::I16 => {
             result.push_str("I16(");
             reading_source.populate_reading_from(result);
-            result.push('.');
+            result.push_str(");");
         }
         crate::reflection::PropertyType::U32 => {
             result.push_str("U32(");
@@ -59,7 +59,7 @@ pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: Readin
         crate::reflection::PropertyType::I64 => {
             result.push_str("I64(");
             reading_source.populate_reading_from(result);
-            result.push('.');
+            result.push_str(");");
         }
 
         crate::reflection::PropertyType::F32 => {
@@ -81,7 +81,7 @@ pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: Readin
         crate::reflection::PropertyType::ISize => {
             result.push_str("ISize(");
             reading_source.populate_reading_from(result);
-            result.push('.');
+            result.push_str(");");
         }
         crate::reflection::PropertyType::String => {
             result.push_str("String(");
@@ -91,7 +91,7 @@ pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: Readin
         crate::reflection::PropertyType::Str => {
             result.push_str("String(");
             reading_source.populate_reading_from(result);
-            result.push('.');
+            result.push_str(");");
         }
         crate::reflection::PropertyType::Bool => {
             result.push_str("Bool(");
