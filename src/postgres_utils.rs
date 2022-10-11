@@ -91,7 +91,7 @@ pub fn read_value(result: &mut String, ty: &PropertyType, reading_source: Readin
         crate::reflection::PropertyType::Str => {
             result.push_str("String(");
             reading_source.populate_reading_from(result);
-            result.push_str(");");
+            result.push_str(".as_str());");
         }
         crate::reflection::PropertyType::Bool => {
             result.push_str("Bool(");
