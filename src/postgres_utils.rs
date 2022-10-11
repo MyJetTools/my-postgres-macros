@@ -5,11 +5,10 @@ pub fn read_value(
     property: &StructProperty,
     sub_property: Option<&PropertyType>,
 ) {
-    result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
-
     let ty = if let Some(sub_property) = sub_property {
         sub_property
     } else {
+        result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
         &property.ty
     };
 
