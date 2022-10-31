@@ -55,7 +55,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: &str) -> TokenStream {
 
     result.push_str("_ => panic!(\"Invalid value {}\", src)");
 
-    result.push_str("}");
+    result.push_str("}}");
 
     result.push_str("}");
 
