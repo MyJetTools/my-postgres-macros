@@ -41,7 +41,7 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
 
             result.push_str(struct_name);
 
-            result.push_str("::read_from_db(");
+            result.push_str("::from_db_value(");
 
             generate_read_db_row_field(result, prop);
             result.push_str("),");
@@ -78,7 +78,7 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
 
                 result.push_str(struct_name);
 
-                result.push_str("::read_from_db(value))}else{None},");
+                result.push_str("::from_db_value(value))}else{None},");
 
                 continue;
             }

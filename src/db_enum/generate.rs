@@ -37,11 +37,22 @@ pub fn generate(ast: &syn::DeriveInput, type_name: &str) -> TokenStream {
 
     result.push_str("}}");
 
-    result.push_str("fn read_from_db(src: ");
+    result.push_str("fn from_db_value(src: ");
     result.push_str(type_name);
     result.push_str(")->Self {");
 
-    result.push_str("todo!(\"Implement\");");
+    let mut i = 0;
+    for enum_case in enum_cases.as_slice() {
+        result.push_str("match src {");
+
+        result.push_str(i.to_string().as_str());
+        result.push_str(" => ");
+        result.push_str("Self::");
+        result.push_str(enum_case.name.as_str());
+
+        result.push(',');
+        i += 1;
+    }
 
     result.push_str("}");
 
