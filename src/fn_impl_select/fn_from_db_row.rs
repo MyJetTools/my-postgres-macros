@@ -68,7 +68,7 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
                 }
             }
 
-            if let PropertyType::Struct(struct_name) = &prop.ty {
+            if let PropertyType::Struct(struct_name) = sub_ty.as_ref() {
                 result.push_str(prop.name.as_str());
                 result.push_str(": if let Some(value) = ");
 
