@@ -26,6 +26,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: &str) -> TokenStream {
         result.push_str(" => ");
 
         result.push_str(i.to_string().as_str());
+        result.push(',');
         i += 1;
     }
 
