@@ -239,7 +239,14 @@ pub fn read_value(
             panic!("Vec not supported");
         }
         PropertyType::Struct(_) => {
-            panic!("Struct not supported");
+            result.push_str("Struct(");
+            if sub_property.is_some() {
+                result.push_str("sql_value");
+            } else {
+                result.push_str("self.");
+                result.push_str(&property.name);
+            }
+            result.push_str(");");
         }
     }
 }
