@@ -189,7 +189,7 @@ pub fn read_value(
             result.push_str(");");
         }
         PropertyType::String => {
-            result.push_str("String(");
+            result.push_str("Str(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
             } else {
@@ -251,9 +251,24 @@ pub fn read_value(
         PropertyType::VecOf(_) => {
             panic!("Vec not supported");
         }
-        PropertyType::Struct(struct_name) => {
-            result.push_str(struct_name);
-            result.push_str(".to_sql_value();");
+        PropertyType::Struct(_) => {
+            if property.has_json_attr() {
+                if sub_property.is_some() {
+                    result.push_str("sql_value.to_sql_value();");
+                } else {
+                    result.push_str("self.");
+                    result.push_str(property.name.as_str());
+                    result.push_str(");");
+                }
+            } else {
+                if sub_property.is_some() {
+                    result.push_str("sql_value.to_sql_value();");
+                } else {
+                    result.push_str("self.");
+                    result.push_str(property.name.as_str());
+                    result.push_str(".to_sql_value();");
+                }
+            }
         }
     }
 }
