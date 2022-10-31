@@ -1,4 +1,6 @@
-use crate::reflection::StructProperty;
+use types_reader::StructProperty;
+
+use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_delete(result: &mut String, fields: &[StructProperty]) {
     for property in fields {

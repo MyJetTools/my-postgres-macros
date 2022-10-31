@@ -1,4 +1,43 @@
-use crate::reflection::{PropertyType, StructProperty};
+use types_reader::{PropertyType, StructProperty};
+
+pub const ATTR_PRIMARY_KEY: &str = "primary_key";
+pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
+//pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
+
+pub const ATTR_TIMESTAMP: &str = "timestamp";
+pub const ATTR_BIGINT: &str = "bigint";
+
+pub trait PostgresStructPropertyExt {
+    fn is_primary_key(&self) -> bool;
+    fn has_timestamp_attr(&self) -> bool;
+    fn has_bigint_attr(&self) -> bool;
+    fn get_db_field_name(&self) -> &str;
+}
+
+impl PostgresStructPropertyExt for StructProperty {
+    fn is_primary_key(&self) -> bool {
+        self.attrs.has_attr(ATTR_PRIMARY_KEY)
+    }
+
+    fn has_timestamp_attr(&self) -> bool {
+        self.attrs.has_attr(ATTR_TIMESTAMP)
+    }
+
+    fn has_bigint_attr(&self) -> bool {
+        self.attrs.has_attr(ATTR_BIGINT)
+    }
+
+    fn get_db_field_name(&self) -> &str {
+        if let Some(attr) = self.attrs.try_get(ATTR_DB_FIELD_NAME) {
+            match attr.get_as_string("name") {
+                Some(result) => return result,
+                None => panic!("Attribute db_field_name must have a name"),
+            }
+        }
+
+        self.name.as_str()
+    }
+}
 
 pub fn read_value(
     result: &mut String,
@@ -13,7 +52,7 @@ pub fn read_value(
     };
 
     match ty {
-        crate::reflection::PropertyType::U8 => {
+        PropertyType::U8 => {
             result.push_str("U8(");
 
             if sub_property.is_some() {
@@ -25,7 +64,7 @@ pub fn read_value(
 
             result.push_str(");");
         }
-        crate::reflection::PropertyType::I8 => {
+        PropertyType::I8 => {
             result.push_str("I8(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -35,7 +74,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::U16 => {
+        PropertyType::U16 => {
             result.push_str("U16(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -45,7 +84,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::I16 => {
+        PropertyType::I16 => {
             result.push_str("I16(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -55,7 +94,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::U32 => {
+        PropertyType::U32 => {
             result.push_str("U32(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -65,7 +104,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::I32 => {
+        PropertyType::I32 => {
             result.push_str("I32(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -75,7 +114,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::U64 => {
+        PropertyType::U64 => {
             result.push_str("U64(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -85,7 +124,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::I64 => {
+        PropertyType::I64 => {
             result.push_str("I64(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -96,7 +135,7 @@ pub fn read_value(
             result.push_str(");");
         }
 
-        crate::reflection::PropertyType::F32 => {
+        PropertyType::F32 => {
             if sub_property.is_some() {
                 result.push_str("sql_value");
             } else {
@@ -106,7 +145,7 @@ pub fn read_value(
             result.push_str(");");
         }
 
-        crate::reflection::PropertyType::F64 => {
+        PropertyType::F64 => {
             result.push_str("F64(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -116,7 +155,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::USize => {
+        PropertyType::USize => {
             result.push_str("USize(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -126,7 +165,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::ISize => {
+        PropertyType::ISize => {
             result.push_str("ISize(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -136,7 +175,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::String => {
+        PropertyType::String => {
             result.push_str("String(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -147,7 +186,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::Str => {
+        PropertyType::Str => {
             result.push_str("String(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -157,7 +196,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::Bool => {
+        PropertyType::Bool => {
             result.push_str("Bool(");
             if sub_property.is_some() {
                 result.push_str("sql_value");
@@ -167,7 +206,7 @@ pub fn read_value(
             }
             result.push_str(");");
         }
-        crate::reflection::PropertyType::DateTime => {
+        PropertyType::DateTime => {
             if property.has_timestamp_attr() {
                 result.push_str("DateTime(");
                 if sub_property.is_some() {
@@ -193,13 +232,13 @@ pub fn read_value(
                 );
             }
         }
-        crate::reflection::PropertyType::OptionOf(sub_ty) => {
+        PropertyType::OptionOf(sub_ty) => {
             read_value(result, property, Some(sub_ty.as_ref()));
         }
-        crate::reflection::PropertyType::VecOf(_) => {
+        PropertyType::VecOf(_) => {
             panic!("Vec not supported");
         }
-        crate::reflection::PropertyType::Struct(_) => {
+        PropertyType::Struct(_) => {
             panic!("Struct not supported");
         }
     }

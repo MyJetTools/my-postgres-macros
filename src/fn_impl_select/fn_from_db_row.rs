@@ -1,4 +1,6 @@
-use crate::reflection::{PropertyType, StructProperty};
+use types_reader::{PropertyType, StructProperty};
+
+use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
     result.push_str("Self {");

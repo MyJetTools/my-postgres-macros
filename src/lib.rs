@@ -7,8 +7,9 @@ mod fn_impl_insert_or_update;
 mod fn_impl_select;
 mod fn_impl_update;
 
+mod db_enum;
+
 mod postgres_utils;
-mod reflection;
 
 use syn;
 
@@ -52,4 +53,16 @@ pub fn postgres_insert_or_update_model(input: TokenStream) -> TokenStream {
 pub fn delete_db_entity(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_delete::generate(&ast)
+}
+
+#[proc_macro_derive(DbEnumAsU8, attributes(enum_case))]
+pub fn db_enum_as_u8(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "u8")
+}
+
+#[proc_macro_derive(DbEnumAsI8, attributes(enum_case))]
+pub fn db_enum_as_i8(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "i8")
 }

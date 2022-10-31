@@ -1,4 +1,4 @@
-use crate::reflection::{PropertyType, StructProperty};
+use types_reader::{PropertyType, StructProperty};
 
 pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
     for property in fields {

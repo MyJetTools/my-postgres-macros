@@ -1,9 +1,10 @@
 use proc_macro::TokenStream;
+use types_reader::StructProperty;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
 
-    let fields = crate::reflection::StructProperty::read(ast);
+    let fields = StructProperty::read(ast);
 
     let struct_name = name.to_string();
 

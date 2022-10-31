@@ -1,4 +1,6 @@
-use crate::reflection::{PropertyType, StructProperty};
+use types_reader::{PropertyType, StructProperty};
+
+use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
     for property in fields {
