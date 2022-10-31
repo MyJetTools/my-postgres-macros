@@ -53,13 +53,14 @@ pub fn read_value(
     let ty = if let Some(sub_property) = sub_property {
         sub_property
     } else {
-        if let PropertyType::Struct(_) = &property.ty {
-            result.push_str("let sql_value = ");
-        } else {
-            result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
-        }
         &property.ty
     };
+
+    if let PropertyType::Struct(_) = &ty {
+        result.push_str("let sql_value = ");
+    } else {
+        result.push_str("let sql_value = my_postgres::code_gens::SqlValue::");
+    }
 
     match ty {
         PropertyType::U8 => {
