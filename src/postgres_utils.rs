@@ -254,11 +254,15 @@ pub fn read_value(
         PropertyType::Struct(_) => {
             if property.has_json_attr() {
                 if sub_property.is_some() {
-                    result.push_str("sql_value.to_sql_value();");
+                    todo!("Not implemented yet");
                 } else {
-                    result.push_str("self.");
+                    result.push_str("let sql_value = serde_json::to_string(&self.");
                     result.push_str(property.name.as_str());
-                    result.push_str(");");
+                    result.push_str(").unwrap();");
+
+                    result.push_str(
+                        "let sql_value = my_postgres::code_gens::SqlValue::String(sql_value);",
+                    );
                 }
             } else {
                 if sub_property.is_some() {
