@@ -34,7 +34,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: &str) -> TokenStream {
 
     result.push_str("fn read_from_db(&self)->Self {");
 
-    result.push_str("todo!(\"Implement\"");
+    result.push_str("todo!(\"Implement\");");
 
     result.push_str("}");
 
