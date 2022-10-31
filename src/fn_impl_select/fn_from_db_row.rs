@@ -29,7 +29,7 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
                 result.push_str(prop.name.as_str());
                 result.push_str(": serde_json::from_str(");
                 generate_read_db_row_field(result, prop);
-                result.push_str("),");
+                result.push_str(").unwrap(),");
                 continue;
             }
 
