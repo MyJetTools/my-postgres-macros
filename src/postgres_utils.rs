@@ -56,10 +56,12 @@ pub fn read_value(
         &property.ty
     };
 
-    if let PropertyType::Struct(_) = &ty {
-        result.push_str("let sql_value = ");
-    } else {
-        result.push_str("let sql_value = my_postgres::code_gens::SqlValue::");
+    if !ty.is_option() {
+        if let PropertyType::Struct(_) = &ty {
+            result.push_str("let sql_value = ");
+        } else {
+            result.push_str("let sql_value = my_postgres::code_gens::SqlValue::");
+        }
     }
 
     match ty {
