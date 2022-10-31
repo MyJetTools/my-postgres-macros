@@ -256,7 +256,7 @@ pub fn read_value(
                 if sub_property.is_some() {
                     todo!("Not implemented yet");
                 } else {
-                    result.push_str("let sql_value = serde_json::to_string(&self.");
+                    result.push_str("serde_json::to_string(&self.");
                     result.push_str(property.name.as_str());
                     result.push_str(").unwrap();");
 
