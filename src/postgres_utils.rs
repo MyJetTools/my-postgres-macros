@@ -6,12 +6,14 @@ pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
 
 pub const ATTR_TIMESTAMP: &str = "timestamp";
 pub const ATTR_BIGINT: &str = "bigint";
+pub const ATTR_JSON: &str = "json";
 
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
     fn has_timestamp_attr(&self) -> bool;
     fn has_bigint_attr(&self) -> bool;
     fn get_db_field_name(&self) -> &str;
+    fn has_json_attr(&self) -> bool;
 }
 
 impl PostgresStructPropertyExt for StructProperty {
@@ -25,6 +27,10 @@ impl PostgresStructPropertyExt for StructProperty {
 
     fn has_bigint_attr(&self) -> bool {
         self.attrs.has_attr(ATTR_BIGINT)
+    }
+
+    fn has_json_attr(&self) -> bool {
+        self.attrs.has_attr(ATTR_JSON)
     }
 
     fn get_db_field_name(&self) -> &str {

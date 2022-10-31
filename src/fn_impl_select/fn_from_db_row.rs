@@ -14,7 +14,8 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
                 generate_read_db_row_field(result, prop);
                 result.push_str("),");
                 continue;
-            } else if prop.has_timestamp_attr() {
+            }
+            if prop.has_timestamp_attr() {
                 result.push_str(prop.name.as_str());
                 result.push_str(": {");
 
@@ -22,9 +23,17 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
                 generate_read_db_row_field(result, prop);
                 result.push_str(";\nDateTimeAsMicroseconds::new(dt.timestamp_millis() * 1000)},\n");
                 continue;
-            } else {
-                panic!("Unknown date time type. Property: {}", prop.name);
             }
+
+            if prop.has_json_attr() {
+                result.push_str(prop.name.as_str());
+                result.push_str(": serde_json::from_str(");
+                generate_read_db_row_field(result, prop);
+                result.push_str("),");
+                continue;
+            }
+
+            panic!("Unknown date time type. Property: {}", prop.name);
         }
 
         if let PropertyType::Struct(struct_name) = &prop.ty {
