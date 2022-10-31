@@ -11,9 +11,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: &str) -> TokenStream {
     result.push_str(name);
     result.push_str(" {");
 
-    result.push_str("fn to_db_value(&self)->");
-
-    result.push_str(type_name);
+    result.push_str("fn to_sql_value(&self)->my_postgres::code_gens::SqlValue");
 
     result.push_str(" {");
 
@@ -25,7 +23,14 @@ pub fn generate(ast: &syn::DeriveInput, type_name: &str) -> TokenStream {
 
         result.push_str(" => ");
 
+        result.push_str("my_postgres::code_gens::SqlValue::");
+
+        result.push_str(type_name.to_uppercase().as_str());
+
+        result.push_str("(");
+
         result.push_str(i.to_string().as_str());
+        result.push_str(")");
         result.push(',');
         i += 1;
     }
