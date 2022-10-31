@@ -66,3 +66,39 @@ pub fn db_enum_as_i8(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::db_enum::generate(&ast, "i8")
 }
+
+#[proc_macro_derive(DbEnumAsU16, attributes(enum_case))]
+pub fn db_enum_as_u16(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "u16")
+}
+
+#[proc_macro_derive(DbEnumAsI16, attributes(enum_case))]
+pub fn db_enum_as_i16(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "i16")
+}
+
+#[proc_macro_derive(DbEnumAsU32, attributes(enum_case))]
+pub fn db_enum_as_u32(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "u32")
+}
+
+#[proc_macro_derive(DbEnumAsI32, attributes(enum_case))]
+pub fn db_enum_as_i32(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "i32")
+}
+
+#[proc_macro_derive(DbEnumAsU64, attributes(enum_case))]
+pub fn db_enum_as_u64(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "u64")
+}
+
+#[proc_macro_derive(DbEnumAsI64, attributes(enum_case))]
+pub fn db_enum_as_i64(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate(&ast, "i64")
+}
