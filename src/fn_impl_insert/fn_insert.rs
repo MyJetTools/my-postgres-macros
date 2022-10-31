@@ -3,7 +3,7 @@ use types_reader::{PropertyType, StructProperty};
 pub fn fn_insert(result: &mut String, fields: &[StructProperty]) {
     for property in fields {
         if let PropertyType::OptionOf(sub_type) = &property.ty {
-            if sub_type.is_string() {
+            if sub_type.is_string() || sub_type.is_struct() {
                 result.push_str("if let Some(sql_value) = &self.");
             } else {
                 result.push_str("if let Some(sql_value) = self.");

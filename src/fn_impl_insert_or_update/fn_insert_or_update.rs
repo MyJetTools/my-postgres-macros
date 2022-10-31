@@ -5,7 +5,7 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 pub fn fn_insert_or_update(result: &mut String, fields: &[StructProperty]) {
     for property in fields {
         if let PropertyType::OptionOf(sub_type) = &property.ty {
-            if sub_type.is_string() {
+            if sub_type.is_string() || sub_type.is_struct() {
                 result.push_str("if let Some(sql_value) = &self.");
             } else {
                 result.push_str("if let Some(sql_value) = self.");
