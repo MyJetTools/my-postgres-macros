@@ -239,13 +239,12 @@ pub fn read_value(
             panic!("Vec not supported");
         }
         PropertyType::Struct(_) => {
-            result.push_str("Struct(");
-            if sub_property.is_some() {
-                result.push_str("sql_value");
-            } else {
-                result.push_str("self.");
-                result.push_str(&property.name);
-            }
+            result.push_str(ty.as_str().as_str());
+            result.push_str("::read_from_db(");
+
+            result.push_str("self.");
+            result.push_str(&property.name);
+
             result.push_str(");");
         }
     }

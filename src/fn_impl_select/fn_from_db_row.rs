@@ -26,6 +26,20 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
                 panic!("Unknown date time type. Property: {}", prop.name);
             }
         }
+
+        if let PropertyType::Struct(struct_name) = &prop.ty {
+            result.push_str(prop.name.as_str());
+            result.push_str(": ");
+
+            result.push_str(struct_name);
+
+            result.push_str("::read_from_db(");
+
+            generate_read_db_row_field(result, prop);
+            result.push_str("),");
+            continue;
+        }
+
         if let PropertyType::OptionOf(sub_ty) = &prop.ty {
             if sub_ty.is_date_time() {
                 if prop.has_timestamp_attr() {
