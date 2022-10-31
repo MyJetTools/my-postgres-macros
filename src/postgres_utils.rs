@@ -53,7 +53,11 @@ pub fn read_value(
     let ty = if let Some(sub_property) = sub_property {
         sub_property
     } else {
-        result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
+        if let PropertyType::Struct(_) = &property.ty {
+            result.push_str("let sql_value = ");
+        } else {
+            result.push_str("let sql_value =  my_postgres::code_gens::SqlValue::");
+        }
         &property.ty
     };
 
@@ -244,14 +248,9 @@ pub fn read_value(
         PropertyType::VecOf(_) => {
             panic!("Vec not supported");
         }
-        PropertyType::Struct(_) => {
-            result.push_str(ty.as_str().as_str());
-            result.push_str("::read_from_db(");
-
-            result.push_str("self.");
-            result.push_str(&property.name);
-
-            result.push_str(");");
+        PropertyType::Struct(struct_name) => {
+            result.push_str(struct_name);
+            result.push_str(".to_sql_value();");
         }
     }
 }
