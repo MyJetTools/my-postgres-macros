@@ -67,6 +67,21 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
                     continue;
                 }
             }
+
+            if let PropertyType::Struct(struct_name) = &prop.ty {
+                result.push_str(prop.name.as_str());
+                result.push_str(": if let Some(value) = ");
+
+                generate_read_db_row_field(result, prop);
+
+                result.push_str("{Some(");
+
+                result.push_str(struct_name);
+
+                result.push_str("::read_from_db(value))}else{None},");
+
+                continue;
+            }
         }
         result.push_str(prop.name.as_str());
         result.push_str(": ");
