@@ -74,9 +74,15 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
                 fill_standard_field(result, struct_property);
             }
             types_reader::PropertyType::DateTime => {
-                result.push_str("extract(EPOCH FROM ");
-                result.push_str(struct_property.get_db_field_name());
-                result.push_str(") * 1000000 as bigint");
+                if struct_property.has_timestamp_attr() {
+                    result.push_str("extract(EPOCH FROM ");
+                    result.push_str(struct_property.get_db_field_name());
+                    result.push_str(") * 1000000 as bigint");
+                } else if struct_property.has_bigint_attr() {
+                    fill_standard_field(result, struct_property);
+                } else {
+                    panic!("Unknown date time type. Property: {}", struct_property.name);
+                }
             }
             types_reader::PropertyType::OptionOf(_) => {
                 fill_standard_field(result, struct_property);
