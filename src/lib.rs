@@ -13,7 +13,10 @@ mod postgres_utils;
 
 use syn;
 
-#[proc_macro_derive(SelectDbEntity, attributes(db_field_name, debug_sql, json))]
+#[proc_macro_derive(
+    SelectDbEntity,
+    attributes(db_field_name, debug_sql, json, timestamp, bigint)
+)]
 pub fn postgres_select_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_select::generate(&ast)
@@ -21,7 +24,7 @@ pub fn postgres_select_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     InsertDbEntity,
-    attributes(db_field_name, ignore_if_null, debug_sql, timestamp, bigint)
+    attributes(db_field_name, ignore_if_null, debug_sql, timestamp, bigint, json)
 )]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
