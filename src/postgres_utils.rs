@@ -243,9 +243,7 @@ pub fn read_value(
         PropertyType::Struct(_) => {
             if property.has_json_attr() {
                 if sub_property.is_some() {
-                    result.push_str("serde_json::to_string(");
-                    result.push_str(property.name.as_str());
-                    result.push_str(").unwrap();");
+                    result.push_str("serde_json::to_string(sql_value).unwrap();");
 
                     result.push_str(
                         "let sql_value = my_postgres::code_gens::SqlValue::String(sql_value);",
