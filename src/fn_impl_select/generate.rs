@@ -18,6 +18,10 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_from_db_row::fn_from_db_row(&mut result, &fields);
     result.push_str("}\n");
 
+    result.push_str("fn get_select_fields() -> &'static str {");
+    super::fn_select_fields(&mut result, &fields);
+    result.push_str("}\n");
+
     result.push_str("}\n");
 
     result.parse().unwrap()
