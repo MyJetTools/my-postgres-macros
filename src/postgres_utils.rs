@@ -220,7 +220,12 @@ pub fn read_value(
             result.push_str(");");
         }
         PropertyType::DateTime => {
-            result.push_str("DateTimeAsUnixMicroseconds(");
+            if property.has_timestamp_attr() {
+                result.push_str("DateTime(");
+            } else {
+                result.push_str("DateTimeAsUnixMicroseconds(");
+            }
+
             if sub_property.is_some() {
                 result.push_str("sql_value");
             } else {
