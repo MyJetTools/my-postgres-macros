@@ -7,24 +7,12 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
 
     for prop in fields {
         if prop.ty.is_date_time() {
-            if prop.has_bigint_attr() {
-                result.push_str(prop.name.as_str());
-                result.push_str(": DateTimeAsMicroseconds::new(");
+            result.push_str(prop.name.as_str());
+            result.push_str(": DateTimeAsMicroseconds::new(");
 
-                generate_read_db_row_field(result, prop);
-                result.push_str("),");
-                continue;
-            } else if prop.has_timestamp_attr() {
-                result.push_str(prop.name.as_str());
-                result.push_str(": {");
-
-                result.push_str("let dt: chrono::NaiveDateTime = ");
-                generate_read_db_row_field(result, prop);
-                result.push_str(";\nDateTimeAsMicroseconds::new(dt.timestamp_millis() * 1000)},\n");
-                continue;
-            } else {
-                panic!("Unknown date time type. Property: {}", prop.name);
-            }
+            generate_read_db_row_field(result, prop);
+            result.push_str("),");
+            continue;
         }
 
         if prop.has_json_attr() {
