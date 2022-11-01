@@ -243,9 +243,10 @@ pub fn read_value(
         PropertyType::Struct(_) => {
             if property.has_json_attr() {
                 if sub_property.is_some() {
-                    result.push_str("let sql_value = serde_json::to_string(&self.");
-                    result.push_str(property.name.as_str());
-                    result.push_str(").unwrap();");
+                    // result.push_str("let sql_value = serde_json::to_string(&self.");
+                    // result.push_str(property.name.as_str());
+                    // result.push_str(").unwrap();");
+                    result.push_str("todo!()");
                 } else {
                     result.push_str("serde_json::to_string(&self.");
                     result.push_str(property.name.as_str());
