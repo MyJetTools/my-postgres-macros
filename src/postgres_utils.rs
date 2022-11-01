@@ -246,7 +246,7 @@ pub fn read_value(
                     // result.push_str("let sql_value = serde_json::to_string(&self.");
                     // result.push_str(property.name.as_str());
                     // result.push_str(").unwrap();");
-                    result.push_str("todo!()");
+                    result.push_str("todo!();");
                 } else {
                     result.push_str("serde_json::to_string(&self.");
                     result.push_str(property.name.as_str());
