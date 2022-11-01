@@ -23,7 +23,9 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
     ) {
         if struct_property.has_json_attr() {
             result.push_str(struct_property.get_db_field_name());
-            result.push_str("::text");
+            result.push_str("::text \"");
+            result.push_str(struct_property.get_db_field_name());
+            result.push('"');
             return;
         }
 
@@ -75,9 +77,12 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
             }
             types_reader::PropertyType::DateTime => {
                 if struct_property.has_timestamp_attr() {
-                    result.push_str("extract(EPOCH FROM ");
+                    result.push_str("(extract(EPOCH FROM ");
                     result.push_str(struct_property.get_db_field_name());
-                    result.push_str(") * 1000000 as bigint");
+                    result.push_str(") * 1000000)::bigint \"");
+
+                    result.push_str(struct_property.get_db_field_name());
+                    result.push('"');
                 } else if struct_property.has_bigint_attr() {
                     fill_standard_field(result, struct_property);
                 } else {
