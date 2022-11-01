@@ -38,22 +38,11 @@ pub fn fn_from_db_row(result: &mut String, fields: &[StructProperty]) {
 
         if let PropertyType::OptionOf(sub_ty) = &prop.ty {
             if sub_ty.is_date_time() {
-                if prop.has_timestamp_attr() {
-                    result.push_str(prop.name.as_str());
-
-                    result.push_str(": {let dt: Option<chrono::NaiveDateTime> = ");
-                    generate_read_db_row_field(result, prop);
-                    result.push_str(";\n");
-
-                    result.push_str("if let Some(dt)=dt{Some(DateTimeAsMicroseconds::new(dt.timestamp_millis() * 1000))}else{None}},\n");
-                    continue;
-                } else {
-                    result.push_str(prop.name.as_str());
-                    result.push_str(": if let Some(value) = ");
-                    generate_read_db_row_field(result, prop);
-                    result.push_str("{Some(DateTimeAsMicroseconds::new(value))}else{None},");
-                    continue;
-                }
+                result.push_str(prop.name.as_str());
+                result.push_str(": if let Some(value) = ");
+                generate_read_db_row_field(result, prop);
+                result.push_str("{Some(DateTimeAsMicroseconds::new(value))}else{None},");
+                continue;
             }
 
             if let PropertyType::Struct(struct_name) = sub_ty.as_ref() {
