@@ -220,30 +220,14 @@ pub fn read_value(
             result.push_str(");");
         }
         PropertyType::DateTime => {
-            if property.has_timestamp_attr() {
-                result.push_str("DateTime(");
-                if sub_property.is_some() {
-                    result.push_str("sql_value");
-                } else {
-                    result.push_str("self.");
-                    result.push_str(&property.name);
-                }
-                result.push_str(");");
-            } else if property.has_bigint_attr() {
-                result.push_str("DateTimeAsUnixMicroseconds(");
-                if sub_property.is_some() {
-                    result.push_str("sql_value");
-                } else {
-                    result.push_str("self.");
-                    result.push_str(&property.name);
-                }
-                result.push_str(");");
+            result.push_str("DateTimeAsUnixMicroseconds(");
+            if sub_property.is_some() {
+                result.push_str("sql_value");
             } else {
-                panic!(
-                    "Please specify type of datetime (timestamp or bigint) for property {}",
-                    property.name
-                );
+                result.push_str("self.");
+                result.push_str(&property.name);
             }
+            result.push_str(");");
         }
         PropertyType::OptionOf(sub_ty) => {
             read_value(result, property, Some(sub_ty.as_ref()));
