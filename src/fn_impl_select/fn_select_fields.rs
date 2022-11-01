@@ -23,9 +23,8 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
     ) {
         if struct_property.has_json_attr() {
             result.push_str(struct_property.get_db_field_name());
-            result.push_str("::text \"");
-            result.push_str(struct_property.get_db_field_name());
-            result.push('"');
+            result.push_str("::text ");
+            fill_casting_to_name(result, struct_property);
             return;
         }
 
@@ -79,10 +78,9 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
                 if struct_property.has_timestamp_attr() {
                     result.push_str("(extract(EPOCH FROM ");
                     result.push_str(struct_property.get_db_field_name());
-                    result.push_str(") * 1000000)::bigint \"");
+                    result.push_str(") * 1000000)::bigint ");
 
-                    result.push_str(struct_property.get_db_field_name());
-                    result.push('"');
+                    fill_casting_to_name(result, struct_property);
                 } else if struct_property.has_bigint_attr() {
                     fill_standard_field(result, struct_property);
                 } else {
@@ -106,4 +104,12 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
 
 fn fill_standard_field(result: &mut String, struct_property: &StructProperty) {
     result.push_str(struct_property.get_db_field_name());
+}
+
+fn fill_casting_to_name(result: &mut String, struct_property: &StructProperty) {
+    result.push('\\');
+    result.push('"');
+    result.push_str(struct_property.get_db_field_name());
+    result.push('\\');
+    result.push('"');
 }
