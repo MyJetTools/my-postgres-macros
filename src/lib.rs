@@ -1,4 +1,5 @@
 extern crate proc_macro;
+use db_enum::EnumType;
 use proc_macro::TokenStream;
 
 mod fn_impl_delete;
@@ -61,47 +62,47 @@ pub fn delete_db_entity(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(DbEnumAsU8, attributes(enum_case))]
 pub fn db_enum_as_u8(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "u8")
+    crate::db_enum::generate(&ast, EnumType::U8)
 }
 
 #[proc_macro_derive(DbEnumAsI8, attributes(enum_case))]
 pub fn db_enum_as_i8(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "i8")
+    crate::db_enum::generate(&ast, EnumType::I8)
 }
 
 #[proc_macro_derive(DbEnumAsU16, attributes(enum_case))]
 pub fn db_enum_as_u16(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "u16")
+    crate::db_enum::generate(&ast, EnumType::U16)
 }
 
 #[proc_macro_derive(DbEnumAsI16, attributes(enum_case))]
 pub fn db_enum_as_i16(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "i16")
+    crate::db_enum::generate(&ast, EnumType::I16)
 }
 
 #[proc_macro_derive(DbEnumAsU32, attributes(enum_case))]
 pub fn db_enum_as_u32(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "u32")
+    crate::db_enum::generate(&ast, EnumType::U32)
 }
 
 #[proc_macro_derive(DbEnumAsI32, attributes(enum_case))]
 pub fn db_enum_as_i32(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "i32")
+    crate::db_enum::generate(&ast, EnumType::I32)
 }
 
 #[proc_macro_derive(DbEnumAsU64, attributes(enum_case))]
 pub fn db_enum_as_u64(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "u64")
+    crate::db_enum::generate(&ast, EnumType::U64)
 }
 
 #[proc_macro_derive(DbEnumAsI64, attributes(enum_case))]
 pub fn db_enum_as_i64(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, "i64")
+    crate::db_enum::generate(&ast, EnumType::I64)
 }
