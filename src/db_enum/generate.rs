@@ -110,5 +110,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
     result.push_str("}");
 
+    println!("{}", result);
+
     result.parse().unwrap()
 }
