@@ -41,7 +41,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push_str(name);
     result.push_str(" {");
 
-    result.push_str("fn to_sql_value(&self)->my_postgres::code_gens::SqlValue");
+    result.push_str("pub fn to_sql_value(&self)->my_postgres::code_gens::SqlValue");
 
     result.push_str(" {");
 
@@ -67,7 +67,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
     result.push_str("}}");
 
-    result.push_str("fn to_");
+    result.push_str("pub fn to_");
     result.push_str(type_name.as_type_name());
     result.push_str("(&self)->");
     result.push_str(type_name.as_type_name());
@@ -86,9 +86,9 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
         i += 1;
     }
 
-    result.push_str("}}");
+    result.push_str("}");
 
-    result.push_str("fn from_db_value(src: ");
+    result.push_str("pub fn from_db_value(src: ");
     result.push_str(type_name.as_type_name());
     result.push_str(")->Self {");
     result.push_str("match src {");
@@ -107,8 +107,6 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push_str("_ => panic!(\"Invalid value {}\", src)");
 
     result.push_str("}}");
-
-    result.push_str("}");
 
     println!("{}", result);
 
