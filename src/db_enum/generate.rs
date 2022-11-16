@@ -15,19 +15,28 @@ pub enum EnumType {
 impl EnumType {
     pub fn as_sql_value_name(&self) -> &str {
         match self {
+            EnumType::U8 => "U8",
+            EnumType::I8 => "I8",
+            EnumType::U16 => "U16",
+            EnumType::I16 => "I16",
+            EnumType::U32 => "U32",
+            EnumType::I32 => "I32",
+            EnumType::U64 => "U64",
+            EnumType::I64 => "I64",
+        }
+    }
+
+    pub fn as_type_name(&self) -> &str {
+        match self {
             EnumType::U8 => "u8",
-            EnumType::I8 => "u8",
+            EnumType::I8 => "i8",
             EnumType::U16 => "u16",
-            EnumType::I16 => "i8",
+            EnumType::I16 => "i16",
             EnumType::U32 => "u32",
             EnumType::I32 => "i32",
             EnumType::U64 => "u64",
             EnumType::I64 => "i64",
         }
-    }
-
-    pub fn as_type_name(&self) -> &str {
-        unimplemented!()
     }
 }
 
