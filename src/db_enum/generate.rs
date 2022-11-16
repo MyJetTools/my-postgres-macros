@@ -95,7 +95,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
         i += 1;
     }
 
-    result.push_str("}");
+    result.push_str("}}");
 
     result.push_str("pub fn from_db_value(src: ");
     result.push_str(type_name.as_type_name());
@@ -115,9 +115,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
     result.push_str("_ => panic!(\"Invalid value {}\", src)");
 
-    result.push_str("}}");
-
-    println!("{}", result);
+    result.push_str("}}}");
 
     result.parse().unwrap()
 }
