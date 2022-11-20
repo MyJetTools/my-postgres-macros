@@ -7,12 +7,14 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
 
     let mut no = 0;
     for struct_property in struct_properties {
+        if struct_property.attrs.has_attr("line_no") {
+            continue;
+        }
         if no > 0 {
             result.push(',');
         }
 
         generate_read_field(result, struct_property, &struct_property.ty);
-
         no += 1;
     }
 

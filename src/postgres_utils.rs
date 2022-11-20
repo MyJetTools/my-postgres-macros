@@ -14,6 +14,7 @@ pub trait PostgresStructPropertyExt {
     fn has_bigint_attr(&self) -> bool;
     fn get_db_field_name(&self) -> &str;
     fn has_json_attr(&self) -> bool;
+    fn has_line_no_attr(&self) -> bool;
 }
 
 impl PostgresStructPropertyExt for StructProperty {
@@ -31,6 +32,10 @@ impl PostgresStructPropertyExt for StructProperty {
 
     fn has_json_attr(&self) -> bool {
         self.attrs.has_attr(ATTR_JSON)
+    }
+
+    fn has_line_no_attr(&self) -> bool {
+        self.attrs.has_attr("line_no")
     }
 
     fn get_db_field_name(&self) -> &str {
