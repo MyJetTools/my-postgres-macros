@@ -16,9 +16,24 @@ pub trait PostgresStructPropertyExt {
     fn has_json_attr(&self) -> bool;
 
     fn is_line_no(&self) -> bool;
+
+    fn sql_value_to_mask(&self) -> bool;
 }
 
 impl PostgresStructPropertyExt for StructProperty {
+    fn sql_value_to_mask(&self) -> bool {
+        if self.ty.is_string() {
+            return true;
+        }
+
+        if let PropertyType::OptionOf(sub_ty) = &self.ty {
+            if sub_ty.is_string() {
+                return true;
+            }
+        }
+
+        false
+    }
     fn is_primary_key(&self) -> bool {
         self.attrs.has_attr(ATTR_PRIMARY_KEY)
     }

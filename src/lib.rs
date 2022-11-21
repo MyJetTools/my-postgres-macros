@@ -3,12 +3,12 @@ use db_enum::EnumType;
 use proc_macro::TokenStream;
 
 mod fn_impl_bulk_select;
-mod fn_impl_bulk_select_input_data;
 mod fn_impl_delete;
 mod fn_impl_insert;
 mod fn_impl_insert_or_update;
 mod fn_impl_select;
 mod fn_impl_update;
+mod fn_impl_where_data;
 
 mod db_enum;
 
@@ -37,7 +37,7 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(BulkSelectDbInputData, attributes(db_field_name))]
 pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::fn_impl_bulk_select_input_data::generate(&ast)
+    crate::fn_impl_where_data::generate(&ast)
 }
 
 #[proc_macro_derive(
