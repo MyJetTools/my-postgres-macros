@@ -8,4 +8,6 @@ pub fn fn_select_line_no(result: &mut String, struct_properties: &[StructPropert
             return;
         }
     }
+
+    panic!("line_no not found");
 }

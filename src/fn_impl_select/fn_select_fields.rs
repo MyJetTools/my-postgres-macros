@@ -7,7 +7,7 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
 
     let mut no = 0;
     for struct_property in struct_properties {
-        if struct_property.attrs.has_attr("line_no") {
+        if struct_property.is_line_no() {
             continue;
         }
         if no > 0 {
