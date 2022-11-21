@@ -83,19 +83,55 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
 }
 
 fn extract_operation(src: &[u8]) -> &str {
-    let mut src = &src[1..src.len() - 1];
+    let src = &src[1..src.len() - 1];
 
     for i in 0..src.len() {
-        if src[i] == b'"' {
-            for j in 0..src.len() {
-                let pos = src.len() - j - 1;
-                if src[pos] == b'"' {
-                    src = &src[i + 1..j];
-                    break;
+        if src[i] == b'"' || src[i] == b'\'' {
+            let b = src[i];
+
+            for j in 1..src.len() {
+                let pos = src.len() - j;
+
+                if src[pos] == b {
+                    let result = &src[i + 1..pos];
+
+                    let result = std::str::from_utf8(result).unwrap();
+                    return result;
                 }
             }
         }
     }
 
     std::str::from_utf8(src).unwrap()
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn test_1() {
+        let src = "(\">\")";
+
+        let operator = super::extract_operation(src.as_bytes());
+
+        assert_eq!(">", operator);
+    }
+
+    #[test]
+    fn test_2() {
+        let src = "(>)";
+
+        let operator = super::extract_operation(src.as_bytes());
+
+        assert_eq!(">", operator);
+    }
+
+    #[test]
+    fn test_3() {
+        let src = "('>')";
+
+        let operator = super::extract_operation(src.as_bytes());
+
+        assert_eq!(">", operator);
+    }
 }
