@@ -68,7 +68,7 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
     if let Some(op) = struct_propery.attrs.try_get("operator") {
         if let Some(content) = op.content.as_ref() {
             result.push_str("op: \"");
-            result.push_str(std::str::from_utf8(content).unwrap());
+            result.push_str(extract_operation(content));
             result.push_str("\"");
         }
         return;
@@ -80,4 +80,22 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
     }
 
     result.push_str("op: \"=\"");
+}
+
+fn extract_operation(src: &[u8]) -> &str {
+    let mut src = &src[1..src.len() - 1];
+
+    for i in 0..src.len() {
+        if src[i] == b'"' {
+            for j in 0..src.len() {
+                let pos = src.len() - j - 1;
+                if src[pos] == b'"' {
+                    src = &src[i + 1..j];
+                    break;
+                }
+            }
+        }
+    }
+
+    std::str::from_utf8(src).unwrap()
 }
