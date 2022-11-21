@@ -68,7 +68,7 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
     if let Some(op) = struct_propery.attrs.try_get("operator") {
         if let Some(content) = op.content.as_ref() {
             result.push_str("op: \"");
-            result.push_str(extract_operation(content));
+            result.push_str(extract_and_verify_operation(content));
             result.push_str("\"");
         }
         return;
@@ -80,6 +80,23 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
     }
 
     result.push_str("op: \"=\"");
+}
+
+fn extract_and_verify_operation(src: &[u8]) -> &str {
+    let result = extract_operation(src);
+
+    if result == "="
+        || result == "!="
+        || result == "<"
+        || result == "<="
+        || result == ">"
+        || result == ">="
+        || result == "<>"
+    {
+        return result;
+    }
+
+    panic!("Invalid operator {}", result);
 }
 
 fn extract_operation(src: &[u8]) -> &str {
