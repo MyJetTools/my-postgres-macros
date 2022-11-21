@@ -3,7 +3,7 @@ use types_reader::StructProperty;
 use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_get_field_value(result: &mut String, struct_properties: &[StructProperty]) {
-    let mut no = 1;
+    let mut no = 0;
 
     result.push_str("match no {");
     for struct_property in struct_properties {
