@@ -37,13 +37,17 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
                 result.push_str(struct_propery.get_db_field_name());
                 result.push_str("\", value: self.");
                 result.push_str(&struct_propery.name);
-                result.push_str(".unix_microseconds.to_string()}");
+                result.push_str(".unix_microseconds.to_string(),");
+                fill_op(result, struct_propery);
+                result.push_str("}");
             } else {
                 result.push_str("my_postgres::InputDataValue::AsString { name: \"");
                 result.push_str(struct_propery.get_db_field_name());
                 result.push_str("\", value: self.");
                 result.push_str(&struct_propery.name);
-                result.push_str(".to_rfc3339()}");
+                result.push_str(".to_rfc3339(),");
+                fill_op(result, struct_propery);
+                result.push_str("}");
             }
         }
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
@@ -55,5 +59,25 @@ fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str(struct_propery.get_db_field_name());
     result.push_str("\", value: &self.");
     result.push_str(&struct_propery.name);
+    result.push_str(",");
+    fill_op(result, struct_propery);
     result.push_str("}");
+}
+
+fn fill_op(result: &mut String, struct_propery: &StructProperty) {
+    if let Some(op) = struct_propery.attrs.try_get("operator") {
+        if let Some(content) = op.content.as_ref() {
+            result.push_str("op: \"");
+            result.push_str(std::str::from_utf8(content).unwrap());
+            result.push_str("\"");
+        }
+        return;
+    }
+
+    if struct_propery.attrs.has_attr("ne") {
+        result.push_str("op: \"!=\"");
+        return;
+    }
+
+    result.push_str("op: \"=\"");
 }
