@@ -12,5 +12,5 @@ pub fn fn_get_param_value(result: &mut String, struct_properties: &[StructProper
         no += 1;
     }
 
-    result.push_str("_ => panic!(\"Unexpected param no\")}");
+    result.push_str("_ => panic!(\"Unexpected param no {}\", no)}");
 }
