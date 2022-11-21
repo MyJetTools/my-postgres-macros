@@ -43,7 +43,7 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
                 result.push_str(struct_propery.get_db_field_name());
                 result.push_str("\", value: self.");
                 result.push_str(&struct_propery.name);
-                result.push_str(".unix_microseconds.to_rfc3339()}");
+                result.push_str(".to_rfc3339()}");
             }
         }
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
