@@ -29,6 +29,7 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::I64 => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::F32 => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::F64 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::DateTime => {
             if struct_propery.has_bigint_attr() {
