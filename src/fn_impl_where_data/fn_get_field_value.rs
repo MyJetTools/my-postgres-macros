@@ -33,13 +33,13 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::DateTime => {
             if struct_propery.has_bigint_attr() {
-                result.push_str("InputDataValue::AsNonString { name: \"");
+                result.push_str("my_postgres::InputDataValue::AsNonString { name: \"");
                 result.push_str(struct_propery.get_db_field_name());
                 result.push_str("\", value: ");
                 result.push_str(&struct_propery.name);
                 result.push_str(".unix_microseconds.to_string()}");
             } else {
-                result.push_str("InputDataValue::AsString { name: \"");
+                result.push_str("my_postgres::InputDataValue::AsString { name: \"");
                 result.push_str(struct_propery.get_db_field_name());
                 result.push_str("\", value: ");
                 result.push_str(&struct_propery.name);
@@ -51,7 +51,7 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
 }
 
 fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("InputDataValue::AsSqlValue { name: \"");
+    result.push_str("my_postgres::InputDataValue::AsSqlValue { name: \"");
     result.push_str(struct_propery.get_db_field_name());
     result.push_str("\", value: &self.");
     result.push_str(&struct_propery.name);
