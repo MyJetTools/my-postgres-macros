@@ -35,13 +35,13 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
             if struct_propery.has_bigint_attr() {
                 result.push_str("my_postgres::InputDataValue::AsNonString { name: \"");
                 result.push_str(struct_propery.get_db_field_name());
-                result.push_str("\", value: ");
+                result.push_str("\", value: self.");
                 result.push_str(&struct_propery.name);
                 result.push_str(".unix_microseconds.to_string()}");
             } else {
                 result.push_str("my_postgres::InputDataValue::AsString { name: \"");
                 result.push_str(struct_propery.get_db_field_name());
-                result.push_str("\", value: ");
+                result.push_str("\", value: self.");
                 result.push_str(&struct_propery.name);
                 result.push_str(".unix_microseconds.to_rfc3339()}");
             }
