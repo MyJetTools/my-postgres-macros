@@ -2,6 +2,7 @@ extern crate proc_macro;
 use db_enum::EnumType;
 use proc_macro::TokenStream;
 
+mod fn_impl_bulk_select;
 mod fn_impl_delete;
 mod fn_impl_insert;
 mod fn_impl_insert_or_update;
@@ -21,6 +22,15 @@ use syn;
 pub fn postgres_select_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_select::generate(&ast)
+}
+
+#[proc_macro_derive(
+    BulkSelectDbEntity,
+    attributes(db_field_name, debug_sql, json, timestamp, bigint, line_no)
+)]
+pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::fn_impl_bulk_select::generate(&ast)
 }
 
 #[proc_macro_derive(
