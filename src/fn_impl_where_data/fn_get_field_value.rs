@@ -58,6 +58,7 @@ fn get_field_value_of_vec(
         types_reader::PropertyType::String => fill_vec_of_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_vec_of_sql_value(result, struct_propery),
         types_reader::PropertyType::DateTime => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::Struct(_) => fill_vec_of_sql_value(result, struct_propery),
         _ => panic!("Vec<{}> is not supported", sub_type.as_str()),
     }
 }
