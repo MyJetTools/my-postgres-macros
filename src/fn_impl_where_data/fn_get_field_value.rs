@@ -1,4 +1,4 @@
-use types_reader::StructProperty;
+use types_reader::{PropertyType, StructProperty};
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
@@ -31,26 +31,54 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::F64 => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => {
-            if struct_propery.has_bigint_attr() {
-                result.push_str("my_postgres::InputDataValue::AsNonString { name: \"");
-                result.push_str(struct_propery.get_db_field_name());
-                result.push_str("\", value: self.");
-                result.push_str(&struct_propery.name);
-                result.push_str(".unix_microseconds.to_string(),");
-                fill_op(result, struct_propery);
-                result.push_str("}");
-            } else {
-                result.push_str("my_postgres::InputDataValue::AsString { name: \"");
-                result.push_str(struct_propery.get_db_field_name());
-                result.push_str("\", value: self.");
-                result.push_str(&struct_propery.name);
-                result.push_str(".to_rfc3339(),");
-                fill_op(result, struct_propery);
-                result.push_str("}");
-            }
+        types_reader::PropertyType::DateTime => fill_date_time_value(result, struct_propery),
+        types_reader::PropertyType::VecOf(sub_type) => {
+            get_field_value_of_vec(result, struct_propery, sub_type)
         }
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
+    }
+}
+
+fn get_field_value_of_vec(
+    result: &mut String,
+    struct_propery: &StructProperty,
+    sub_type: &PropertyType,
+) {
+    match sub_type {
+        types_reader::PropertyType::U8 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::I8 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::U16 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::I16 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::U32 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::I32 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::U64 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::I64 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::F32 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::F64 => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::DateTime => fill_date_time_value(result, struct_propery),
+        _ => panic!("Vec<{}> is not supported", struct_propery.ty.as_str()),
+    }
+}
+
+fn fill_date_time_value(result: &mut String, struct_propery: &StructProperty) {
+    if struct_propery.has_bigint_attr() {
+        result.push_str("my_postgres::InputDataValue::AsNonString { name: \"");
+        result.push_str(struct_propery.get_db_field_name());
+        result.push_str("\", value: self.");
+        result.push_str(&struct_propery.name);
+        result.push_str(".unix_microseconds.to_string(),");
+        fill_op(result, struct_propery);
+        result.push_str("}");
+    } else {
+        result.push_str("my_postgres::InputDataValue::AsString { name: \"");
+        result.push_str(struct_propery.get_db_field_name());
+        result.push_str("\", value: self.");
+        result.push_str(&struct_propery.name);
+        result.push_str(".to_rfc3339(),");
+        fill_op(result, struct_propery);
+        result.push_str("}");
     }
 }
 
