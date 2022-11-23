@@ -32,7 +32,9 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::DateTime => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::OptionOf(_) => fill_option_of(result, struct_propery),
+        types_reader::PropertyType::OptionOf(sub_type) => {
+            fill_option_of(result, struct_propery, &sub_type)
+        }
         types_reader::PropertyType::VecOf(sub_type) => {
             get_field_value_of_vec(result, struct_propery, sub_type)
         }
@@ -40,8 +42,8 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
     }
 }
 
-fn fill_option_of(result: &mut String, struct_propery: &StructProperty) {
-    match &struct_propery.ty {
+fn fill_option_of(result: &mut String, struct_propery: &StructProperty, sub_type: &PropertyType) {
+    match &sub_type {
         types_reader::PropertyType::U8 => fill_option_of_sql_value(result, struct_propery),
         types_reader::PropertyType::I8 => fill_option_of_sql_value(result, struct_propery),
         types_reader::PropertyType::U16 => fill_option_of_sql_value(result, struct_propery),
