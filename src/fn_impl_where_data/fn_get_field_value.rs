@@ -127,9 +127,9 @@ fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
 fn fill_option_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("my_postgres::SqlWhereValue::AsValue { name: \"");
     result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", value: self.");
+    result.push_str("\", value: if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
-    result.push_str(".as_ref(),");
+    result.push_str("{Some(value)}else{None},");
     fill_op(result, struct_propery);
     result.push_str("}");
 }
