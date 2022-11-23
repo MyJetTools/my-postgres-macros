@@ -70,19 +70,23 @@ fn get_field_value_of_option_of_vec(
     sub_type: &PropertyType,
 ) {
     match sub_type {
-        types_reader::PropertyType::U8 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::I8 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::U16 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::I16 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::U32 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::I32 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::U64 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::I64 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::F32 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::F64 => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::String => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::Str => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::U8 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I8 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::U16 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I16 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::U32 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I32 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::U64 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I64 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::F32 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::F64 => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::String => {
+            fill_option_of_vec_of_sql_value(result, struct_propery)
+        }
+        types_reader::PropertyType::Str => fill_option_of_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::DateTime => {
+            fill_option_of_vec_of_sql_value(result, struct_propery)
+        }
         types_reader::PropertyType::Struct(_) => {
             fill_option_of_vec_of_sql_value(result, struct_propery)
         }
