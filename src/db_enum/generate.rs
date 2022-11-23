@@ -132,7 +132,23 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
     result.push_str("_ => panic!(\"Invalid value {}\", src)");
 
-    result.push_str("}}}");
+    result.push_str("}}");
+
+    result.push_str(
+        r#"
+    impl<'s> my_postgres::SqlWhereValueWriter<'s> for DocumentTypeDto {
+        fn write(
+            &'s self,
+            sql: &mut String,
+            params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,
+        ) {
+            sql.push_str(self.as_numbered_str());
+        }
+    }
+    "#,
+    );
+
+    result.push('}');
 
     result.parse().unwrap()
 }
