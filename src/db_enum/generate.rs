@@ -134,7 +134,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
     result.push_str("}}}");
 
-    result.push_str("impl<'s> my_postgres::SqlWhereValueWriter<'s> for ");
+    result.push_str("impl<'s> my_postgres::SqlValueWriter<'s> for ");
     result.push_str(name);
     result.push_str(
         r#"{
