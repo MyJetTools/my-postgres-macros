@@ -97,6 +97,23 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
     result.push_str("}}");
 
+    result.push_str("pub fn as_numbered_str(&self)->&'static str {");
+
+    result.push_str(" match self {");
+
+    let mut i = 0;
+    for enum_case in enum_cases.as_slice() {
+        result.push_str(enum_case.name.as_str());
+
+        result.push_str(" => \"");
+        result.push_str(i.to_string().as_str());
+        result.push('"');
+        result.push(',');
+        i += 1;
+    }
+
+    result.push_str("}}");
+
     result.push_str("pub fn from_db_value(src: ");
     result.push_str(type_name.as_type_name());
     result.push_str(")->Self {");
