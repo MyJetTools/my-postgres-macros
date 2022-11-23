@@ -45,19 +45,19 @@ fn get_field_value_of_vec(
     sub_type: &PropertyType,
 ) {
     match sub_type {
-        types_reader::PropertyType::U8 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::I8 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::U16 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::I16 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::U32 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::I32 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::U64 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::I64 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::F32 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::F64 => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::U8 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I8 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::U16 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I16 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::U32 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I32 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::U64 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::I64 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::F32 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::F64 => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::String => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::Str => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::DateTime => fill_vec_of_sql_value(result, struct_propery),
         _ => panic!("Vec<{}> is not supported", sub_type.as_str()),
     }
 }
@@ -70,6 +70,14 @@ fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str(",");
     fill_op(result, struct_propery);
     result.push_str("}");
+}
+
+fn fill_vec_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
+    result.push_str("my_postgres::SqlWhereValue::to_in_operator(\"");
+    result.push_str(struct_propery.get_db_field_name());
+    result.push_str("\", &self.");
+    result.push_str(&struct_propery.name);
+    result.push_str(")");
 }
 
 fn fill_op(result: &mut String, struct_propery: &StructProperty) {
