@@ -32,11 +32,18 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::DateTime => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::OptionOf(_) => fill_option_of(result, struct_propery),
         types_reader::PropertyType::VecOf(sub_type) => {
             get_field_value_of_vec(result, struct_propery, sub_type)
         }
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
     }
+}
+
+fn fill_option_of(result: &mut String, struct_propery: &StructProperty) {
+    result.push_str(" if let Some(value) = &self.");
+    result.push_str(struct_propery.name.as_str());
+    result.push_str("{Some(value)}else{None}");
 }
 
 fn get_field_value_of_vec(
@@ -66,9 +73,9 @@ fn get_field_value_of_vec(
 fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("my_postgres::SqlWhereValue::AsValue { name: \"");
     result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", value: &self.");
+    result.push_str("\", value: Some(&self.");
     result.push_str(&struct_propery.name);
-    result.push_str(",");
+    result.push_str("),");
     fill_op(result, struct_propery);
     result.push_str("}");
 }
