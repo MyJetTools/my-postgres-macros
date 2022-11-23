@@ -31,7 +31,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(fields.len().to_string().as_str());
     result.push_str("}\n");
 
-    result.push_str("fn get_field_value(&'s self, no: usize) -> my_postgres::InputDataValue<'s> {");
+    result.push_str("fn get_field_value(&'s self, no: usize) -> my_postgres::SqlWhereValue<'s> {");
     super::fn_get_field_value::fn_get_field_value(&mut result, &fields);
     result.push_str("}\n");
 
