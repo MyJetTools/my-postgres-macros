@@ -35,7 +35,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_get_field_name::fn_get_field_name(&mut result, &fields);
     result.push_str("}\n");
 
-    result.push_str("fn get_field_value(&'s self, no: usize) -> my_postgres::SqlValue<'s>");
+    result.push_str("fn get_field_value(&'s self, no: usize) -> my_postgres::SqlValue<'s>{");
     super::fn_get_field_value::fn_get_field_value(&mut result, &fields);
     result.push_str("}\n");
 
