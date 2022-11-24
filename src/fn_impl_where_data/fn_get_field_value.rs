@@ -17,6 +17,17 @@ pub fn fn_get_field_value(result: &mut String, struct_properties: &[StructProper
     result.push_str("_ => panic!(\"Unexpected param no {}\", no)}");
 }
 
+fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
+    result.push_str("my_postgres::sql_where::SqlWhereValue::AsValue { name: \"");
+    result.push_str(struct_propery.get_db_field_name());
+    result.push_str("\", value: ");
+    crate::get_field_value::get_field_value(result, struct_propery);
+
+    result.push_str(",");
+    fill_op(result, struct_propery);
+    result.push_str("}");
+}
+
 fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
     match &struct_propery.ty {
         types_reader::PropertyType::U8 => fill_sql_value(result, struct_propery),
@@ -112,16 +123,6 @@ fn get_field_value_of_vec(
         types_reader::PropertyType::Struct(_) => fill_vec_of_sql_value(result, struct_propery),
         _ => panic!("Vec<{}> is not supported", sub_type.as_str()),
     }
-}
-
-fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::sql_where::SqlWhereValue::AsValue { name: \"");
-    result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", value: Some(&self.");
-    result.push_str(&struct_propery.name);
-    result.push_str("),");
-    fill_op(result, struct_propery);
-    result.push_str("}");
 }
 
 fn fill_option_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
