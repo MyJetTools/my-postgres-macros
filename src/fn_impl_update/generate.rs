@@ -48,5 +48,20 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     result.push_str("}\n");
 
+    let mut with_primary_key = Vec::new();
+
+    for field in fields {
+        if field.is_primary_key() {
+            with_primary_key.push(field);
+        }
+    }
+
+    crate::fn_impl_where_data::generate_implementation(
+        &mut result,
+        struct_name.as_str(),
+        with_primary_key.as_slice(),
+        has_str,
+    );
+
     result.parse().unwrap()
 }
