@@ -8,6 +8,7 @@ mod fn_impl_insert;
 mod fn_impl_select;
 mod fn_impl_update;
 mod fn_impl_where_data;
+mod get_field_value;
 
 mod db_enum;
 
