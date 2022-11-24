@@ -29,7 +29,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let mut result = String::new();
 
-    result.push_str("impl my_postgres::sql_update::SqlUpdateModel for ");
+    result.push_str("impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for ");
     result.push_str(struct_name.as_str());
     if has_str {
         result.push_str("<'s>");
@@ -38,6 +38,10 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     result.push_str("fn get_fields_amount() -> usize{");
     result.push_str((fields.len() - primary_key_amount).to_string().as_str());
+    result.push_str("}\n");
+
+    result.push_str("fn get_field_value(&'s self, no: usize) -> SqlUpdateValue<'s>{");
+    super::fn_get_field_value::fn_get_field_value(&mut result, fields.as_slice());
     result.push_str("}\n");
 
     result.push_str("}\n");
