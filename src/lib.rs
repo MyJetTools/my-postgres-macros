@@ -3,7 +3,6 @@ use db_enum::EnumType;
 use proc_macro::TokenStream;
 
 mod fn_impl_bulk_select;
-mod fn_impl_delete;
 mod fn_impl_insert;
 mod fn_impl_select;
 mod fn_impl_update;
@@ -59,15 +58,6 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
 pub fn postgres_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_update::generate(&ast)
-}
-
-#[proc_macro_derive(
-    DeleteDbEntity,
-    attributes(db_field_name, primary_key, ignore_if_null, debug_sql)
-)]
-pub fn delete_db_entity(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    crate::fn_impl_delete::generate(&ast)
 }
 
 #[proc_macro_derive(DbEnumAsU8, attributes(enum_case))]
