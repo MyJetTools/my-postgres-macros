@@ -40,7 +40,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str((fields.len() - primary_key_amount).to_string().as_str());
     result.push_str("}\n");
 
-    result.push_str("fn get_field_value(&'s self, no: usize) -> SqlUpdateValue<'s>{");
+    result.push_str(
+        "fn get_field_value(&'s self, no: usize) -> my_postgres::sql_update::SqlUpdateValue<'s>{",
+    );
     super::fn_get_field_value::fn_get_field_value(&mut result, fields.as_slice());
     result.push_str("}\n");
 
