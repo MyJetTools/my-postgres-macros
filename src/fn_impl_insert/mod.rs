@@ -1,4 +1,4 @@
-pub mod fn_insert;
+mod fn_get_field_name;
+mod fn_get_field_value;
 mod generate;
-pub use fn_insert::fn_insert;
 pub use generate::generate;

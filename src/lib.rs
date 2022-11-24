@@ -34,7 +34,10 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
     crate::fn_impl_bulk_select::generate(&ast)
 }
 
-#[proc_macro_derive(WhereInputData, attributes(db_field_name, timestamp, bigint, operator))]
+#[proc_macro_derive(
+    WhereInputData,
+    attributes(db_field_name, timestamp, bigint, operator, ignore)
+)]
 pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::fn_impl_where_data::generate(&ast)

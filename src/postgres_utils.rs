@@ -15,6 +15,8 @@ pub trait PostgresStructPropertyExt {
     fn get_db_field_name(&self) -> &str;
     fn has_json_attr(&self) -> bool;
 
+    fn has_ignore_attr(&self) -> bool;
+
     fn is_line_no(&self) -> bool;
 
     fn sql_value_to_mask(&self) -> bool;
@@ -42,6 +44,10 @@ impl PostgresStructPropertyExt for StructProperty {
         self.attrs.has_attr(ATTR_TIMESTAMP)
     }
 
+    fn has_ignore_attr(&self) -> bool {
+        self.attrs.has_attr("ignore")
+    }
+
     fn has_bigint_attr(&self) -> bool {
         self.attrs.has_attr(ATTR_BIGINT)
     }
@@ -64,6 +70,20 @@ impl PostgresStructPropertyExt for StructProperty {
 
         self.name.as_str()
     }
+}
+
+pub fn filter_fields(src: Vec<StructProperty>) -> Vec<StructProperty> {
+    let mut result = Vec::with_capacity(src.len());
+
+    for itm in src {
+        if itm.has_ignore_attr() {
+            continue;
+        }
+
+        result.push(itm);
+    }
+
+    return result;
 }
 
 pub fn read_value(
