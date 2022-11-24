@@ -41,7 +41,7 @@ pub fn generate_implementation(
     }
     result.push_str(" {\n");
 
-    result.push_str("fn get_max_fields_amount() -> usize {");
+    result.push_str("fn get_fields_amount() -> usize {");
     result.push_str(fields.len().to_string().as_str());
     result.push_str("}\n");
 
