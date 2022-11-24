@@ -33,7 +33,7 @@ pub fn generate_implementation(
     fields: &[StructProperty],
     has_str: bool,
 ) {
-    result.push_str("impl<'s> my_postgres::SqlWhereData<'s> for ");
+    result.push_str("impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for ");
     result.push_str(struct_name);
 
     if has_str {
