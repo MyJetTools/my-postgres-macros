@@ -36,6 +36,7 @@ impl PostgresStructPropertyExt for StructProperty {
 
         false
     }
+
     fn is_primary_key(&self) -> bool {
         self.attrs.has_attr(ATTR_PRIMARY_KEY)
     }

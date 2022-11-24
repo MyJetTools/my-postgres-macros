@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use types_reader::StructProperty;
+use types_reader::{PropertyType, StructProperty};
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
@@ -8,10 +8,23 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let struct_name = name.to_string();
 
+    let mut has_str = false;
+
+    for field in &fields {
+        if let PropertyType::Str = field.ty {
+            has_str = true;
+            break;
+        }
+    }
+
     let mut result = String::new();
 
     result.push_str("impl<'s> my_postgres::sql_insert::SqlInsertModel<'s> for ");
     result.push_str(struct_name.as_str());
+
+    if has_str {
+        result.push_str("<'s>");
+    }
     result.push_str(" {\n");
 
     result.push_str("fn get_fields_amount()->usize{");
@@ -22,7 +35,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_get_field_name::fn_get_field_name(&mut result, &fields);
     result.push_str("}\n");
 
-    result.push_str("fn get_field_value(no: usize) -> &'static str{");
+    result.push_str("fn get_field_value(&'s self, no: usize) -> &'static str{");
     super::fn_get_field_value::fn_get_field_value(&mut result, &fields);
     result.push_str("}\n");
 
