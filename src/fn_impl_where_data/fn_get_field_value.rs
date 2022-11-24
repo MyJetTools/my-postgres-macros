@@ -115,7 +115,7 @@ fn get_field_value_of_vec(
 }
 
 fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::SqlWhereValue::AsValue { name: \"");
+    result.push_str("my_postgres::sql_where::SqlWhereValue::AsValue { name: \"");
     result.push_str(struct_propery.get_db_field_name());
     result.push_str("\", value: Some(&self.");
     result.push_str(&struct_propery.name);
@@ -125,7 +125,7 @@ fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
 }
 
 fn fill_option_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::SqlWhereValue::AsValue { name: \"");
+    result.push_str("my_postgres::sql_where::SqlWhereValue::AsValue { name: \"");
     result.push_str(struct_propery.get_db_field_name());
     result.push_str("\", value: if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
@@ -135,7 +135,7 @@ fn fill_option_of_sql_value(result: &mut String, struct_propery: &StructProperty
 }
 
 fn fill_option_of_vec_of_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::SqlWhereValue::to_in_operator(\"");
+    result.push_str("my_postgres::sql_where::SqlWhereValue::to_in_operator(\"");
     result.push_str(struct_propery.get_db_field_name());
     result.push_str("\", &self.");
     result.push_str(&struct_propery.name);
@@ -143,7 +143,7 @@ fn fill_option_of_vec_of_value(result: &mut String, struct_propery: &StructPrope
 }
 
 fn fill_vec_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::SqlWhereValue::to_in_operator(\"");
+    result.push_str("my_postgres::sql_where::SqlWhereValue::to_in_operator(\"");
     result.push_str(struct_propery.get_db_field_name());
     result.push_str("\", &Some(self.");
     result.push_str(&struct_propery.name);

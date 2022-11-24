@@ -45,7 +45,9 @@ pub fn generate_implementation(
     result.push_str(fields.len().to_string().as_str());
     result.push_str("}\n");
 
-    result.push_str("fn get_field_value(&'s self, no: usize) -> my_postgres::SqlWhereValue<'s> {");
+    result.push_str(
+        "fn get_field_value(&'s self, no: usize) -> my_postgres::sql_where::SqlWhereValue<'s> {",
+    );
     super::fn_get_field_value::fn_get_field_value(result, &fields);
     result.push_str("}\n");
 
