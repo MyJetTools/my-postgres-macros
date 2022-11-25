@@ -48,7 +48,7 @@ fn fill_value(result: &mut String, struct_propery: &StructProperty) {
 }
 
 fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("{value:if let Some(value) = &self.");
+    result.push_str("{if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
     result.push_str(
         "{my_postgres::SqlValue::Value {value, options: None}}else{my_postgres::SqlValue::Null}}",
