@@ -20,7 +20,7 @@ pub fn fn_get_field_value(result: &mut String, struct_properties: &[StructProper
 fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("my_postgres::sql_where::SqlWhereValue::AsValue { name: \"");
     result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", value: ");
+    result.push_str("\", value: value: my_postgres::SqlValue::Value");
     crate::get_field_value::get_field_value(result, struct_propery);
 
     result.push_str(",");
