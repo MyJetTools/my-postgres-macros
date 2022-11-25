@@ -1,5 +1,7 @@
 use types_reader::{PropertyType, StructProperty};
 
+use crate::postgres_utils::PostgresStructPropertyExt;
+
 pub fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
     match &struct_propery.ty {
         types_reader::PropertyType::U8 => fill_value(result, struct_propery),
@@ -51,6 +53,14 @@ fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
     result.push_str(
-        "{my_postgres::SqlValue::Value {value, options: None}}else{my_postgres::SqlValue::Null}",
+        "{my_postgres::SqlValue::Value {value, options: None}}else{my_postgres::SqlValue::",
     );
+
+    if struct_propery.has_ignore_if_null_attr() {
+        result.push_str("Ignore")
+    } else {
+        result.push_str("Null")
+    }
+
+    result.push_str("}");
 }

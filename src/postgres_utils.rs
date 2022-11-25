@@ -16,6 +16,7 @@ pub trait PostgresStructPropertyExt {
     fn has_json_attr(&self) -> bool;
 
     fn has_ignore_attr(&self) -> bool;
+    fn has_ignore_if_null_attr(&self) -> bool;
 
     fn is_line_no(&self) -> bool;
 
@@ -51,6 +52,10 @@ impl PostgresStructPropertyExt for StructProperty {
 
     fn has_bigint_attr(&self) -> bool {
         self.attrs.has_attr(ATTR_BIGINT)
+    }
+
+    fn has_ignore_if_null_attr(&self) -> bool {
+        self.attrs.has_attr("ignore_if_null")
     }
 
     fn has_json_attr(&self) -> bool {
