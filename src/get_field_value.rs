@@ -42,13 +42,13 @@ fn fill_option_of(result: &mut String, struct_propery: &StructProperty, sub_type
 }
 
 fn fill_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("Some(&self.");
+    result.push_str("{value: &self.");
     result.push_str(&struct_propery.name);
-    result.push_str(")");
+    result.push_str(", options: None}");
 }
 
 fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("if let Some(value) = &self.");
+    result.push_str("{value:if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
-    result.push_str("{Some(value)}else{None}");
+    result.push_str("{Some(value)}else{None}, options: None}");
 }
