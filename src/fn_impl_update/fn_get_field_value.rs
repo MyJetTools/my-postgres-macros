@@ -15,7 +15,7 @@ pub fn fn_get_field_value(result: &mut String, fields: &[StructProperty]) {
         result.push_str("=> my_postgres::sql_update::SqlUpdateValue{ name: \"");
         result.push_str(field.get_db_field_name());
 
-        result.push_str("\", value: my_postgres::SqlValue ");
+        result.push_str("\", value: my_postgres::SqlValue::Value ");
 
         crate::get_field_value::get_field_value(result, field);
         result.push_str("},");
