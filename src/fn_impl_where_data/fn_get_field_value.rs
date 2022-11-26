@@ -43,7 +43,7 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::DateTime => {
-            check_for_date_time(result, struct_propery);
+            check_for_date_time(struct_propery);
             fill_option_of_sql_value(result, struct_propery);
         }
 
@@ -72,7 +72,7 @@ fn fill_option_of(result: &mut String, struct_propery: &StructProperty, sub_type
         types_reader::PropertyType::String => fill_option_of_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_option_of_sql_value(result, struct_propery),
         types_reader::PropertyType::DateTime => {
-            check_for_date_time(result, struct_propery);
+            check_for_date_time(struct_propery);
             fill_option_of_sql_value(result, struct_propery);
         }
 
@@ -102,7 +102,7 @@ fn fill_option_of_vec(
         types_reader::PropertyType::String => fill_option_of_vec_of_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_option_of_vec_of_value(result, struct_propery),
         types_reader::PropertyType::DateTime => {
-            check_for_date_time(result, struct_propery);
+            check_for_date_time(struct_propery);
             fill_option_of_vec_of_value(result, struct_propery);
         }
 
@@ -169,7 +169,7 @@ fn fill_vec_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str(")");
 }
 
-fn check_for_date_time(result: &mut String, struct_propery: &StructProperty) {
+fn check_for_date_time(struct_propery: &StructProperty) {
     if let Some(attr) = struct_propery.get_sql_type() {
         if attr != "timestamp" && attr != "bigint" {
             panic!("DateTime must be timestamp or bigint");
