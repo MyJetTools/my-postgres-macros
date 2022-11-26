@@ -102,8 +102,10 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
                     } else if sql_type == "bigint" {
                         fill_standard_field(result, struct_property);
                     } else {
-                        panic!("Unknown date time type. Property: {}", struct_property.name);
+                        panic!("Unknown date time type. Property: {} can be either timestamp or bignint", struct_property.name);
                     }
+                } else {
+                    panic!("Property {} misses an sql_type attr", struct_property.name)
                 }
             }
             types_reader::PropertyType::OptionOf(_) => {
