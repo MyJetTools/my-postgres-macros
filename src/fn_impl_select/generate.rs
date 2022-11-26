@@ -14,12 +14,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("fn from(src: crate::sql_select::FromDbRow) -> Self {");
-    super::fn_from::fn_from(&mut result, &fields);
-    result.push_str("}\n");
-
-    result.push_str("fn get_select_fields() -> &'static str {");
-    super::fn_select_fields(&mut result, &fields);
+    result.push_str("fn fill_select_fields(sql: &mut String) -> Self {");
+    super::fn_fill_select_fields::fn_fill_select_fields(&mut result, &fields);
     result.push_str("}\n");
 
     result.push_str("fn get_order_by_fields() -> Option<my_postgres::sql_select::OrderByFields> {");

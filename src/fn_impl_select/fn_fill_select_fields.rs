@@ -2,7 +2,7 @@ use types_reader::StructProperty;
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-pub fn fn_from(result: &mut String, fields: &[StructProperty]) {
+pub fn fn_fill_select_fields(result: &mut String, fields: &[StructProperty]) {
     let mut no = 0;
     for prop in fields {
         if no > 0 {
