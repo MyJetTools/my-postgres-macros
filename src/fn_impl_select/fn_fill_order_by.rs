@@ -44,7 +44,7 @@ pub fn fn_fill_order_by(result: &mut String, fields: &[StructProperty]) {
             result.push_str("result.push(' ');");
             result.push_str("result.push_str(\"");
             result.push_str(field.get_db_field_name());
-            result.push_str("\";");
+            result.push_str("\");");
         }
     }
 }
