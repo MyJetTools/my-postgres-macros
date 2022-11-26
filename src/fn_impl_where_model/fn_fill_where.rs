@@ -3,7 +3,7 @@ use types_reader::{PropertyType, StructProperty};
 use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) {
-    result.push_str("use my_postgres::sql_where::SqlWhereValue;");
+    result.push_str("use my_postgres::SqlValueWriter;");
 
     let mut no = 0;
     for struct_property in struct_properties {
@@ -139,10 +139,7 @@ fn get_field_value_of_vec(
 fn fill_option_of_sql_value(result: &mut String, struct_property: &StructProperty) {
     result.push_str(" if let Some(value) = &self.");
     result.push_str(&struct_property.name);
-    result.push_str("{");
-
-    result.push_str(struct_property.name.as_str());
-    result.push_str(".write(sql, params, ");
+    result.push_str("{value.write(sql, params, ");
     crate::get_field_value::fill_sql_type(result, struct_property);
     result.push_str(")};");
 }
