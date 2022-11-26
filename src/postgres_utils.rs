@@ -4,14 +4,12 @@ pub const ATTR_PRIMARY_KEY: &str = "primary_key";
 pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
 //pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
 
-pub const ATTR_TIMESTAMP: &str = "timestamp";
-pub const ATTR_BIGINT: &str = "bigint";
+pub const ATTR_SQL_TYPE: &str = "sql_type";
 pub const ATTR_JSON: &str = "json";
 
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
-    fn has_timestamp_attr(&self) -> bool;
-    fn has_bigint_attr(&self) -> bool;
+    fn get_sql_type(&self) -> Option<String>;
     fn get_db_field_name(&self) -> &str;
     fn has_json_attr(&self) -> bool;
 
@@ -42,16 +40,19 @@ impl PostgresStructPropertyExt for StructProperty {
         self.attrs.has_attr(ATTR_PRIMARY_KEY)
     }
 
-    fn has_timestamp_attr(&self) -> bool {
-        self.attrs.has_attr(ATTR_TIMESTAMP)
-    }
-
     fn has_ignore_attr(&self) -> bool {
         self.attrs.has_attr("ignore")
     }
 
-    fn has_bigint_attr(&self) -> bool {
-        self.attrs.has_attr(ATTR_BIGINT)
+    fn get_sql_type(&self) -> Option<String> {
+        let attr = self.attrs.try_get(ATTR_SQL_TYPE)?;
+
+        if let Some(value) = &attr.content {
+            return crate::postgres_utils::extract_attr_value(value)
+                .to_string()
+                .into();
+        }
+        panic!("Attribute {} has to have value inside ()", ATTR_SQL_TYPE);
     }
 
     fn has_ignore_if_null_attr(&self) -> bool {

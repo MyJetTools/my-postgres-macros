@@ -92,16 +92,18 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
                 fill_standard_field(result, struct_property);
             }
             types_reader::PropertyType::DateTime => {
-                if struct_property.has_timestamp_attr() {
-                    result.push_str("(extract(EPOCH FROM ");
-                    result.push_str(struct_property.get_db_field_name());
-                    result.push_str(") * 1000000)::bigint ");
+                if let Some(sql_type) = struct_property.get_sql_type() {
+                    if sql_type == "timestamp" {
+                        result.push_str("(extract(EPOCH FROM ");
+                        result.push_str(struct_property.get_db_field_name());
+                        result.push_str(") * 1000000)::bigint ");
 
-                    fill_casting_to_name(result, struct_property);
-                } else if struct_property.has_bigint_attr() {
-                    fill_standard_field(result, struct_property);
-                } else {
-                    panic!("Unknown date time type. Property: {}", struct_property.name);
+                        fill_casting_to_name(result, struct_property);
+                    } else if sql_type == "bigint" {
+                        fill_standard_field(result, struct_property);
+                    } else {
+                        panic!("Unknown date time type. Property: {}", struct_property.name);
+                    }
                 }
             }
             types_reader::PropertyType::OptionOf(_) => {

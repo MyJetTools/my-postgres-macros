@@ -20,7 +20,6 @@ use syn;
     attributes(
         db_field_name,
         json,
-        timestamp,
         bigint,
         line_no,
         sql,
@@ -37,7 +36,7 @@ pub fn postgres_select_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     BulkSelectDbEntity,
-    attributes(db_field_name, json, timestamp, bigint, line_no, sql_type,)
+    attributes(db_field_name, json, bigint, line_no, sql_type,)
 )]
 pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -48,7 +47,6 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
     WhereInputData,
     attributes(
         db_field_name,
-        timestamp,
         bigint,
         operator,
         ignore_if_null,
@@ -65,15 +63,7 @@ pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     InsertDbEntity,
-    attributes(
-        db_field_name,
-        ignore_if_null,
-        ignore,
-        timestamp,
-        bigint,
-        json,
-        sql_type,
-    )
+    attributes(db_field_name, ignore_if_null, ignore, bigint, json, sql_type,)
 )]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
