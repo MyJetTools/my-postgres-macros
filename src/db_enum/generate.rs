@@ -50,7 +50,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push_str(name);
     result.push_str(" {");
 
-    result.push_str("pub fn to_sql_value(&self)->my_postgres::code_gens::SqlValue");
+    result.push_str("pub fn to_sql_value(&self)->my_postgres::SqlValue");
 
     result.push_str(" {");
 
@@ -62,7 +62,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
         result.push_str(" => ");
 
-        result.push_str("my_postgres::code_gens::SqlValue::");
+        result.push_str("my_postgres::SqlValue::");
 
         result.push_str(type_name.as_sql_value_name());
 
