@@ -13,7 +13,7 @@ pub fn fn_fill_select_fields(result: &mut String, fields: &[StructProperty]) {
         result.push_str(prop.ty.as_str().as_str());
         result.push_str("::fill_select_part(sql, \"");
         result.push_str(prop.get_db_field_name());
-        result.push_str("\"), ");
+        result.push_str("\", ");
 
         if let Some(sql_type) = prop.get_sql_type() {
             result.push_str("Some(\"");
@@ -25,12 +25,4 @@ pub fn fn_fill_select_fields(result: &mut String, fields: &[StructProperty]) {
 
         result.push_str(");");
     }
-}
-
-fn generate_read_db_row_field(result: &mut String, prop: &StructProperty) {
-    result.push_str("row.get(");
-    result.push('"');
-    result.push_str(prop.get_db_field_name());
-    result.push('"');
-    result.push(')');
 }

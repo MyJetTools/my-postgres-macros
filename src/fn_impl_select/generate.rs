@@ -14,7 +14,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("fn fill_select_fields(sql: &mut String) -> Self {");
+    result.push_str("fn fill_select_fields(sql: &mut String) {");
     super::fn_fill_select_fields::fn_fill_select_fields(&mut result, &fields);
     result.push_str("}\n");
 
