@@ -19,7 +19,6 @@ pub fn fn_fill_order_by(result: &mut String, fields: &[StructProperty]) {
     }
 
     if order_by_desc.is_empty() && order_by.is_empty() {
-        result.push_str("None");
         return;
     }
 
