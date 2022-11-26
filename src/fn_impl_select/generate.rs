@@ -22,7 +22,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_select_fields(&mut result, &fields);
     result.push_str("}\n");
 
-    result.push_str("fn get_order_by_fields() -> Option<my_postgres::OrderByFields<'s>> {");
+    result.push_str(
+        "fn get_order_by_fields() -> Option<my_postgres::sql_select::OrderByFields<'s>> {",
+    );
     super::fn_get_order_by_fields::fn_get_order_by_fields(&mut result, &fields);
     result.push_str("}\n");
 
