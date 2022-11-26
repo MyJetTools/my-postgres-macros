@@ -60,7 +60,7 @@ pub fn generate_implementation(
     }
     result.push_str(" {\n");
 
-    result.push_str("fn fill_where(&self, sql: &mut String, params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,) {");
+    result.push_str("fn fill_where(&'s self, sql: &mut String, params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,) {");
     super::fn_fill_where::fn_fill_where(result, &fields);
     result.push_str("}\n");
 
