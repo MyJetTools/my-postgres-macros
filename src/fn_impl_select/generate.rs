@@ -26,6 +26,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_get_group_by_fields::fn_get_group_by_fields(&mut result, &fields);
     result.push_str("}\n");
 
+    result.push_str(
+        r#"    fn from(src: my_postgres::sql_select::FromDbRow) -> Self {
+        todo!()
+    }"#,
+    );
+
     result.push_str("}\n");
 
     result.parse().unwrap()
