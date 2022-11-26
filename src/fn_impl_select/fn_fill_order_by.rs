@@ -28,21 +28,21 @@ pub fn fn_fill_order_by(result: &mut String, fields: &[StructProperty]) {
     }
 
     if !order_by_desc.is_empty() {
-        result.push_str("result.push_str(\" ORDER BY\");");
+        result.push_str("sql.push_str(\" ORDER BY\");");
         for field in order_by_desc {
-            result.push_str("result.push(' ');");
-            result.push_str("result.push_str(\"");
+            result.push_str("sql.push(' ');");
+            result.push_str("sql.push_str(\"");
             result.push_str(field.get_db_field_name());
             result.push_str("\");");
-            result.push_str("result.push_str(\" DESC\");");
+            result.push_str("sql.push_str(\" DESC\");");
         }
     }
 
     if !order_by.is_empty() {
-        result.push_str("result.push_str(\" ORDER BY\");");
+        result.push_str("sql.push_str(\" ORDER BY\");");
         for field in order_by {
-            result.push_str("result.push(' ');");
-            result.push_str("result.push_str(\"");
+            result.push_str("sql.push(' ');");
+            result.push_str("sql.push_str(\"");
             result.push_str(field.get_db_field_name());
             result.push_str("\");");
         }

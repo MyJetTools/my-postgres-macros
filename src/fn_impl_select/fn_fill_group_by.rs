@@ -18,8 +18,8 @@ pub fn fn_fill_group_by(result: &mut String, fields: &[StructProperty]) {
 
     result.push_str("result.push_str(\" GROUP BY\");");
     for prop in group_by {
-        result.push_str("result.push(' ');");
-        result.push_str("result.push_str(\"");
+        result.push_str("sql.push(' ');");
+        result.push_str("sql.push_str(\"");
         result.push_str(prop);
         result.push_str("\");");
     }
