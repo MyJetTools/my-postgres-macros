@@ -91,3 +91,26 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Vec<StructProperty> {
 
     return result;
 }
+
+pub fn extract_attr_value(src: &[u8]) -> &str {
+    let src = &src[1..src.len() - 1];
+
+    for i in 0..src.len() {
+        if src[i] == b'"' || src[i] == b'\'' {
+            let b = src[i];
+
+            for j in 1..src.len() {
+                let pos = src.len() - j;
+
+                if src[pos] == b {
+                    let result = &src[i + 1..pos];
+
+                    let result = std::str::from_utf8(result).unwrap();
+                    return result;
+                }
+            }
+        }
+    }
+
+    std::str::from_utf8(src).unwrap()
+}

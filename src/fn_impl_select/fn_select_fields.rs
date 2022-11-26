@@ -14,7 +14,22 @@ pub fn fn_select_fields(result: &mut String, struct_properties: &[StructProperty
             result.push(',');
         }
 
-        generate_read_field(result, struct_property, &struct_property.ty);
+        if let Some(select) = struct_property.attrs.try_get("sql") {
+            if let Some(select) = &select.content {
+                let value = crate::postgres_utils::extract_attr_value(select);
+                result.push_str(value);
+                result.push_str(" as ");
+                result.push_str(struct_property.get_db_field_name());
+            } else {
+                panic!(
+                    "please specify content inside sql attribute for {}",
+                    struct_property.name
+                );
+            }
+        } else {
+            generate_read_field(result, struct_property, &struct_property.ty);
+        }
+
         no += 1;
     }
 

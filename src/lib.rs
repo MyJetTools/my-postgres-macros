@@ -17,7 +17,7 @@ use syn;
 
 #[proc_macro_derive(
     SelectDbEntity,
-    attributes(db_field_name, debug_sql, json, timestamp, bigint, line_no)
+    attributes(db_field_name, debug_sql, json, timestamp, bigint, line_no, sql)
 )]
 pub fn postgres_select_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
