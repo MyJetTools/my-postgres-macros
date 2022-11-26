@@ -10,7 +10,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
     result.push_str("let mut no = 0;");
     for struct_property in struct_properties {
         if no > 0 {
-            result.push_str("if no>0 {sql.push_str(\" AND \");no+=1;}");
+            result.push_str("if no>0 {sql.push_str(\" AND \");}");
         }
 
         no += 1;
@@ -25,6 +25,7 @@ fn fill_sql_value(result: &mut String, struct_property: &StructProperty) {
     result.push_str(".write(sql, params, ");
     crate::get_field_value::fill_sql_type(result, struct_property);
     result.push_str(");");
+    result.push_str("no+=1;");
 }
 
 fn read_field_value(result: &mut String, struct_propery: &StructProperty) {
@@ -143,7 +144,7 @@ fn fill_option_of_sql_value(result: &mut String, struct_property: &StructPropert
     result.push_str(&struct_property.name);
     result.push_str("{value.write(sql, params, ");
     crate::get_field_value::fill_sql_type(result, struct_property);
-    result.push_str(")};");
+    result.push_str("); no+=1;};");
 }
 
 fn fill_option_of_vec_of_value(result: &mut String, struct_propery: &StructProperty) {
