@@ -73,9 +73,9 @@ fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
 pub fn fill_sql_type(result: &mut String, struct_propery: &StructProperty) {
     if let Some(sql_type) = struct_propery.attrs.try_get("sql_type") {
         if let Some(content) = sql_type.content.as_ref() {
-            result.push_str("Some(");
+            result.push_str("Some(\"");
             result.push_str(crate::postgres_utils::extract_attr_value(content));
-            result.push_str(")");
+            result.push_str("\")");
             return;
         }
     }
