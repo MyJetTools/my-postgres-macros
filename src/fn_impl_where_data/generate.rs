@@ -51,5 +51,13 @@ pub fn generate_implementation(
     super::fn_get_field_value::fn_get_field_value(result, &fields);
     result.push_str("}\n");
 
+    result.push_str("fn get_limit(&self) -> Option<usize> {");
+    result.push_str("None");
+    result.push_str("}\n");
+
+    result.push_str("fn get_offset(&self) -> Option<usize> {");
+    result.push_str("None");
+    result.push_str("}\n");
+
     result.push_str("}\n");
 }
