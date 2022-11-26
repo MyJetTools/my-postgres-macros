@@ -2,7 +2,7 @@ use types_reader::StructProperty;
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-pub fn fn_fill_order_by(result: &mut String, fields: &[StructProperty]) {
+pub fn fn_get_order_by_fields(result: &mut String, fields: &[StructProperty]) {
     let mut order_by_desc = Vec::with_capacity(fields.len());
     let mut order_by = Vec::with_capacity(fields.len());
 
@@ -35,6 +35,7 @@ pub fn fn_fill_order_by(result: &mut String, fields: &[StructProperty]) {
             order_by_content.push_str(field.get_db_field_name());
         }
         order_by_content.push_str(" DESC");
+
         result.push_str(order_by_content.as_str());
         return;
     }

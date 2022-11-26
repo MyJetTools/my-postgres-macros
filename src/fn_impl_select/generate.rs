@@ -18,12 +18,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_fill_select_fields::fn_fill_select_fields(&mut result, &fields);
     result.push_str("}\n");
 
-    result.push_str("fn fill_order_by_fields(sql: &mut String) {");
-    super::fn_fill_order_by::fn_fill_order_by(&mut result, &fields);
+    result.push_str("fn get_order_by_fields() -> Option<&'static str>");
+    super::fn_fill_order_by::fn_get_order_by_fields(&mut result, &fields);
     result.push_str("}\n");
 
-    result.push_str("fn fill_group_by_fields(sql: &mut String){");
-    super::fn_fill_group_by::fn_fill_group_by(&mut result, &fields);
+    result.push_str("fn get_group_by_fields() -> Option<&'static str>{");
+    super::fn_fill_group_by::get_group_by_fields(&mut result, &fields);
     result.push_str("}\n");
 
     result.push_str("fn from(db_row: &tokio_postgres::Row) -> Self {");
