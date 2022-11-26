@@ -9,6 +9,7 @@ pub const ATTR_JSON: &str = "json";
 
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
+    fn check_for_sql_type(&self);
     fn get_sql_type(&self) -> Option<String>;
     fn get_db_field_name(&self) -> &str;
     fn has_json_attr(&self) -> bool;
@@ -42,6 +43,10 @@ impl PostgresStructPropertyExt for StructProperty {
 
     fn has_ignore_attr(&self) -> bool {
         self.attrs.has_attr("ignore")
+    }
+
+    fn check_for_sql_type(&self) {
+        panic!("please specify sql_type attribute for {}", self.name);
     }
 
     fn get_sql_type(&self) -> Option<String> {
