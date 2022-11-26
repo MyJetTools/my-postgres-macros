@@ -10,7 +10,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let mut result = String::new();
 
-    result.push_str("impl<'s> my_postgres::sql_select::SelectEntity<'s> for ");
+    result.push_str("impl my_postgres::sql_select::SelectEntity for ");
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
@@ -22,10 +22,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_select_fields(&mut result, &fields);
     result.push_str("}\n");
 
-    result.push_str(
-        "fn get_order_by_fields() -> Option<my_postgres::sql_select::OrderByFields<'s>> {",
-    );
+    result.push_str("fn get_order_by_fields() -> Option<my_postgres::sql_select::OrderByFields> {");
     super::fn_get_order_by_fields::fn_get_order_by_fields(&mut result, &fields);
+    result.push_str("}\n");
+
+    result.push_str("fn get_group_by_fields() -> Option<my_postgres::sql_select::GroupByFields> {");
+    super::fn_get_group_by_fields::fn_get_group_by_fields(&mut result, &fields);
     result.push_str("}\n");
 
     result.push_str("}\n");
