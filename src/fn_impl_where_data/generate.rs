@@ -4,7 +4,22 @@ use types_reader::{PropertyType, StructProperty};
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
 
-    let fields = crate::postgres_utils::filter_fields(StructProperty::read(ast));
+    let src_fields = StructProperty::read(ast);
+
+    let mut limit = None;
+    let mut offset = None;
+
+    let mut fields = Vec::with_capacity(src_fields.len());
+
+    for field in src_fields {
+        if field.attrs.has_attr("limit") {
+            limit = Some(field);
+        } else if field.attrs.has_attr("offset") {
+            offset = Some(field);
+        } else {
+            fields.push(field);
+        }
+    }
 
     let mut has_str = false;
 
@@ -22,6 +37,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         struct_name.as_str(),
         fields.as_slice(),
         has_str,
+        limit,
+        offset,
     );
 
     result.parse().unwrap()
@@ -32,6 +49,8 @@ pub fn generate_implementation(
     struct_name: &str,
     fields: &[StructProperty],
     has_str: bool,
+    limit: Option<StructProperty>,
+    offset: Option<StructProperty>,
 ) {
     result.push_str("impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for ");
     result.push_str(struct_name);
@@ -52,11 +71,26 @@ pub fn generate_implementation(
     result.push_str("}\n");
 
     result.push_str("fn get_limit(&self) -> Option<usize> {");
-    result.push_str("None");
+
+    if let Some(limit) = limit {
+        result.push_str("Some(self.");
+        result.push_str(limit.name.as_str());
+
+        result.push(')');
+    } else {
+        result.push_str("None");
+    }
+
     result.push_str("}\n");
 
     result.push_str("fn get_offset(&self) -> Option<usize> {");
-    result.push_str("None");
+    if let Some(offset) = offset {
+        result.push_str("Some(self.");
+        result.push_str(offset.name.as_str());
+        result.push(')');
+    } else {
+        result.push_str("None");
+    }
     result.push_str("}\n");
 
     result.push_str("}\n");

@@ -46,7 +46,16 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     WhereInputData,
-    attributes(db_field_name, timestamp, bigint, operator, ignore_if_null, ignore)
+    attributes(
+        db_field_name,
+        timestamp,
+        bigint,
+        operator,
+        ignore_if_null,
+        ignore,
+        limit,
+        offset
+    )
 )]
 pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

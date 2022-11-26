@@ -61,6 +61,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         struct_name.as_str(),
         with_primary_key.as_slice(),
         has_str,
+        None,
+        None,
     );
 
     result.parse().unwrap()
