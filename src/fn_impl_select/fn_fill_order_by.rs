@@ -1,17 +1,19 @@
 use types_reader::StructProperty;
 
-pub fn fn_get_order_by_fields(result: &mut String, fields: &[StructProperty]) {
+use crate::postgres_utils::PostgresStructPropertyExt;
+
+pub fn fn_fill_order_by(result: &mut String, fields: &[StructProperty]) {
     let mut order_by_desc = Vec::with_capacity(fields.len());
     let mut order_by = Vec::with_capacity(fields.len());
 
     for prop in fields {
         if prop.attrs.has_attr("order_by_desc") {
-            order_by_desc.push(prop.name.as_str());
+            order_by_desc.push(prop);
             continue;
         }
 
         if prop.attrs.has_attr("order_by") {
-            order_by.push(prop.name.as_str());
+            order_by.push(prop);
             continue;
         }
     }
@@ -26,22 +28,23 @@ pub fn fn_get_order_by_fields(result: &mut String, fields: &[StructProperty]) {
     }
 
     if !order_by_desc.is_empty() {
-        result.push_str("Some(my_postgres::sql_select::OrderByFields::Desc(vec![");
+        result.push_str("result.push_str(\" ORDER BY\");");
         for field in order_by_desc {
-            result.push_str("\"");
-            result.push_str(field);
-            result.push_str("\",");
+            result.push_str("result.push(' ');");
+            result.push_str("result.push_str(\"");
+            result.push_str(field.get_db_field_name());
+            result.push_str("\");");
+            result.push_str("result.push_str(\" DESC\");");
         }
-        result.push_str("]))");
     }
 
     if !order_by.is_empty() {
-        result.push_str("Some(my_postgres::sql_select::OrderByFields::Asc(vec![");
+        result.push_str("result.push_str(\" ORDER BY\");");
         for field in order_by {
-            result.push_str("\"");
-            result.push_str(field);
-            result.push_str("\",");
+            result.push_str("result.push(' ');");
+            result.push_str("result.push_str(\"");
+            result.push_str(field.get_db_field_name());
+            result.push_str("\";");
         }
-        result.push_str("]))");
     }
 }
