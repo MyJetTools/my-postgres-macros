@@ -3,6 +3,8 @@ use types_reader::{PropertyType, StructProperty};
 use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) {
+    result.push_str("use my_postgres::sql_where::SqlWhereValue;");
+
     let mut no = 0;
     for struct_property in struct_properties {
         if no > 0 {
@@ -10,26 +12,20 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
         }
 
         no += 1;
-        result.push_str("self.");
-        result.push_str(struct_property.name.as_str());
-        result.push_str(".write(sql, params, ");
-        crate::get_field_value::fill_sql_type(result, struct_property);
-        result.push_str(");");
+
+        read_field_value(result, struct_property);
     }
 }
 
-fn fill_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::sql_where::SqlWhereValue::AsValue { name: \"");
-    result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", value: ");
-    crate::get_field_value::get_field_value(result, struct_propery);
-
-    result.push_str(",");
-    fill_op(result, struct_propery);
-    result.push_str("}");
+fn fill_sql_value(result: &mut String, struct_property: &StructProperty) {
+    result.push_str("self.");
+    result.push_str(struct_property.name.as_str());
+    result.push_str(".write(sql, params, ");
+    crate::get_field_value::fill_sql_type(result, struct_property);
+    result.push_str(");");
 }
 
-fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
+fn read_field_value(result: &mut String, struct_propery: &StructProperty) {
     match &struct_propery.ty {
         types_reader::PropertyType::U8 => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::I8 => fill_sql_value(result, struct_propery),
@@ -140,18 +136,15 @@ fn get_field_value_of_vec(
     }
 }
 
-fn fill_option_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::sql_where::SqlWhereValue::AsValue { name: \"");
-    result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", value: if let Some(value) = &self.");
-    result.push_str(&struct_propery.name);
-    result.push_str("{my_postgres::SqlValue::Value {value, sql_type: ");
+fn fill_option_of_sql_value(result: &mut String, struct_property: &StructProperty) {
+    result.push_str(" if let Some(value) = &self.");
+    result.push_str(&struct_property.name);
+    result.push_str("{");
 
-    crate::get_field_value::fill_sql_type(result, struct_propery);
-
-    result.push_str("}}else{my_postgres::SqlValue::Ignore},");
-    fill_op(result, struct_propery);
-    result.push_str("}");
+    result.push_str(struct_property.name.as_str());
+    result.push_str(".write(sql, params, ");
+    crate::get_field_value::fill_sql_type(result, struct_property);
+    result.push_str(")};");
 }
 
 fn fill_option_of_vec_of_value(result: &mut String, struct_propery: &StructProperty) {
