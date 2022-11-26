@@ -5,21 +5,21 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) {
     result.push_str("use my_postgres::SqlValueWriter;");
 
-    let mut no = 0;
-
     result.push_str("let mut no = 0;");
     for struct_property in struct_properties {
-        if no > 0 {
-            result.push_str("if no>0 {sql.push_str(\" AND \");}");
-        }
-
-        no += 1;
+        result.push_str("if no>0 {sql.push_str(\" AND \");}");
 
         read_field_value(result, struct_property);
     }
 }
 
 fn fill_sql_value(result: &mut String, struct_property: &StructProperty) {
+    result.push_str("sql.push_str(\"");
+    result.push_str(struct_property.get_db_field_name());
+
+    fill_op(result, struct_property);
+    result.push_str("\");");
+
     result.push_str("self.");
     result.push_str(struct_property.name.as_str());
     result.push_str(".write(sql, params, ");
@@ -176,19 +176,12 @@ fn check_for_date_time(struct_propery: &StructProperty) {
 fn fill_op(result: &mut String, struct_propery: &StructProperty) {
     if let Some(op) = struct_propery.attrs.try_get("operator") {
         if let Some(content) = op.content.as_ref() {
-            result.push_str("op: \"");
             result.push_str(extract_and_verify_operation(content));
-            result.push_str("\"");
         }
         return;
     }
 
-    if struct_propery.attrs.has_attr("ne") {
-        result.push_str("op: \"!=\"");
-        return;
-    }
-
-    result.push_str("op: \"=\"");
+    result.push_str("=");
 }
 
 fn extract_and_verify_operation(src: &[u8]) -> &str {
