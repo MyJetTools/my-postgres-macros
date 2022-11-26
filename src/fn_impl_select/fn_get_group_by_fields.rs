@@ -4,7 +4,7 @@ pub fn fn_get_group_by_fields(result: &mut String, fields: &[StructProperty]) {
     let mut group_by = Vec::with_capacity(fields.len());
 
     for prop in fields {
-        if prop.attrs.has_attr("order_by") {
+        if prop.attrs.has_attr("group_by") {
             group_by.push(prop.name.as_str());
             continue;
         }
