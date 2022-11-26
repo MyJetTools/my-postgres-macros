@@ -15,7 +15,9 @@ pub fn fn_fill_select_fields(result: &mut String, fields: &[StructProperty]) {
 
         if let Some(sql) = prop.attrs.try_get("sql") {
             if let Some(value) = &sql.content {
+                result.push_str("sql.push_str(\"");
                 result.push_str(crate::postgres_utils::extract_attr_value(value));
+                result.push_str("\");");
             } else {
                 panic!(
                     "please specify content inside sql attribute for {}",
