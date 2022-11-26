@@ -73,10 +73,8 @@ pub fn generate_implementation(
     result.push_str("fn get_limit(&self) -> Option<usize> {");
 
     if let Some(limit) = limit {
-        result.push_str("Some(self.");
+        result.push_str("self.");
         result.push_str(limit.name.as_str());
-
-        result.push(')');
     } else {
         result.push_str("None");
     }
@@ -85,9 +83,8 @@ pub fn generate_implementation(
 
     result.push_str("fn get_offset(&self) -> Option<usize> {");
     if let Some(offset) = offset {
-        result.push_str("Some(self.");
+        result.push_str("self.");
         result.push_str(offset.name.as_str());
-        result.push(')');
     } else {
         result.push_str("None");
     }
