@@ -26,7 +26,8 @@ use syn;
         line_no,
         sql,
         order_by,
-        order_by_desc
+        order_by_desc,
+        group_by
     )
 )]
 pub fn postgres_select_model(input: TokenStream) -> TokenStream {
