@@ -1,4 +1,4 @@
-mod fn_from_db_row;
+mod fn_from;
 mod fn_get_group_by_fields;
 mod fn_get_order_by_fields;
 mod fn_select_fields;

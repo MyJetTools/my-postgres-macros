@@ -14,8 +14,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
-    result.push_str("fn from_db_row(row: &tokio_postgres::Row) -> Self {");
-    super::fn_from_db_row::fn_from_db_row(&mut result, &fields);
+    result.push_str("fn from(src: crate::sql_select::FromDbRow) -> Self {");
+    super::fn_from::fn_from(&mut result, &fields);
     result.push_str("}\n");
 
     result.push_str("fn get_select_fields() -> &'static str {");
