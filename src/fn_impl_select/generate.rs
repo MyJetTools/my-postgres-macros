@@ -23,8 +23,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     result.push_str("}\n");
 
     result.push_str("fn get_order_by_fields() -> Option<my_postgres::OrderByFields<'s>> {");
-    result.push_str("}\n");
     super::fn_get_order_by_fields::fn_get_order_by_fields(&mut result, &fields);
+    result.push_str("}\n");
+
     result.push_str("}\n");
 
     result.parse().unwrap()
