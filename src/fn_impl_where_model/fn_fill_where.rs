@@ -14,7 +14,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
         result.push_str(struct_property.name.as_str());
         result.push_str(".write(sql, params, ");
         crate::get_field_value::fill_sql_type(result, struct_property);
-        result.push_str("),");
+        result.push_str(");");
     }
 
     result.push_str("_ => panic!(\"Unexpected param no {}\", no)}");
