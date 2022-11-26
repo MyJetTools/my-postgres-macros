@@ -26,7 +26,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     super::fn_get_group_by_fields::fn_get_group_by_fields(&mut result, &fields);
     result.push_str("}\n");
 
-    result.push_str("fn from(db_row: my_postgres::sql_select::FromDbRow) -> Self {");
+    result.push_str("fn from(db_row: &tokio_postgres::Row) -> Self {");
     super::fn_from::fn_from(&mut result, &fields);
     result.push_str("}");
 
