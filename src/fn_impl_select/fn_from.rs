@@ -3,6 +3,8 @@ use types_reader::StructProperty;
 use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_from(result: &mut String, fields: &[StructProperty]) {
+    result.push_str("use my_postgres::sql_select::FromDbRow;");
+
     result.push_str("Self{");
 
     for field in fields {
