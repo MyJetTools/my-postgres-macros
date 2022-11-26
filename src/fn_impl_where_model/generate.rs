@@ -60,14 +60,8 @@ pub fn generate_implementation(
     }
     result.push_str(" {\n");
 
-    result.push_str("fn get_fields_amount() -> usize {");
-    result.push_str(fields.len().to_string().as_str());
-    result.push_str("}\n");
-
-    result.push_str(
-        "fn get_field_value(&'s self, no: usize) -> my_postgres::sql_where::SqlWhereValue<'s> {",
-    );
-    super::fn_get_field_value::fn_get_field_value(result, &fields);
+    result.push_str("fn fill_where(&self, sql: &mut String, params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,) {");
+    super::fn_fill_where::fn_fill_where(result, &fields);
     result.push_str("}\n");
 
     result.push_str("fn get_limit(&self) -> Option<usize> {");

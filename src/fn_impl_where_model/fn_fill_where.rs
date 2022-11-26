@@ -2,16 +2,19 @@ use types_reader::{PropertyType, StructProperty};
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-pub fn fn_get_field_value(result: &mut String, struct_properties: &[StructProperty]) {
+pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) {
     let mut no = 0;
-
-    result.push_str("match no {");
     for struct_property in struct_properties {
-        result.push_str(no.to_string().as_str());
-        result.push_str("=> ");
-        get_field_value(result, struct_property);
-        result.push(',');
+        if no > 0 {
+            result.push_str("sql.push_str(\" AND \");");
+        }
+
         no += 1;
+        result.push_str("self.");
+        result.push_str(struct_property.name.as_str());
+        result.push_str(".write(sql, params, ");
+        crate::get_field_value::fill_sql_type(result, struct_property);
+        result.push_str("),");
     }
 
     result.push_str("_ => panic!(\"Unexpected param no {}\", no)}");
