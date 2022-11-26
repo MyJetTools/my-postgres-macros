@@ -142,26 +142,21 @@ fn get_field_value_of_vec(
 fn fill_option_of_sql_value(result: &mut String, struct_property: &StructProperty) {
     result.push_str(" if let Some(value) = &self.");
     result.push_str(&struct_property.name);
-    result.push_str("{value.write(sql, params, ");
+    result.push_str("{");
+    result.push_str("sql.push_str(\"");
+    result.push_str(struct_property.get_db_field_name());
+
+    fill_op(result, struct_property);
+    result.push_str("\");");
+
+    result.push_str("value.write(sql, params, ");
     crate::get_field_value::fill_sql_type(result, struct_property);
     result.push_str("); no+=1;};");
 }
 
-fn fill_option_of_vec_of_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::sql_where::SqlWhereValue::to_in_operator(\"");
-    result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", &self.");
-    result.push_str(&struct_propery.name);
-    result.push_str(")");
-}
+fn fill_option_of_vec_of_value(result: &mut String, struct_propery: &StructProperty) {}
 
-fn fill_vec_of_sql_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::sql_where::SqlWhereValue::to_in_operator(\"");
-    result.push_str(struct_propery.get_db_field_name());
-    result.push_str("\", &self.");
-    result.push_str(&struct_propery.name);
-    result.push_str(")");
-}
+fn fill_vec_of_sql_value(result: &mut String, struct_propery: &StructProperty) {}
 
 fn check_for_date_time(struct_propery: &StructProperty) {
     if let Some(attr) = struct_propery.get_sql_type() {
