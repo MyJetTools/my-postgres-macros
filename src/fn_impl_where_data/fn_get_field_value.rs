@@ -42,7 +42,10 @@ fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::F64 => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::String => fill_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_sql_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_sql_value(result, struct_propery),
+        types_reader::PropertyType::DateTime => {
+            struct_propery.get_sql_type();
+            fill_sql_value(result, struct_propery);
+        }
         types_reader::PropertyType::OptionOf(sub_type) => {
             fill_option_of(result, struct_propery, &sub_type)
         }
@@ -67,7 +70,10 @@ fn fill_option_of(result: &mut String, struct_propery: &StructProperty, sub_type
         types_reader::PropertyType::F64 => fill_option_of_sql_value(result, struct_propery),
         types_reader::PropertyType::String => fill_option_of_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_option_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_option_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::DateTime => {
+            struct_propery.get_sql_type();
+            fill_option_of_sql_value(result, struct_propery);
+        }
         types_reader::PropertyType::VecOf(sub_type) => {
             fill_option_of_vec(result, struct_propery, sub_type)
         }
@@ -93,7 +99,10 @@ fn fill_option_of_vec(
         types_reader::PropertyType::F64 => fill_option_of_vec_of_value(result, struct_propery),
         types_reader::PropertyType::String => fill_option_of_vec_of_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_option_of_vec_of_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_option_of_vec_of_value(result, struct_propery),
+        types_reader::PropertyType::DateTime => {
+            struct_propery.get_sql_type();
+            fill_option_of_vec_of_value(result, struct_propery)
+        }
         types_reader::PropertyType::Struct(_) => {
             fill_option_of_vec_of_value(result, struct_propery)
         }
@@ -119,7 +128,10 @@ fn get_field_value_of_vec(
         types_reader::PropertyType::F64 => fill_vec_of_sql_value(result, struct_propery),
         types_reader::PropertyType::String => fill_vec_of_sql_value(result, struct_propery),
         types_reader::PropertyType::Str => fill_vec_of_sql_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_vec_of_sql_value(result, struct_propery),
+        types_reader::PropertyType::DateTime => {
+            struct_propery.get_sql_type();
+            fill_vec_of_sql_value(result, struct_propery);
+        }
         types_reader::PropertyType::Struct(_) => fill_vec_of_sql_value(result, struct_propery),
         _ => panic!("Vec<{}> is not supported", sub_type.as_str()),
     }
