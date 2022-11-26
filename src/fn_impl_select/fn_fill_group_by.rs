@@ -21,4 +21,5 @@ pub fn get_group_by_fields(result: &mut String, fields: &[StructProperty]) {
         result.push(' ');
         result.push_str(prop);
     }
+    result.push_str("\"");
 }
