@@ -56,7 +56,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     }
 
-    crate::fn_impl_where_data::generate_implementation(
+    crate::fn_impl_where_model::generate_implementation(
         &mut result,
         struct_name.as_str(),
         with_primary_key.as_slice(),

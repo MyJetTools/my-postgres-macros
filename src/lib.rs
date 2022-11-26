@@ -6,7 +6,7 @@ mod fn_impl_bulk_select;
 mod fn_impl_insert;
 mod fn_impl_select;
 mod fn_impl_update;
-mod fn_impl_where_data;
+mod fn_impl_where_model;
 mod get_field_value;
 
 mod db_enum;
@@ -20,7 +20,6 @@ use syn;
     attributes(
         db_field_name,
         json,
-        bigint,
         line_no,
         sql,
         sql_type,
@@ -44,7 +43,7 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(
-    WhereInputData,
+    WhereDbModel,
     attributes(
         db_field_name,
         bigint,
@@ -58,7 +57,7 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
 )]
 pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::fn_impl_where_data::generate(&ast)
+    crate::fn_impl_where_model::generate(&ast)
 }
 
 #[proc_macro_derive(
