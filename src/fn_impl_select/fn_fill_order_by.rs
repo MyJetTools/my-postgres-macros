@@ -19,6 +19,7 @@ pub fn fn_get_order_by_fields(result: &mut String, fields: &[StructProperty]) {
     }
 
     if order_by_desc.is_empty() && order_by.is_empty() {
+        result.push_str("None");
         return;
     }
 
@@ -26,14 +27,14 @@ pub fn fn_get_order_by_fields(result: &mut String, fields: &[StructProperty]) {
         panic!("Ether order_by_desc or order_by must be set, not both");
     }
 
-    result.push_str("\" ORDER BY");
+    result.push_str("Some(\" ORDER BY");
 
     if !order_by_desc.is_empty() {
         for field in order_by_desc {
             result.push(' ');
             result.push_str(field.get_db_field_name());
         }
-        result.push_str(" DESC\"");
+        result.push_str(" DESC\")");
 
         return;
     }
@@ -43,6 +44,6 @@ pub fn fn_get_order_by_fields(result: &mut String, fields: &[StructProperty]) {
             result.push(' ');
             result.push_str(field.get_db_field_name());
         }
-        result.push_str("\"");
+        result.push_str("\")");
     }
 }

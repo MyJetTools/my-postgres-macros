@@ -13,13 +13,14 @@ pub fn get_group_by_fields(result: &mut String, fields: &[StructProperty]) {
     }
 
     if group_by.is_empty() {
+        result.push_str("None");
         return;
     }
 
-    result.push_str("\" GROUP BY");
+    result.push_str("Some(\" GROUP BY");
     for prop in group_by {
         result.push(' ');
         result.push_str(prop);
     }
-    result.push_str("\"");
+    result.push_str("\")");
 }
