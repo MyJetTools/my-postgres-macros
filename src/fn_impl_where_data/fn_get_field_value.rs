@@ -130,9 +130,11 @@ fn fill_option_of_sql_value(result: &mut String, struct_propery: &StructProperty
     result.push_str(struct_propery.get_db_field_name());
     result.push_str("\", value: if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
-    result.push_str(
-        "{my_postgres::SqlValue::Value {value, options: None}}else{my_postgres::SqlValue::Ignore},",
-    );
+    result.push_str("{my_postgres::SqlValue::Value {value, sql_type: ");
+
+    crate::get_field_value::fill_sql_type(result, struct_propery);
+
+    result.push_str("}}else{my_postgres::SqlValue::Ignore},");
     fill_op(result, struct_propery);
     result.push_str("}");
 }

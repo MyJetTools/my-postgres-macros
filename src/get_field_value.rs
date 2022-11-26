@@ -46,7 +46,7 @@ fn fill_option_of(result: &mut String, struct_propery: &StructProperty, sub_type
 fn fill_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("my_postgres::SqlValue::Value {value: &self.");
     result.push_str(&struct_propery.name);
-    result.push_str(", options: ");
+    result.push_str(", sql_type: ");
 
     fill_sql_type(result, struct_propery);
 
@@ -56,7 +56,7 @@ fn fill_value(result: &mut String, struct_propery: &StructProperty) {
 fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
-    result.push_str("{my_postgres::SqlValue::Value {value, options: ");
+    result.push_str("{my_postgres::SqlValue::Value {value, sql_type: ");
 
     fill_sql_type(result, struct_propery);
 
@@ -70,7 +70,7 @@ fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("}");
 }
 
-fn fill_sql_type(result: &mut String, struct_propery: &StructProperty) {
+pub fn fill_sql_type(result: &mut String, struct_propery: &StructProperty) {
     if let Some(sql_type) = struct_propery.attrs.try_get("sql_type") {
         if let Some(content) = sql_type.content.as_ref() {
             result.push_str("Some(");
