@@ -10,7 +10,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let mut result = String::new();
 
-    result.push_str("impl<'s> my_postgres::SelectEntity<'s> for ");
+    result.push_str("impl<'s> my_postgres::sql_select::SelectEntity<'s> for ");
     result.push_str(struct_name.as_str());
     result.push_str(" {\n");
 
