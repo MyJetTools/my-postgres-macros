@@ -19,12 +19,12 @@ use syn;
     SelectDbEntity,
     attributes(
         db_field_name,
-        debug_sql,
         json,
         timestamp,
         bigint,
         line_no,
         sql,
+        sql_type,
         order_by,
         order_by_desc,
         group_by
@@ -37,7 +37,7 @@ pub fn postgres_select_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     BulkSelectDbEntity,
-    attributes(db_field_name, debug_sql, json, timestamp, bigint, line_no)
+    attributes(db_field_name, json, timestamp, bigint, line_no, sql_type,)
 )]
 pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -54,7 +54,8 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
         ignore_if_null,
         ignore,
         limit,
-        offset
+        offset,
+        sql_type,
     )
 )]
 pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
@@ -68,10 +69,10 @@ pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
         db_field_name,
         ignore_if_null,
         ignore,
-        debug_sql,
         timestamp,
         bigint,
-        json
+        json,
+        sql_type,
     )
 )]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
@@ -81,7 +82,7 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     UpdateDbEntity,
-    attributes(db_field_name, primary_key, ignore_if_null, ignore, debug_sql)
+    attributes(db_field_name, primary_key, ignore_if_null, ignore, sql_type,)
 )]
 pub fn postgres_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

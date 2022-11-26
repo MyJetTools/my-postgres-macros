@@ -46,16 +46,21 @@ fn fill_option_of(result: &mut String, struct_propery: &StructProperty, sub_type
 fn fill_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("my_postgres::SqlValue::Value {value: &self.");
     result.push_str(&struct_propery.name);
-    result.push_str(", options: None}");
+    result.push_str(", options: ");
+
+    fill_sql_type(result, struct_propery);
+
+    result.push_str("}");
 }
 
 fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("if let Some(value) = &self.");
     result.push_str(&struct_propery.name);
-    result.push_str(
-        "{my_postgres::SqlValue::Value {value, options: None}}else{my_postgres::SqlValue::",
-    );
+    result.push_str("{my_postgres::SqlValue::Value {value, options: ");
 
+    fill_sql_type(result, struct_propery);
+
+    result.push_str("}}else{my_postgres::SqlValue::");
     if struct_propery.has_ignore_if_null_attr() {
         result.push_str("Ignore")
     } else {
@@ -63,4 +68,17 @@ fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
     }
 
     result.push_str("}");
+}
+
+fn fill_sql_type(result: &mut String, struct_propery: &StructProperty) {
+    if let Some(sql_type) = struct_propery.attrs.try_get("sql_type") {
+        if let Some(content) = sql_type.content.as_ref() {
+            result.push_str("Some(");
+            result.push_str(crate::postgres_utils::extract_attr_value(content));
+            result.push_str(")");
+            return;
+        }
+    }
+
+    result.push_str("None");
 }
