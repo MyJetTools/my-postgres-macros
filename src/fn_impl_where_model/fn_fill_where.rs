@@ -6,9 +6,11 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
     result.push_str("use my_postgres::SqlValueWriter;");
 
     let mut no = 0;
+
+    result.push_str("let mut no = 0;");
     for struct_property in struct_properties {
         if no > 0 {
-            result.push_str("sql.push_str(\" AND \");");
+            result.push_str("if no>0 {sql.push_str(\" AND \");no+=1;}");
         }
 
         no += 1;
