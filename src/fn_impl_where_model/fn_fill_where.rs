@@ -22,7 +22,9 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("self.write(sql, params, ");
+                result.push_str("self.");
+                result.push_str(struct_property.name.as_str());
+                result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
             } else {
@@ -31,13 +33,14 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 }
 
                 no += 1;
-
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("self.write(sql, params, ");
+                result.push_str("self.");
+                result.push_str(struct_property.name.as_str());
+                result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
             }
@@ -56,7 +59,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
 
                 result.push_str("self.");
                 result.push_str(struct_property.name.as_str());
-                result.push_str("write(sql, params, ");
+                result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
             } else {
@@ -73,7 +76,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
 
                 result.push_str("self.");
                 result.push_str(struct_property.name.as_str());
-                result.push_str("write(sql, params, ");
+                result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
             }
