@@ -35,7 +35,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 result.push_str(struct_property.get_db_field_name());
                 result.push_str(" IN (\");for (i, itm) in value.iter().enumerate() {if i > 0 {sql.push(',');}itm.write(sql, params,");
                 fill_sql_type(result, struct_property);
-                result.push_str(");}sql.push(')');}}}");
+                result.push_str(");}sql.push(')');no += 1;}}}");
             } else {
                 result.push_str("if let Some(value) = &self.");
                 result.push_str(struct_property.name.as_str());
@@ -51,7 +51,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
 
                 result.push_str("value.write(sql, params, ");
                 fill_sql_type(result, struct_property);
-                result.push_str(");");
+                result.push_str(");no += 1;");
 
                 result.push('}');
             }
@@ -72,7 +72,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 result.push_str(struct_property.name.as_str());
                 result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
-                result.push_str(");");
+                result.push_str(");no += 1;");
             } else {
                 if no > 0 {
                     fill_adding_delimiter(result);
@@ -89,14 +89,14 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 result.push_str(struct_property.name.as_str());
                 result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
-                result.push_str(");");
+                result.push_str(");no += 1;");
             }
         }
     }
 }
 
 fn fill_adding_delimiter(result: &mut String) {
-    result.push_str("if no > 0 { sql.push_str(\" AND \"); }else{ no += 1; }");
+    result.push_str("if no > 0 { sql.push_str(\" AND \"); }");
 }
 
 fn fill_sql_value(result: &mut String, struct_property: &StructProperty) {
