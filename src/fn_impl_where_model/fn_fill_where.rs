@@ -5,16 +5,46 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) {
     result.push_str("use my_postgres::SqlValueWriter;");
 
-    result.push_str("let mut no = 0;");
-    let mut no = 0;
+    result.push_str("let mut writer = my_postgres::sql_where::WhereRenderer::new()");
+
     for struct_property in struct_properties {
-        if no > 0 {
-            result.push_str("if no>0 {sql.push_str(\" AND \");}");
+        if let PropertyType::OptionOf(sub_ty) = &struct_property.ty {
+            if let PropertyType::VecOf(_) = sub_ty.as_ref() {
+                result.push_str("writer.add_opt_of_vec(");
+                result.push_str("sql, \"");
+                result.push_str(struct_property.get_db_field_name());
+                result.push_str("\", params,");
+                crate::get_field_value::fill_sql_type(result, struct_property);
+                result.push_str(");");
+            } else {
+                result.push_str("writer.add_optional_value(");
+                result.push_str("sql, \"");
+                result.push_str(struct_property.get_db_field_name());
+                result.push_str("\", \"");
+                fill_op(result, struct_property);
+                result.push_str("\",params,");
+                crate::get_field_value::fill_sql_type(result, struct_property);
+                result.push_str(");");
+            }
+        } else {
+            if let PropertyType::VecOf(_) = &struct_property.ty {
+                result.push_str("writer.add_vec(");
+                result.push_str("sql, \"");
+                result.push_str(struct_property.get_db_field_name());
+                result.push_str("\", params,");
+                crate::get_field_value::fill_sql_type(result, struct_property);
+                result.push_str(");");
+            } else {
+                result.push_str("writer.add_value(");
+                result.push_str("sql, \"");
+                result.push_str(struct_property.get_db_field_name());
+                result.push_str("\", \"");
+                fill_op(result, struct_property);
+                result.push_str("\",params,");
+                crate::get_field_value::fill_sql_type(result, struct_property);
+                result.push_str(");");
+            }
         }
-
-        no += 1;
-
-        read_field_value(result, struct_property);
     }
 }
 
