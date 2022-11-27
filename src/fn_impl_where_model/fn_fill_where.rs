@@ -31,9 +31,11 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
 
-                result.push_str("} else {}");
-
-                result.push_str("}}");
+                result.push_str("} else {sql.push_str(\"");
+                result.push_str(struct_property.get_db_field_name());
+                result.push_str(" IN (\");for (i, itm) in value.iter().enumerate() {if i > 0 {sql.push(',');}itm.write(sql, params,");
+                fill_sql_type(result, struct_property);
+                result.push_str(");}sql.push(')');}}}");
             } else {
                 result.push_str("if let Some(value) = &self.");
                 result.push_str(struct_property.name.as_str());
