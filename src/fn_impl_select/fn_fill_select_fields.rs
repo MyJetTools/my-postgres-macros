@@ -7,6 +7,10 @@ pub fn fn_fill_select_fields(result: &mut String, fields: &[StructProperty]) {
 
     let mut no = 0;
     for prop in fields {
+        if prop.attrs.has_attr("line_no") {
+            continue;
+        }
+
         if no > 0 {
             result.push_str("sql.push(',');");
         }
