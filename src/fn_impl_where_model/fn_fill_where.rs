@@ -6,11 +6,16 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
     result.push_str("use my_postgres::SqlValueWriter;");
 
     result.push_str("let mut no = 0;");
+    let mut no = 0;
 
     for struct_property in struct_properties {
         if let PropertyType::OptionOf(sub_ty) = &struct_property.ty {
             if let PropertyType::VecOf(_) = sub_ty.as_ref() {
-                fill_adding_delimiter(result);
+                if no > 0 {
+                    fill_adding_delimiter(result);
+                }
+
+                no += 1;
 
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
@@ -21,7 +26,11 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
             } else {
-                fill_adding_delimiter(result);
+                if no > 0 {
+                    fill_adding_delimiter(result);
+                }
+
+                no += 1;
 
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
@@ -34,25 +43,37 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
             }
         } else {
             if let PropertyType::VecOf(_) = &struct_property.ty {
-                fill_adding_delimiter(result);
+                if no > 0 {
+                    fill_adding_delimiter(result);
+                }
+
+                no += 1;
 
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("self.write(sql, params, ");
+                result.push_str("self.");
+                result.push_str(struct_property.name.as_str());
+                result.push_str("write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
             } else {
-                fill_adding_delimiter(result);
+                if no > 0 {
+                    fill_adding_delimiter(result);
+                }
+
+                no += 1;
 
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("self.write(sql, params, ");
+                result.push_str("self.");
+                result.push_str(struct_property.name.as_str());
+                result.push_str("write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
             }
