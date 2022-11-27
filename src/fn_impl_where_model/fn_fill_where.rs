@@ -29,7 +29,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
 
                 result.push_str("value.get(0).unwrap().write(sql, params, ");
                 fill_sql_type(result, struct_property);
-                result.push_str(");");
+                result.push_str(");no += 1;");
 
                 result.push_str("} else {sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
