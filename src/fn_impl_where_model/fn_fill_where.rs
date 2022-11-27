@@ -27,7 +27,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("value..get(0).unwrap().write(sql, params, ");
+                result.push_str("value.get(0).unwrap().write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
 
