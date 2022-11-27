@@ -3,9 +3,7 @@ use types_reader::{PropertyType, StructProperty};
 use crate::postgres_utils::PostgresStructPropertyExt;
 
 pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) {
-    result.push_str("use my_postgres::SqlValueWriter;");
-
-    result.push_str("let mut writer = my_postgres::sql_where::WhereRenderer::new()");
+    result.push_str("let mut writer = my_postgres::sql_where::WhereRenderer::new();");
 
     for struct_property in struct_properties {
         if let PropertyType::OptionOf(sub_ty) = &struct_property.ty {
@@ -13,7 +11,9 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 result.push_str("writer.add_opt_of_vec(");
                 result.push_str("sql, \"");
                 result.push_str(struct_property.get_db_field_name());
-                result.push_str("\", params,");
+                result.push_str("\", self.");
+                result.push_str(struct_property.name.as_str());
+                result.push_str("params,");
                 crate::get_field_value::fill_sql_type(result, struct_property);
                 result.push_str(");");
             } else {
@@ -22,7 +22,9 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 result.push_str(struct_property.get_db_field_name());
                 result.push_str("\", \"");
                 fill_op(result, struct_property);
-                result.push_str("\",params,");
+                result.push_str("\", self.\"");
+                result.push_str(struct_property.name.as_str());
+                result.push_str("params,");
                 crate::get_field_value::fill_sql_type(result, struct_property);
                 result.push_str(");");
             }
@@ -31,7 +33,9 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 result.push_str("writer.add_vec(");
                 result.push_str("sql, \"");
                 result.push_str(struct_property.get_db_field_name());
-                result.push_str("\", params,");
+                result.push_str("\", self.");
+                result.push_str(struct_property.name.as_str());
+                result.push_str("params,");
                 crate::get_field_value::fill_sql_type(result, struct_property);
                 result.push_str(");");
             } else {
@@ -40,7 +44,9 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 result.push_str(struct_property.get_db_field_name());
                 result.push_str("\", \"");
                 fill_op(result, struct_property);
-                result.push_str("\",params,");
+                result.push_str("\", self.\"");
+                result.push_str(struct_property.name.as_str());
+                result.push_str("params,");
                 crate::get_field_value::fill_sql_type(result, struct_property);
                 result.push_str(");");
             }
