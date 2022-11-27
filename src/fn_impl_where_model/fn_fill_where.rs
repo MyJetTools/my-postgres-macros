@@ -11,38 +11,45 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
     for struct_property in struct_properties {
         if let PropertyType::OptionOf(sub_ty) = &struct_property.ty {
             if let PropertyType::VecOf(_) = sub_ty.as_ref() {
+                result.push_str("if let Some(value) = &self.");
+                result.push_str(struct_property.name.as_str());
+                result.push('{');
                 if no > 0 {
                     fill_adding_delimiter(result);
                 }
-
                 no += 1;
-
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("self.");
+                result.push_str("value.");
                 result.push_str(struct_property.name.as_str());
                 result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
+
+                result.push('}');
             } else {
+                result.push_str("if let Some(value) = &self.");
+                result.push_str(struct_property.name.as_str());
+                result.push('{');
                 if no > 0 {
                     fill_adding_delimiter(result);
                 }
-
                 no += 1;
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("self.");
+                result.push_str("value.");
                 result.push_str(struct_property.name.as_str());
                 result.push_str(".write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
+
+                result.push('}');
             }
         } else {
             if let PropertyType::VecOf(_) = &struct_property.ty {
