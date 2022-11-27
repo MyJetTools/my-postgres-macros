@@ -13,23 +13,27 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
             if let PropertyType::VecOf(_) = sub_ty.as_ref() {
                 result.push_str("if let Some(value) = &self.");
                 result.push_str(struct_property.name.as_str());
-                result.push('{');
+                result.push_str("{if value.len() > 0 {");
                 if no > 0 {
                     fill_adding_delimiter(result);
                 }
                 no += 1;
+
+                // value.len() == 1
+
+                result.push_str("if value.len() == 1 {");
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("value.");
-                result.push_str(struct_property.name.as_str());
-                result.push_str(".write(sql, params, ");
+                result.push_str("value.write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
 
-                result.push('}');
+                result.push_str("} else {}");
+
+                result.push_str("}}");
             } else {
                 result.push_str("if let Some(value) = &self.");
                 result.push_str(struct_property.name.as_str());
@@ -43,9 +47,7 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
                 fill_op(result, struct_property);
                 result.push_str("\");");
 
-                result.push_str("value.");
-                result.push_str(struct_property.name.as_str());
-                result.push_str(".write(sql, params, ");
+                result.push_str("value.write(sql, params, ");
                 fill_sql_type(result, struct_property);
                 result.push_str(");");
 
