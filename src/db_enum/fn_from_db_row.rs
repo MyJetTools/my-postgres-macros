@@ -25,5 +25,5 @@ pub fn fn_from_db_row(result: &mut String, type_name: &str, enum_type: &EnumType
         result.push(')');
     }
 
-    result.push('}');
+    result.push_str("}}");
 }
