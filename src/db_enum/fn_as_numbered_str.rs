@@ -1,7 +1,5 @@
 use types_reader::EnumCase;
 
-use super::EnumType;
-
 pub fn fn_as_numbered_str(result: &mut String, enum_cases: &[EnumCase]) {
     result.push_str(" match self {");
 

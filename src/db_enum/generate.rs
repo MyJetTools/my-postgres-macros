@@ -25,9 +25,22 @@ impl EnumType {
             EnumType::I64 => "i64",
         }
     }
+
+    pub fn db_complient_type_name(&self) -> &str {
+        match self {
+            EnumType::U8 => "i32",
+            EnumType::I8 => "i32",
+            EnumType::U16 => "i32",
+            EnumType::I16 => "i32",
+            EnumType::U32 => "i32",
+            EnumType::I32 => "i32",
+            EnumType::U64 => "i64",
+            EnumType::I64 => "i64",
+        }
+    }
 }
 
-pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
+pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> TokenStream {
     let name = &ast.ident.to_string();
     let enum_cases = EnumCase::read(ast);
 
@@ -38,9 +51,9 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push_str(" {");
 
     result.push_str("pub fn to_");
-    result.push_str(type_name.as_type_name());
+    result.push_str(enum_type.as_type_name());
     result.push_str("(&self)->");
-    result.push_str(type_name.as_type_name());
+    result.push_str(enum_type.as_type_name());
 
     result.push_str(" {");
 
@@ -63,7 +76,7 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push('}');
 
     result.push_str("pub fn from_db_value(src: ");
-    result.push_str(type_name.as_type_name());
+    result.push_str(enum_type.as_type_name());
     result.push_str(")->Self {");
     result.push_str("match src {");
     let mut i = 0;
@@ -109,5 +122,6 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     "#,
     );
 
+    super::fn_from_db_row::fn_from_db_row(&mut result, name, &enum_type);
     result.parse().unwrap()
 }
