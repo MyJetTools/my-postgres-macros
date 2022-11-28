@@ -18,9 +18,11 @@ pub fn fn_from_db_row(result: &mut String, type_name: &str, enum_type: &EnumType
     result.push_str(");");
 
     if enum_type.db_complient_type_name() == enum_type.as_type_name() {
-        result.push_str("StatusDto::from_db_value(result)");
+        result.push_str(type_name);
+        result.push_str("::from_db_value(result)");
     } else {
-        result.push_str("StatusDto::from_db_value(result as ");
+        result.push_str(type_name);
+        result.push_str("::from_db_value(result as ");
         result.push_str(enum_type.as_type_name());
         result.push(')');
     }
