@@ -20,6 +20,7 @@ pub fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
         types_reader::PropertyType::OptionOf(sub_type) => {
             fill_option_of(result, struct_propery, &sub_type)
         }
+        types_reader::PropertyType::Struct(_) => fill_value(result, struct_propery),
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
     }
 }
