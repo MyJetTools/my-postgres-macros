@@ -1,4 +1,4 @@
-use types_reader::StructProperty;
+use types_reader::{PropertyType, StructProperty};
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
@@ -29,7 +29,12 @@ pub fn fn_fill_select_fields(result: &mut String, fields: &[StructProperty]) {
                 );
             }
         } else {
-            result.push_str(prop.ty.as_str().as_str());
+            if let PropertyType::OptionOf(sub_type) = &prop.ty {
+                result.push_str(sub_type.as_str().as_str());
+            } else {
+                result.push_str(prop.ty.as_str().as_str());
+            }
+
             result.push_str("::fill_select_part(sql, \"");
             result.push_str(prop.get_db_field_name());
             result.push_str("\", ");
