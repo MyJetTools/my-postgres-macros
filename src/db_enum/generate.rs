@@ -59,21 +59,8 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push_str("}}");
 
     result.push_str("pub fn as_numbered_str(&self)->&'static str {");
-
-    result.push_str(" match self {");
-
-    let mut i = 0;
-    for enum_case in enum_cases.as_slice() {
-        result.push_str(enum_case.name.as_str());
-
-        result.push_str(" => \"");
-        result.push_str(i.to_string().as_str());
-        result.push('"');
-        result.push(',');
-        i += 1;
-    }
-
-    result.push_str("}}");
+    super::fn_as_numbered_str::fn_as_numbered_str(&mut result, enum_cases.as_slice());
+    result.push('}');
 
     result.push_str("pub fn from_db_value(src: ");
     result.push_str(type_name.as_type_name());
@@ -93,7 +80,17 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
 
     result.push_str("_ => panic!(\"Invalid value {}\", src)");
 
-    result.push_str("}}}");
+    result.push_str("}}");
+
+    result.push_str(
+        r#"
+        fn fill_select_part(sql: &mut String, field_name: &str, sql_type: Option<&str>) {
+            sql.push_str(field_name);
+        }
+    "#,
+    );
+
+    result.push('}');
 
     result.push_str("impl<'s> my_postgres::SqlValueWriter<'s> for ");
     result.push_str(name);
