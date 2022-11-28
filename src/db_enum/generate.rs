@@ -37,10 +37,6 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push_str(name);
     result.push_str(" {");
 
-    result.push_str("pub fn to_sql_value(&self)->my_postgres::SqlValue {");
-    super::fn_to_sql_value::fn_to_sql_value(&mut result, &enum_cases, &type_name);
-    result.push('}');
-
     result.push_str("pub fn to_");
     result.push_str(type_name.as_type_name());
     result.push_str("(&self)->");
