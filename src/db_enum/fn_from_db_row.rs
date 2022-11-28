@@ -10,7 +10,7 @@ pub fn fn_from_db_row(result: &mut String, type_name: &str, enum_type: &EnumType
     );
     result.push_str(type_name);
 
-    result.push_str("let result: ");
+    result.push_str("{let result: ");
     result.push_str(enum_type.db_complient_type_name());
 
     result.push_str(" = row.get(");
