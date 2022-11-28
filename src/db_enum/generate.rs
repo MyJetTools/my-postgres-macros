@@ -13,19 +13,6 @@ pub enum EnumType {
 }
 
 impl EnumType {
-    pub fn as_sql_value_name(&self) -> &str {
-        match self {
-            EnumType::U8 => "U8",
-            EnumType::I8 => "I8",
-            EnumType::U16 => "U16",
-            EnumType::I16 => "I16",
-            EnumType::U32 => "U32",
-            EnumType::I32 => "I32",
-            EnumType::U64 => "U64",
-            EnumType::I64 => "I64",
-        }
-    }
-
     pub fn as_type_name(&self) -> &str {
         match self {
             EnumType::U8 => "u8",
@@ -50,31 +37,9 @@ pub fn generate(ast: &syn::DeriveInput, type_name: EnumType) -> TokenStream {
     result.push_str(name);
     result.push_str(" {");
 
-    result.push_str("pub fn to_sql_value(&self)->my_postgres::SqlValue");
-
-    result.push_str(" {");
-
-    result.push_str(" match self {");
-
-    let mut i = 0;
-    for enum_case in enum_cases.as_slice() {
-        result.push_str(enum_case.name.as_str());
-
-        result.push_str(" => ");
-
-        result.push_str("my_postgres::SqlValue::");
-
-        result.push_str(type_name.as_sql_value_name());
-
-        result.push_str("(");
-
-        result.push_str(i.to_string().as_str());
-        result.push_str(")");
-        result.push(',');
-        i += 1;
-    }
-
-    result.push_str("}}");
+    result.push_str("pub fn to_sql_value(&self)->my_postgres::SqlValue {");
+    super::fn_to_sql_value::fn_to_sql_value(&mut result, &enum_cases, &type_name);
+    result.push('}');
 
     result.push_str("pub fn to_");
     result.push_str(type_name.as_type_name());
