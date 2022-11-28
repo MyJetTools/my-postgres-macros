@@ -13,6 +13,10 @@ pub fn fn_from_db_row(result: &mut String, type_name: &str, enum_type: &EnumType
     result.push_str("let result: ");
     result.push_str(enum_type.db_complient_type_name());
 
+    result.push_str(" = row.get(");
+    result.push_str("name");
+    result.push_str(");");
+
     if enum_type.db_complient_type_name() == enum_type.as_type_name() {
         result.push_str("StatusDto::from_db_value(result)");
     } else {
