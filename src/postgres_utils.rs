@@ -10,7 +10,10 @@ pub const ATTR_JSON: &str = "json";
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
     fn check_for_sql_type(&self);
+
+    fn has_sql_type_attr(&self) -> bool;
     fn get_sql_type(&self) -> Option<String>;
+
     fn get_db_field_name(&self) -> &str;
     fn has_json_attr(&self) -> bool;
 
@@ -49,6 +52,9 @@ impl PostgresStructPropertyExt for StructProperty {
         panic!("please specify sql_type attribute for {}", self.name);
     }
 
+    fn has_sql_type_attr(&self) -> bool {
+        self.attrs.has_attr(ATTR_SQL_TYPE)
+    }
     fn get_sql_type(&self) -> Option<String> {
         let attr = self.attrs.try_get(ATTR_SQL_TYPE)?;
 
@@ -90,6 +96,12 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Vec<StructProperty> {
     for itm in src {
         if itm.has_ignore_attr() {
             continue;
+        }
+
+        if itm.ty.is_date_time() {
+            if !itm.has_sql_type_attr() {
+                panic!("Please specify sql_type for {}", itm.name);
+            }
         }
 
         result.push(itm);
