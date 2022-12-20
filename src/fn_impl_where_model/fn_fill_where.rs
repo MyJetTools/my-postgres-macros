@@ -110,7 +110,7 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
     } else {
         result.push_str("sql.push_str(self.");
         result.push_str(struct_propery.name.as_str());
-        result.push_str(".get_default_operator()");
+        result.push_str(".get_default_operator());");
     }
 }
 
