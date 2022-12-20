@@ -111,12 +111,12 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
         if let Some(content) = op.content.as_ref() {
             result.push_str(extract_and_verify_operation(content));
         }
-        result.push_str("\")");
+        result.push_str("\");");
     } else {
-        result.push_str("sql.push_str(\"=\")");
+        result.push_str("sql.push_str(\"=\");");
     }
 
-    result.push('}');
+    result.push_str("}else{result.push_str(\" \");}");
 }
 
 fn extract_and_verify_operation(src: &[u8]) -> &str {
