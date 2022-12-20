@@ -104,7 +104,7 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
     result.push_str("if self.");
 
     result.push_str(struct_propery.name.as_str());
-    result.push_str("use_operator(){");
+    result.push_str(".use_operator(){");
 
     if let Some(op) = struct_propery.attrs.try_get("operator") {
         result.push_str("sql.push_str(\"");
