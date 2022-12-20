@@ -65,8 +65,9 @@ pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) 
 
                 result.push_str("sql.push_str(\"");
                 result.push_str(struct_property.get_db_field_name());
-                fill_op(result, struct_property);
                 result.push_str("\");");
+
+                fill_op(result, struct_property);
 
                 result.push_str("self.");
                 result.push_str(struct_property.name.as_str());
@@ -100,14 +101,22 @@ fn fill_adding_delimiter(result: &mut String) {
 }
 
 fn fill_op(result: &mut String, struct_propery: &StructProperty) {
+    result.push_str("if self.");
+
+    result.push_str(struct_propery.name.as_str());
+    result.push_str("use_operator(){");
+
     if let Some(op) = struct_propery.attrs.try_get("operator") {
+        result.push_str("sql.push_str(\"");
         if let Some(content) = op.content.as_ref() {
             result.push_str(extract_and_verify_operation(content));
         }
-        return;
+        result.push_str("\")");
+    } else {
+        result.push_str("sql.push_str(\"=\")");
     }
 
-    result.push_str("=");
+    result.push('}');
 }
 
 fn extract_and_verify_operation(src: &[u8]) -> &str {
