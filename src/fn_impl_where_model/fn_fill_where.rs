@@ -101,11 +101,6 @@ fn fill_adding_delimiter(result: &mut String) {
 }
 
 fn fill_op(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("if self.");
-
-    result.push_str(struct_propery.name.as_str());
-    result.push_str(".use_operator(){");
-
     if let Some(op) = struct_propery.attrs.try_get("operator") {
         result.push_str("sql.push_str(\"");
         if let Some(content) = op.content.as_ref() {
@@ -113,10 +108,10 @@ fn fill_op(result: &mut String, struct_propery: &StructProperty) {
         }
         result.push_str("\");");
     } else {
-        result.push_str("sql.push_str(\"=\");");
+        result.push_str("sql.push_str(self.");
+        result.push_str(struct_propery.name.as_str());
+        result.push_str(".get_default_operator()");
     }
-
-    result.push_str("}else{sql.push_str(\" \");}");
 }
 
 fn extract_and_verify_operation(src: &[u8]) -> &str {
