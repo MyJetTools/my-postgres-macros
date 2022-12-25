@@ -1,13 +1,13 @@
 use proc_macro::TokenStream;
-use types_reader::{PropertyType, StructProperty};
+use quote::quote;
+use types_reader::StructProperty;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
 
     let fields = crate::postgres_utils::filter_fields(StructProperty::read(ast));
 
-    let struct_name = name.to_string();
-
+    /*
     let mut has_str = false;
 
     for field in &fields {
@@ -16,30 +16,64 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             break;
         }
     }
+     */
 
-    let mut result = String::new();
+    let fields_amount = fields.len();
 
-    result.push_str("impl<'s> my_postgres::sql_insert::SqlInsertModel<'s> for ");
-    result.push_str(struct_name.as_str());
+    let get_field_name = fn_get_field_name(&fields);
+    let get_field_value = fn_get_field_value(&fields);
 
-    if has_str {
-        result.push_str("<'s>");
+    quote! {
+        impl<'s> my_postgres::sql_insert::SqlInsertModel<'s> for #name{
+
+            fn get_fields_amount()->usize{
+                #fields_amount
+            }
+
+            fn get_field_name(no: usize) -> &'static str{
+                match no{
+                    #(#get_field_name)*
+                    _=>panic!("no such field with number {}", no)
+                }
+            }
+
+            fn get_field_value(&'s self, no: usize) -> my_postgres::SqlValue<'s>{
+                match no{
+                    #(#get_field_value)*
+                    _=>panic!("no such field with number {}", no)
+                }
+            }
+
+        }
     }
-    result.push_str(" {\n");
+    .into()
+}
 
-    result.push_str("fn get_fields_amount()->usize{");
-    result.push_str(fields.len().to_string().as_str());
-    result.push_str("}\n");
+pub fn fn_get_field_name(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
+    let mut result = Vec::new();
+    for (i, field) in fields.iter().enumerate() {
+        let field_name = field.name.as_str();
+        result.push(
+            quote! {
+                #i=>#field_name,
+            }
+            .into(),
+        );
+    }
+    result
+}
 
-    result.push_str("fn get_field_name(no: usize) -> &'static str{");
-    super::fn_get_field_name::fn_get_field_name(&mut result, &fields);
-    result.push_str("}\n");
+pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
+    let mut result = Vec::new();
+    for (i, field) in fields.iter().enumerate() {
+        let value = crate::get_field_value_ext::get_field_value(field);
 
-    result.push_str("fn get_field_value(&'s self, no: usize) -> my_postgres::SqlValue<'s>{");
-    super::fn_get_field_value::fn_get_field_value(&mut result, &fields);
-    result.push_str("}\n");
-
-    // implementation of trait
-    result.push_str("}\n");
-    result.parse().unwrap()
+        result.push(
+            quote! {
+                #i => #value,
+            }
+            .into(),
+        );
+    }
+    result
 }

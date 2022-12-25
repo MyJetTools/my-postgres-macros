@@ -7,12 +7,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let fields = StructProperty::read(ast);
 
-    let props = fn_select_line_no(&fields);
+    let line_no_prop = fn_select_line_no(&fields);
 
     quote! {
         impl my_postgres::sql_select::BulkSelectEntity for #name{
             fn get_line_no(&self) -> i32 {
-                #props
+                #line_no_prop
             }
         }
     }
