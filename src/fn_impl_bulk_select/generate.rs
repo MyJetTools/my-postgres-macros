@@ -1,4 +1,5 @@
 use proc_macro::TokenStream;
+use quote::quote;
 use types_reader::StructProperty;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
@@ -6,19 +7,28 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let fields = StructProperty::read(ast);
 
-    let struct_name = name.to_string();
+    let props = fn_select_line_no(&fields);
 
-    let mut result = String::new();
+    quote! {
+        impl my_postgres::sql_select::BulkSelectEntity for #name{
+            fn get_line_no(&self) -> i32 {
+                #props
+            }
+        }
+    }
+    .into()
+}
 
-    result.push_str("impl my_postgres::sql_select::BulkSelectEntity for ");
-    result.push_str(struct_name.as_str());
-    result.push_str(" {\n");
+fn fn_select_line_no(struct_properties: &[StructProperty]) -> proc_macro2::TokenStream {
+    for struct_property in struct_properties {
+        if struct_property.attrs.has_attr("line_no") || struct_property.name == "line_no" {
+            let prop_name = struct_property.name_ident;
+            return quote! {
+                self.#prop_name
+            }
+            .into();
+        }
+    }
 
-    result.push_str("fn get_line_no(&self) -> i32 {");
-    super::fn_select_line_no::fn_select_line_no(&mut result, &fields);
-    result.push_str("}\n");
-
-    result.push_str("}\n");
-
-    result.parse().unwrap()
+    panic!("line_no not found");
 }

@@ -25,7 +25,7 @@ pub trait PostgresStructPropertyExt {
     fn sql_value_to_mask(&self) -> bool;
 }
 
-impl PostgresStructPropertyExt for StructProperty {
+impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
     fn sql_value_to_mask(&self) -> bool {
         if self.ty.is_string() {
             return true;
