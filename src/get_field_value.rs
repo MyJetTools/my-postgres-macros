@@ -84,14 +84,11 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
 }
 
 pub fn fill_sql_type(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
-    if let Some(sql_type) = struct_propery.attrs.try_get("sql_type") {
-        if let Some(content) = sql_type.content.as_ref() {
-            let attr_value = crate::postgres_utils::extract_attr_value(content);
-            return quote! {
-                Some(#attr_value)
-            }
-            .into();
+    if let Some(sql_type) = struct_propery.get_sql_type() {
+        return quote! {
+            Some(#sql_type)
         }
+        .into();
     }
 
     quote!(None).into()

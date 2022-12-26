@@ -21,7 +21,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
 fn fn_select_line_no(struct_properties: &[StructProperty]) -> proc_macro2::TokenStream {
     for struct_property in struct_properties {
-        if struct_property.attrs.has_attr("line_no") || struct_property.name == "line_no" {
+        if struct_property.attrs.contains_key("line_no") || struct_property.name == "line_no" {
             let prop_name = struct_property.get_field_name_ident();
             return quote! {
                 self.#prop_name

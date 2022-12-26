@@ -2,7 +2,7 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 use quote::quote;
 use types_reader::StructProperty;
 
-pub fn fn_from(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
+pub fn fn_from(fields: &[StructProperty]) -> Result<Vec<proc_macro2::TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(fields.len());
 
     for field in fields {
@@ -10,7 +10,7 @@ pub fn fn_from(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
 
         let type_ident = field.ty.get_token_stream();
 
-        let db_field_name = field.get_db_field_name();
+        let db_field_name = field.get_db_field_name()?;
 
         let sql_type = super::fill_sql_type(field);
 
@@ -19,5 +19,5 @@ pub fn fn_from(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
         });
     }
 
-    result
+    Ok(result)
 }

@@ -2,28 +2,33 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 use quote::quote;
 use types_reader::StructProperty;
 
-pub fn fn_get_order_by_fields(fields: &[StructProperty]) -> proc_macro2::TokenStream {
+pub fn fn_get_order_by_fields(
+    fields: &[StructProperty],
+) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut order_by_desc = Vec::with_capacity(fields.len());
     let mut order_by = Vec::with_capacity(fields.len());
 
     for prop in fields {
-        if prop.attrs.has_attr("order_by_desc") {
+        if prop.attrs.contains_key("order_by_desc") {
             order_by_desc.push(prop);
             continue;
         }
 
-        if prop.attrs.has_attr("order_by") {
+        if prop.attrs.contains_key("order_by") {
             order_by.push(prop);
             continue;
         }
     }
 
     if order_by_desc.is_empty() && order_by.is_empty() {
-        return quote! { None }.into();
+        return Ok(quote! { None }.into());
     }
 
     if !order_by_desc.is_empty() && !order_by.is_empty() {
-        panic!("Ether order_by_desc or order_by must be set, not both");
+        return Err(syn::Error::new_spanned(
+            order_by_desc.get(0).unwrap().field,
+            "Ether order_by_desc or order_by must be set, not both",
+        ));
     }
 
     let mut result = String::new();
@@ -32,15 +37,15 @@ pub fn fn_get_order_by_fields(fields: &[StructProperty]) -> proc_macro2::TokenSt
     if !order_by_desc.is_empty() {
         for field in order_by_desc {
             result.push(' ');
-            result.push_str(field.get_db_field_name());
+            result.push_str(field.get_db_field_name()?.as_str());
         }
         result.push_str(" DESC");
     } else if !order_by.is_empty() {
         for field in order_by {
             result.push(' ');
-            result.push_str(field.get_db_field_name());
+            result.push_str(field.get_db_field_name()?.as_str());
         }
     }
 
-    return quote!(Some(#result)).into();
+    return Ok(quote!(Some(#result)).into());
 }

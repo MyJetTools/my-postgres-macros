@@ -3,11 +3,13 @@ use types_reader::{PropertyType, StructProperty};
 use crate::postgres_utils::PostgresStructPropertyExt;
 use quote::quote;
 
-pub fn fn_fill_select_fields(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
+pub fn fn_fill_select_fields(
+    fields: &[StructProperty],
+) -> Result<Vec<proc_macro2::TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(fields.len() * 2);
     let mut no = 0;
     for prop in fields {
-        if prop.attrs.has_attr("line_no") {
+        if prop.attrs.contains_key("line_no") {
             continue;
         }
 
@@ -19,21 +21,27 @@ pub fn fn_fill_select_fields(fields: &[StructProperty]) -> Vec<proc_macro2::Toke
 
         no += 1;
 
-        if let Some(sql) = prop.attrs.try_get("sql") {
-            if let Some(value) = &sql.content {
-                let attr_value = crate::postgres_utils::extract_attr_value(value);
-
-                result.push(quote! {
-                    sql.push_str(#attr_value);
-                });
+        if let Some(sql) = prop.attrs.get("sql") {
+            if let Some(sql) = sql {
+                if let Some(attr_value) = sql.get_single_param() {
+                    let attr_value = attr_value.get_value_as_str();
+                    result.push(quote! {
+                        sql.push_str(#attr_value);
+                    });
+                } else {
+                    return Err(syn::Error::new_spanned(
+                        prop.field,
+                        "#1 please specify content inside sql attribute",
+                    ));
+                }
             } else {
-                panic!(
-                    "please specify content inside sql attribute for {}",
-                    prop.name
-                );
+                return Err(syn::Error::new_spanned(
+                    prop.field,
+                    "#2 please specify content inside sql attribute",
+                ));
             }
         } else {
-            let db_field_name = prop.get_db_field_name();
+            let db_field_name = prop.get_db_field_name()?;
 
             let sql_type = super::fill_sql_type(prop);
 
@@ -58,5 +66,5 @@ pub fn fn_fill_select_fields(fields: &[StructProperty]) -> Vec<proc_macro2::Toke
         }
     }
 
-    result
+    Ok(result)
 }

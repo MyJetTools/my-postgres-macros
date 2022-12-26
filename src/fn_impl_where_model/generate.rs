@@ -13,9 +13,9 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let mut fields = Vec::with_capacity(src_fields.len());
 
     for field in src_fields {
-        if field.attrs.has_attr("limit") {
+        if field.attrs.contains_key("limit") {
             limit = Some(field);
-        } else if field.attrs.has_attr("offset") {
+        } else if field.attrs.contains_key("offset") {
             offset = Some(field);
         } else {
             fields.push(field);
@@ -72,7 +72,11 @@ pub fn generate_implementation(
         .into()
     };
 
-    let where_data = super::fn_fill_where::fn_fill_where(fields);
+    let where_data = match super::fn_fill_where::fn_fill_where(fields) {
+        Ok(result) => result,
+        Err(err) => err.to_compile_error(),
+    };
+
     quote! {
        impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
         fn fill_where(&'s self, sql: &mut String, params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,) {

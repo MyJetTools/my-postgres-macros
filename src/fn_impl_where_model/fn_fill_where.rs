@@ -1,72 +1,105 @@
-use types_reader::StructProperty;
+use macros_utils::AttributeParams;
+use types_reader::{PropertyType, StructProperty};
 
 use quote::quote;
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-pub fn fn_fill_where(struct_properties: &[StructProperty]) -> proc_macro2::TokenStream {
+pub fn fn_fill_where(
+    struct_properties: &[StructProperty],
+) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut no = 0;
 
     let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
+
+    lines.push(quote!(let no = 0;));
 
     for struct_property in struct_properties {
         let prop_name_ident = struct_property.get_field_name_ident();
         let sql_type = crate::get_field_value::fill_sql_type(struct_property);
 
-        let op = fill_op(struct_property);
+        let op = fill_op(struct_property)?;
+
+        let db_field_name = match struct_property.get_db_field_name() {
+            Ok(result) => result,
+            Err(err) => {
+                return Err(syn::Error::new_spanned(struct_property.field, err));
+            }
+        };
+
+        if let PropertyType::OptionOf(_) = &struct_property.ty {
+            lines.push(quote! {
+                if let Some(value) = self.#prop_name_ident{
+                    #op
+                    value.write(sql, params, #sql_type);
+                }
+            });
+        } else {
+            lines.push(quote! {
+                #op
+                self.#prop_name_ident.write(sql, params, #sql_type);
+            });
+        }
 
         if no > 0 {
-            let name = format!(" AND {}", struct_property.get_db_field_name());
+            let name = format!(" AND {}", db_field_name);
             lines.push(quote! {
                 sql.push_str(#name);
             });
         } else {
-            let name = struct_property.get_db_field_name();
             lines.push(quote! {
-                sql.push_str(#name);
+                sql.push_str(#db_field_name);
             });
         }
-        lines.push(quote! {
-            #op
-            self.#prop_name_ident.write(sql, params, #sql_type);
-        });
 
         no += 1;
     }
 
-    quote! {
+    Ok(quote! {
         use my_postgres::SqlValueWriter;
         #(#lines)*
-    }
+    })
 }
 
-fn fill_op(struct_property: &StructProperty) -> proc_macro2::TokenStream {
+fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream, syn::Error> {
     let prop_name_ident = struct_property.get_field_name_ident();
     //sql.push_str(self.#prop_name_ident.get_default_operator());
 
-    if let Some(op) = struct_property.attrs.try_get("operator") {
-        if let Some(content) = op.content.as_ref() {
-            let op = extract_and_verify_operation(content);
-            return quote! {
+    if let Some(params) = struct_property.attrs.get("operator") {
+        if let Some(params) = params {
+            let op = extract_and_verify_operation(params, struct_property)?;
+            return Ok(quote! {
                 sql.push_str(#op);
             }
-            .into();
+            .into());
         } else {
-            return quote! {
+            return Ok(quote! {
                 sql.push_str(self.#prop_name_ident.get_default_operator());
             }
-            .into();
+            .into());
         }
     } else {
-        return quote! {
+        return Ok(quote! {
             sql.push_str(self.#prop_name_ident.get_default_operator());
         }
-        .into();
+        .into());
     }
 }
 
-fn extract_and_verify_operation(src: &[u8]) -> &str {
-    let result = extract_operation(src);
+fn extract_and_verify_operation(
+    params: &AttributeParams,
+    prop: &StructProperty,
+) -> Result<String, syn::Error> {
+    let result = params.get_single_param();
+
+    if result.is_none() {
+        return Err(syn::Error::new_spanned(
+            prop.field,
+            "Operator must have a value".to_string(),
+        ));
+    }
+
+    let result = result.as_ref().unwrap().get_value_as_str();
 
     if result == "="
         || result == "!="
@@ -76,62 +109,11 @@ fn extract_and_verify_operation(src: &[u8]) -> &str {
         || result == ">="
         || result == "<>"
     {
-        return result;
+        return Ok(result.to_string());
     }
 
-    panic!("Invalid operator {}", result);
-}
-
-fn extract_operation(src: &[u8]) -> &str {
-    let src = &src[1..src.len() - 1];
-
-    for i in 0..src.len() {
-        if src[i] == b'"' || src[i] == b'\'' {
-            let b = src[i];
-
-            for j in 1..src.len() {
-                let pos = src.len() - j;
-
-                if src[pos] == b {
-                    let result = &src[i + 1..pos];
-
-                    let result = std::str::from_utf8(result).unwrap();
-                    return result;
-                }
-            }
-        }
-    }
-
-    std::str::from_utf8(src).unwrap()
-}
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_1() {
-        let src = "(\">\")";
-
-        let operator = super::extract_operation(src.as_bytes());
-
-        assert_eq!(">", operator);
-    }
-
-    #[test]
-    fn test_2() {
-        let src = "(>)";
-
-        let operator = super::extract_operation(src.as_bytes());
-
-        assert_eq!(">", operator);
-    }
-
-    #[test]
-    fn test_3() {
-        let src = "('>')";
-
-        let operator = super::extract_operation(src.as_bytes());
-
-        assert_eq!(">", operator);
-    }
+    return Err(syn::Error::new_spanned(
+        prop.field,
+        format!("Invalid operator {}", result),
+    ));
 }

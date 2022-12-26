@@ -1,4 +1,3 @@
-use proc_macro::TokenStream;
 use types_reader::{PropertyType, StructProperty};
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
@@ -13,7 +12,7 @@ pub trait PostgresStructPropertyExt {
 
     fn get_sql_type(&self) -> Option<String>;
 
-    fn get_db_field_name(&self) -> &str;
+    fn get_db_field_name(&self) -> Result<String, syn::Error>;
     fn has_json_attr(&self) -> bool;
 
     fn has_ignore_attr(&self) -> bool;
@@ -40,49 +39,68 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
     }
 
     fn is_primary_key(&self) -> bool {
-        self.attrs.has_attr(ATTR_PRIMARY_KEY)
+        self.attrs.contains_key(ATTR_PRIMARY_KEY)
     }
 
     fn has_ignore_attr(&self) -> bool {
-        self.attrs.has_attr("ignore")
+        self.attrs.contains_key("ignore")
     }
 
     fn get_sql_type(&self) -> Option<String> {
-        let attr = self.attrs.try_get(ATTR_SQL_TYPE)?;
+        let attr = self.attrs.get(ATTR_SQL_TYPE)?;
 
-        if let Some(value) = &attr.content {
-            return crate::postgres_utils::extract_attr_value(value)
-                .to_string()
-                .into();
+        match attr {
+            Some(result) => {
+                let result = result.get_from_single_or_named("name")?;
+                Some(result.get_value_as_str().to_string())
+            }
+            None => None,
         }
-        panic!("Attribute {} has to have value inside ()", ATTR_SQL_TYPE);
     }
 
     fn has_ignore_if_null_attr(&self) -> bool {
-        self.attrs.has_attr("ignore_if_null")
+        self.attrs.contains_key("ignore_if_null")
     }
 
     fn has_json_attr(&self) -> bool {
-        self.attrs.has_attr(ATTR_JSON)
+        self.attrs.contains_key(ATTR_JSON)
     }
 
     fn is_line_no(&self) -> bool {
-        self.attrs.has_attr("line_no") || self.name == "line_no"
+        self.attrs.contains_key("line_no") || self.name == "line_no"
     }
 
-    fn get_db_field_name(&self) -> &str {
-        if let Some(attr) = self.attrs.try_get(ATTR_DB_FIELD_NAME) {
-            match attr.get_as_string("name") {
-                Some(result) => return result,
-                None => panic!("Attribute db_field_name must have a name"),
+    fn get_db_field_name(&self) -> Result<String, syn::Error> {
+        if let Some(attr) = self.attrs.get(ATTR_DB_FIELD_NAME) {
+            match attr {
+                Some(result) => match result.get_from_single_or_named("name") {
+                    Some(result) => return Ok(result.get_value_as_str().to_string()),
+                    None => {
+                        return Err(syn::Error::new_spanned(
+                            self.field,
+                            format!(
+                                "Attribute {} should have name inside ()",
+                                ATTR_DB_FIELD_NAME
+                            ),
+                        ))
+                    }
+                },
+                None => {
+                    return Err(syn::Error::new_spanned(
+                        self.field,
+                        format!("Attribute db_field_name should not be empty"),
+                    ))
+                }
             }
         }
 
-        self.name.as_str()
+        Ok(self.name.clone())
     }
 }
 
-pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, TokenStream> {
+pub fn filter_fields(
+    src: Vec<StructProperty>,
+) -> Result<Vec<StructProperty>, proc_macro::TokenStream> {
     let mut result = Vec::with_capacity(src.len());
 
     for itm in src {
@@ -116,27 +134,4 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, To
     }
 
     return Ok(result);
-}
-
-pub fn extract_attr_value(src: &[u8]) -> &str {
-    let src = &src[1..src.len() - 1];
-
-    for i in 0..src.len() {
-        if src[i] == b'"' || src[i] == b'\'' {
-            let b = src[i];
-
-            for j in 1..src.len() {
-                let pos = src.len() - j;
-
-                if src[pos] == b {
-                    let result = &src[i + 1..pos];
-
-                    let result = std::str::from_utf8(result).unwrap();
-                    return result;
-                }
-            }
-        }
-    }
-
-    std::str::from_utf8(src).unwrap()
 }

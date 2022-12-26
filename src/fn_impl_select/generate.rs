@@ -12,16 +12,27 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
-    let select_fields = super::fn_fill_select_fields::fn_fill_select_fields(&fields);
+    let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
+        Ok(result) => result,
+        Err(err) => vec![err.to_compile_error()],
+    };
 
-    let orders_by_fields = super::fn_fill_order_by::fn_get_order_by_fields(&fields);
+    let orders_by_fields = match super::fn_fill_order_by::fn_get_order_by_fields(&fields) {
+        Ok(result) => result,
+        Err(err) => err.to_compile_error(),
+    };
 
-    let group_by_fields = super::fn_fill_group_by::get_group_by_fields(&fields);
+    let group_by_fields = match super::fn_fill_group_by::get_group_by_fields(&fields) {
+        Ok(result) => result,
+        Err(err) => err.to_compile_error(),
+    };
 
-    let from_fields = super::fn_from::fn_from(&fields);
+    let from_fields = match super::fn_from::fn_from(&fields) {
+        Ok(result) => result,
+        Err(err) => vec![err.to_compile_error()],
+    };
 
     quote! {
-
             impl my_postgres::sql_select::SelectEntity for #struct_name{
 
                 fn fill_select_fields(sql: &mut String) {
