@@ -56,10 +56,13 @@ pub fn fn_fill_where(
         no += 1;
     }
 
-    Ok(quote! {
+    let result = quote! {
         use my_postgres::SqlValueWriter;
         #(#lines)*
-    })
+    };
+
+    println!("{}", result.to_string());
+    Ok(result)
 }
 
 fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream, syn::Error> {
