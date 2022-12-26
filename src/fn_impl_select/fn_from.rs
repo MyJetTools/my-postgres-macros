@@ -8,7 +8,7 @@ pub fn fn_from(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
     for field in fields {
         let name_ident = field.get_field_name_ident();
 
-        let type_ident = field.get_syn_type_as_token_stream();
+        let type_ident = field.get_syn_type();
 
         let db_field_name = field.get_db_field_name();
 
