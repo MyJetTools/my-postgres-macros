@@ -2,6 +2,8 @@ use types_reader::StructProperty;
 
 use quote::quote;
 
+use crate::postgres_utils::PostgresStructPropertyExt;
+
 pub fn fn_fill_where(struct_properties: &[StructProperty]) -> proc_macro2::TokenStream {
     let mut no = 0;
 
@@ -14,18 +16,17 @@ pub fn fn_fill_where(struct_properties: &[StructProperty]) -> proc_macro2::Token
         let op = fill_op(struct_property);
 
         if no > 0 {
-            let name = format!(" AND {}", struct_property.name.as_str());
+            let name = format!(" AND {}", struct_property.get_db_field_name());
             lines.push(quote! {
                 sql.push_str(#name);
             });
         } else {
-            let name = struct_property.name.as_str();
+            let name = struct_property.get_db_field_name();
             lines.push(quote! {
                 sql.push_str(#name);
             });
         }
         lines.push(quote! {
-
             #op
             self.#prop_name_ident.write(sql, params, #sql_type);
         });
