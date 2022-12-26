@@ -12,7 +12,7 @@ pub fn fn_fill_where(
 
     let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
 
-    lines.push(quote!(let no = 0;));
+    lines.push(quote!(let mut no = 0;));
 
     for struct_property in struct_properties {
         let prop_name_ident = struct_property.get_field_name_ident();
@@ -27,28 +27,29 @@ pub fn fn_fill_where(
             }
         };
 
+        if no > 0 {
+            lines.push(quote! {
+                if no > 0{
+                    sql.push_str(" AND ");
+                }
+            });
+        }
+
         if let PropertyType::OptionOf(_) = &struct_property.ty {
             lines.push(quote! {
                 if let Some(value) = self.#prop_name_ident{
+                    sql.push_str(#db_field_name);
                     #op
                     value.write(sql, params, #sql_type);
+                    no+=1;
                 }
             });
         } else {
             lines.push(quote! {
+                sql.push_str(#db_field_name);
                 #op
                 self.#prop_name_ident.write(sql, params, #sql_type);
-            });
-        }
-
-        if no > 0 {
-            let name = format!(" AND {}", db_field_name);
-            lines.push(quote! {
-                sql.push_str(#name);
-            });
-        } else {
-            lines.push(quote! {
-                sql.push_str(#db_field_name);
+                no+=1;
             });
         }
 
