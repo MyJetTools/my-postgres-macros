@@ -11,7 +11,6 @@ pub const ATTR_JSON: &str = "json";
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
 
-    fn has_sql_type_attr(&self) -> bool;
     fn get_sql_type(&self) -> Option<String>;
 
     fn get_db_field_name(&self) -> &str;
@@ -48,9 +47,6 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.has_attr("ignore")
     }
 
-    fn has_sql_type_attr(&self) -> bool {
-        self.attrs.has_attr(ATTR_SQL_TYPE)
-    }
     fn get_sql_type(&self) -> Option<String> {
         let attr = self.attrs.try_get(ATTR_SQL_TYPE)?;
 
@@ -95,7 +91,17 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, To
         }
 
         if itm.ty.is_date_time() {
-            if !itm.has_sql_type_attr() {
+            if let Some(attr) = itm.get_sql_type() {
+                if attr != "timestamp" && attr != "bigint" {
+                    let result = syn::Error::new_spanned(
+                        itm.field,
+                        format!("Sql type must be 'timestamp' or 'bigint'"),
+                    );
+
+                    let err = result.to_compile_error();
+                    return Err(quote::quote!(#err).into());
+                }
+            } else {
                 let result = syn::Error::new_spanned(
                     itm.field,
                     format!("Please specify sql_type for {}", itm.name),
