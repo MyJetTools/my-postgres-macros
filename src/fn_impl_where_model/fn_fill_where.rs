@@ -38,7 +38,7 @@ pub fn fn_fill_where(
             let op = fill_op(quote!(value), struct_property)?;
 
             lines.push(quote! {
-                if let Some(value) = self.#prop_name_ident{
+                if let Some(value) = &self.#prop_name_ident{
                     sql.push_str(#db_field_name);
                     #op
                     value.write(sql, params, #sql_type);
