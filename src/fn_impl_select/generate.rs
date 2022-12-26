@@ -28,7 +28,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                     #orders_by_fields
                 }
 
-                fn get_group_by_fields() -> Option<&'static str>{{
+                fn get_group_by_fields() -> Option<&'static str>{
                     #group_by_fields
                 }
 
@@ -40,7 +40,6 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
                 }
             }
-        }
     }
     .into()
 }
