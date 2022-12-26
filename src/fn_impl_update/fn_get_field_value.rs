@@ -1,27 +1,29 @@
+use crate::postgres_utils::PostgresStructPropertyExt;
+use proc_macro2::TokenStream;
+use quote::quote;
 use types_reader::StructProperty;
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
+    let mut result = Vec::with_capacity(fields.len());
 
-pub fn fn_get_field_value(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("match no{");
-
-    let mut i = 0;
+    let mut i: usize = 0;
     for field in fields {
         if field.is_primary_key() {
             continue;
         }
 
-        result.push_str(i.to_string().as_str());
-        result.push_str("=> my_postgres::sql_update::SqlUpdateValue{ name: \"");
-        result.push_str(field.get_db_field_name());
+        let db_field_name = field.get_db_field_name();
 
-        result.push_str("\", value: ");
+        let value = crate::get_field_value::get_field_value(field);
 
-        crate::get_field_value::get_field_value(result, field);
-        result.push_str("},");
-
+        result.push(
+            quote! {
+                #i => my_postgres::sql_update::SqlUpdateValue{ name: #db_field_name, value: #value}
+            }
+            .into(),
+        );
         i += 1;
     }
-    result.push_str("_=>panic!(\"no such field with number {}\", no)");
-    result.push_str("}");
+
+    result
 }

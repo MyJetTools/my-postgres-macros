@@ -1,85 +1,98 @@
+use proc_macro2::TokenStream;
+use quote::quote;
 use types_reader::{PropertyType, StructProperty};
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-pub fn get_field_value(result: &mut String, struct_propery: &StructProperty) {
+pub fn get_field_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     match &struct_propery.ty {
-        types_reader::PropertyType::U8 => fill_value(result, struct_propery),
-        types_reader::PropertyType::I8 => fill_value(result, struct_propery),
-        types_reader::PropertyType::U16 => fill_value(result, struct_propery),
-        types_reader::PropertyType::I16 => fill_value(result, struct_propery),
-        types_reader::PropertyType::U32 => fill_value(result, struct_propery),
-        types_reader::PropertyType::I32 => fill_value(result, struct_propery),
-        types_reader::PropertyType::U64 => fill_value(result, struct_propery),
-        types_reader::PropertyType::I64 => fill_value(result, struct_propery),
-        types_reader::PropertyType::F32 => fill_value(result, struct_propery),
-        types_reader::PropertyType::F64 => fill_value(result, struct_propery),
-        types_reader::PropertyType::String => fill_value(result, struct_propery),
-        types_reader::PropertyType::Str => fill_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_value(result, struct_propery),
+        types_reader::PropertyType::U8 => return get_value(struct_propery),
+        types_reader::PropertyType::I8 => return get_value(struct_propery),
+        types_reader::PropertyType::U16 => return get_value(struct_propery),
+        types_reader::PropertyType::I16 => return get_value(struct_propery),
+        types_reader::PropertyType::U32 => return get_value(struct_propery),
+        types_reader::PropertyType::I32 => return get_value(struct_propery),
+        types_reader::PropertyType::U64 => return get_value(struct_propery),
+        types_reader::PropertyType::I64 => return get_value(struct_propery),
+        types_reader::PropertyType::F32 => return get_value(struct_propery),
+        types_reader::PropertyType::F64 => return get_value(struct_propery),
+        types_reader::PropertyType::String => return get_value(struct_propery),
+        types_reader::PropertyType::Str => return get_value(struct_propery),
+        types_reader::PropertyType::DateTime => return get_value(struct_propery),
         types_reader::PropertyType::OptionOf(sub_type) => {
-            fill_option_of(result, struct_propery, &sub_type)
+            return fill_option_of(struct_propery, &sub_type)
         }
-        types_reader::PropertyType::Struct(_) => fill_value(result, struct_propery),
+        types_reader::PropertyType::Struct(_) => return get_value(struct_propery),
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
     }
 }
 
-fn fill_option_of(result: &mut String, struct_propery: &StructProperty, sub_type: &PropertyType) {
+fn fill_option_of(
+    struct_propery: &StructProperty,
+    sub_type: &PropertyType,
+) -> proc_macro2::TokenStream {
     match &sub_type {
-        types_reader::PropertyType::U8 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::I8 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::U16 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::I16 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::U32 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::I32 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::U64 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::I64 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::F32 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::F64 => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::String => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::Str => fill_option_of_value(result, struct_propery),
-        types_reader::PropertyType::DateTime => fill_option_of_value(result, struct_propery),
+        types_reader::PropertyType::U8 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::I8 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::U16 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::I16 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::U32 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::I32 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::U64 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::I64 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::F32 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::F64 => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::String => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::Str => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::DateTime => return fill_option_of_value(struct_propery),
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
     }
 }
 
-fn fill_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("my_postgres::SqlValue::Value {value: &self.");
-    result.push_str(&struct_propery.name);
-    result.push_str(", sql_type: ");
+fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
+    let name = struct_propery.name_ident;
 
-    fill_sql_type(result, struct_propery);
+    let sql_type = fill_sql_type(struct_propery);
 
-    result.push_str("}");
-}
-
-fn fill_option_of_value(result: &mut String, struct_propery: &StructProperty) {
-    result.push_str("if let Some(value) = &self.");
-    result.push_str(&struct_propery.name);
-    result.push_str("{my_postgres::SqlValue::Value {value, sql_type: ");
-
-    fill_sql_type(result, struct_propery);
-
-    result.push_str("}}else{my_postgres::SqlValue::");
-    if struct_propery.has_ignore_if_null_attr() {
-        result.push_str("Ignore")
-    } else {
-        result.push_str("Null")
+    quote! {
+        my_postgres::SqlValue::Value {
+            value: &self.#name,
+            sql_type: #sql_type
+        }
     }
-
-    result.push_str("}");
+    .into()
 }
 
-pub fn fill_sql_type(result: &mut String, struct_propery: &StructProperty) {
+fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
+    let prop_name = struct_propery.name_ident;
+
+    let sql_type = fill_sql_type(struct_propery);
+
+    let else_case: TokenStream = if struct_propery.has_ignore_if_null_attr() {
+        quote!(my_postgres::SqlValue::Ignore).into()
+    } else {
+        quote!(my_postgres::SqlValue::Null).into()
+    };
+
+    quote! {
+       if let Some(value) = &self.#prop_name{
+          my_postgres::SqlValue::Value {value, sql_type: #sql_type}
+       }else{
+            #else_case
+       }
+    }
+}
+
+pub fn fill_sql_type(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     if let Some(sql_type) = struct_propery.attrs.try_get("sql_type") {
         if let Some(content) = sql_type.content.as_ref() {
-            result.push_str("Some(\"");
-            result.push_str(crate::postgres_utils::extract_attr_value(content));
-            result.push_str("\")");
-            return;
+            let attr_value = crate::postgres_utils::extract_attr_value(content);
+            return quote! {
+                Some(#attr_value)
+            }
+            .into();
         }
     }
 
-    result.push_str("None");
+    quote!(None).into()
 }

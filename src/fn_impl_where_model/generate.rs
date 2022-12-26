@@ -1,8 +1,9 @@
-use proc_macro::TokenStream;
-use types_reader::{PropertyType, StructProperty};
+use proc_macro2::{Ident, TokenStream};
+use quote::quote;
+use types_reader::StructProperty;
 
-pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
-    let name = &ast.ident;
+pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
+    let struct_name = &ast.ident;
 
     let src_fields = StructProperty::read(ast);
 
@@ -21,68 +22,63 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     }
 
-    let mut has_str = false;
+    let result = generate_implementation(struct_name, fields.as_slice(), limit, offset);
 
-    for field in &fields {
-        if let PropertyType::Str = field.ty {
-            has_str = true;
-            break;
-        }
+    quote! {
+        #result
     }
-
-    let struct_name = name.to_string();
-    let mut result = String::new();
-    generate_implementation(
-        &mut result,
-        struct_name.as_str(),
-        fields.as_slice(),
-        has_str,
-        limit,
-        offset,
-    );
-
-    result.parse().unwrap()
+    .into()
 }
 
 pub fn generate_implementation(
-    result: &mut String,
-    struct_name: &str,
+    struct_name: &Ident,
     fields: &[StructProperty],
-    has_str: bool,
     limit: Option<StructProperty>,
     offset: Option<StructProperty>,
-) {
-    result.push_str("impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for ");
-    result.push_str(struct_name);
-
-    if has_str {
-        result.push_str("<'s>");
-    }
-    result.push_str(" {\n");
-
-    result.push_str("fn fill_where(&'s self, sql: &mut String, params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,) {");
-    super::fn_fill_where::fn_fill_where(result, &fields);
-    result.push_str("}\n");
-
-    result.push_str("fn get_limit(&self) -> Option<usize> {");
-
-    if let Some(limit) = limit {
-        result.push_str("self.");
-        result.push_str(limit.name.as_str());
+) -> proc_macro2::TokenStream {
+    let limit: TokenStream = if let Some(limit) = &limit {
+        let name = limit.name_ident;
+        quote! {
+            fn get_limit(&self) -> Option<usize> {
+                self.#name.as_str()
+            }
+        }
+        .into()
     } else {
-        result.push_str("None");
-    }
+        quote! {
+            fn get_limit(&self) -> Option<usize> {
+                None
+            }
+        }
+        .into()
+    };
 
-    result.push_str("}\n");
-
-    result.push_str("fn get_offset(&self) -> Option<usize> {");
-    if let Some(offset) = offset {
-        result.push_str("self.");
-        result.push_str(offset.name.as_str());
+    let offset: TokenStream = if let Some(offset) = &offset {
+        let name = offset.name_ident;
+        quote! {
+            fn get_offset(&self) -> Option<usize> {
+                self.#name.as_str()
+            }
+        }
+        .into()
     } else {
-        result.push_str("None");
-    }
-    result.push_str("}\n");
+        quote! {
+            fn get_offset(&self) -> Option<usize> {
+                None
+            }
+        }
+        .into()
+    };
 
-    result.push_str("}\n");
+    let where_data = super::fn_fill_where::fn_fill_where(fields);
+    quote! {
+       impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
+        fn fill_where(&'s self, sql: &mut String, params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,) {
+            #where_data
+        }
+        #limit
+        #offset
+       }
+    }
+    .into()
 }

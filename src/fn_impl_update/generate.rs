@@ -1,23 +1,13 @@
 use proc_macro::TokenStream;
-use types_reader::{PropertyType, StructProperty};
+use types_reader::StructProperty;
 
 use crate::postgres_utils::PostgresStructPropertyExt;
+use quote::quote;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
-    let name = &ast.ident;
+    let struct_name = &ast.ident;
 
     let fields = StructProperty::read(ast);
-
-    let struct_name = name.to_string();
-
-    let mut has_str = false;
-
-    for field in &fields {
-        if let PropertyType::Str = field.ty {
-            has_str = true;
-            break;
-        }
-    }
 
     let mut primary_key_amount = 0;
 
@@ -27,26 +17,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     }
 
-    let mut result = String::new();
+    let get_field_value_case = super::fn_get_field_value::fn_get_field_value(fields.as_slice());
 
-    result.push_str("impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for ");
-    result.push_str(struct_name.as_str());
-    if has_str {
-        result.push_str("<'s>");
-    }
-    result.push_str(" {\n");
-
-    result.push_str("fn get_fields_amount() -> usize{");
-    result.push_str((fields.len() - primary_key_amount).to_string().as_str());
-    result.push_str("}\n");
-
-    result.push_str(
-        "fn get_field_value(&'s self, no: usize) -> my_postgres::sql_update::SqlUpdateValue<'s>{",
-    );
-    super::fn_get_field_value::fn_get_field_value(&mut result, fields.as_slice());
-    result.push_str("}\n");
-
-    result.push_str("}\n");
+    let fields_ammount = fields.len() - primary_key_amount;
 
     let mut with_primary_key = Vec::new();
 
@@ -56,14 +29,29 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     }
 
-    crate::fn_impl_where_model::generate_implementation(
-        &mut result,
-        struct_name.as_str(),
+    let where_impl = crate::fn_impl_where_model::generate_implementation(
+        struct_name,
         with_primary_key.as_slice(),
-        has_str,
         None,
         None,
     );
 
-    result.parse().unwrap()
+    quote! {
+
+        impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for #struct_name{
+            fn get_fields_amount() -> usize{
+                #fields_ammount
+            }
+            fn get_field_value(&'s self, no: usize) -> my_postgres::sql_update::SqlUpdateValue<'s>{
+                match no{
+                    #(#get_field_value_case)*
+                    _=>panic!("no such field with number {}", no)
+                }
+
+            }
+        }
+
+        #where_impl
+    }
+    .into()
 }

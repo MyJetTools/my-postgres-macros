@@ -1,116 +1,61 @@
-use types_reader::{PropertyType, StructProperty};
+use types_reader::StructProperty;
 
-use crate::{get_field_value::fill_sql_type, postgres_utils::PostgresStructPropertyExt};
+use quote::quote;
 
-pub fn fn_fill_where(result: &mut String, struct_properties: &[StructProperty]) {
-    result.push_str("use my_postgres::SqlValueWriter;");
-
-    result.push_str("let mut no = 0;");
+pub fn fn_fill_where(struct_properties: &[StructProperty]) -> proc_macro2::TokenStream {
     let mut no = 0;
 
+    let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
+
     for struct_property in struct_properties {
-        if let PropertyType::OptionOf(sub_ty) = &struct_property.ty {
-            if let PropertyType::VecOf(_) = sub_ty.as_ref() {
-                result.push_str("if let Some(value) = &self.");
-                result.push_str(struct_property.name.as_str());
-                result.push_str("{if value.len() > 0 {");
-                if no > 0 {
-                    fill_adding_delimiter(result);
-                }
-                no += 1;
-
-                // value.len() == 1
-
-                result.push_str("if value.len() == 1 {");
-                result.push_str("sql.push_str(\"");
-                result.push_str(struct_property.get_db_field_name());
-                result.push_str("\");");
-                fill_op(result, struct_property);
-
-                result.push_str("value.get(0).unwrap().write(sql, params, ");
-                fill_sql_type(result, struct_property);
-                result.push_str(");no += 1;");
-
-                result.push_str("} else {sql.push_str(\"");
-                result.push_str(struct_property.get_db_field_name());
-                result.push_str(" IN (\");for (i, itm) in value.iter().enumerate() {if i > 0 {sql.push(',');}itm.write(sql, params,");
-                fill_sql_type(result, struct_property);
-                result.push_str(");}sql.push(')');no += 1;}}}");
-            } else {
-                result.push_str("if let Some(value) = &self.");
-                result.push_str(struct_property.name.as_str());
-                result.push('{');
-                if no > 0 {
-                    fill_adding_delimiter(result);
-                }
-                no += 1;
-                result.push_str("sql.push_str(\"");
-                result.push_str(struct_property.get_db_field_name());
-                result.push_str("\");");
-                fill_op(result, struct_property);
-
-                result.push_str("value.write(sql, params, ");
-                fill_sql_type(result, struct_property);
-                result.push_str(");no += 1;");
-
-                result.push('}');
-            }
-        } else {
-            if let PropertyType::VecOf(_) = &struct_property.ty {
-                if no > 0 {
-                    fill_adding_delimiter(result);
-                }
-
-                no += 1;
-
-                result.push_str("sql.push_str(\"");
-                result.push_str(struct_property.get_db_field_name());
-                result.push_str("\");");
-
-                fill_op(result, struct_property);
-
-                result.push_str("self.");
-                result.push_str(struct_property.name.as_str());
-                result.push_str(".write(sql, params, ");
-                fill_sql_type(result, struct_property);
-                result.push_str(");no += 1;");
-            } else {
-                if no > 0 {
-                    fill_adding_delimiter(result);
-                }
-
-                no += 1;
-
-                result.push_str("sql.push_str(\"");
-                result.push_str(struct_property.get_db_field_name());
-                result.push_str("\");");
-                fill_op(result, struct_property);
-
-                result.push_str("self.");
-                result.push_str(struct_property.name.as_str());
-                result.push_str(".write(sql, params, ");
-                fill_sql_type(result, struct_property);
-                result.push_str(");no += 1;");
-            }
+        if no > 0 {
+            lines.push(quote! {
+                sql.push_str(" AND ");
+            });
         }
+        let name = struct_property.name.as_str();
+        let prop_name_ident = struct_property.name_ident;
+        let sql_type = crate::get_field_value::fill_sql_type(struct_property);
+
+        let op = fill_op(struct_property);
+
+        lines.push(quote! {
+            sql.push_str(#name);
+            #op
+            self.#prop_name_ident.write(sql, params, #sql_type);
+        });
+
+        no += 1;
+    }
+
+    quote! {
+        use my_postgres::SqlValueWriter;
+        #(#lines)*
     }
 }
 
-fn fill_adding_delimiter(result: &mut String) {
-    result.push_str("if no > 0 { sql.push_str(\" AND \"); }");
-}
+fn fill_op(struct_property: &StructProperty) -> proc_macro2::TokenStream {
+    let prop_name_ident = struct_property.name_ident;
+    //sql.push_str(self.#prop_name_ident.get_default_operator());
 
-fn fill_op(result: &mut String, struct_propery: &StructProperty) {
-    if let Some(op) = struct_propery.attrs.try_get("operator") {
-        result.push_str("sql.push_str(\"");
+    if let Some(op) = struct_property.attrs.try_get("operator") {
         if let Some(content) = op.content.as_ref() {
-            result.push_str(extract_and_verify_operation(content));
+            let op = extract_and_verify_operation(content);
+            return quote! {
+                sql.push_str(#op);
+            }
+            .into();
+        } else {
+            return quote! {
+                sql.push_str(self.#prop_name_ident.get_default_operator());
+            }
+            .into();
         }
-        result.push_str("\");");
     } else {
-        result.push_str("sql.push_str(self.");
-        result.push_str(struct_propery.name.as_str());
-        result.push_str(".get_default_operator());");
+        return quote! {
+            sql.push_str(self.#prop_name_ident.get_default_operator());
+        }
+        .into();
     }
 }
 

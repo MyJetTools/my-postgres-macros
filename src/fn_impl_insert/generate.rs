@@ -7,17 +7,6 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let fields = crate::postgres_utils::filter_fields(StructProperty::read(ast));
 
-    /*
-    let mut has_str = false;
-
-    for field in &fields {
-        if let PropertyType::Str = field.ty {
-            has_str = true;
-            break;
-        }
-    }
-     */
-
     let fields_amount = fields.len();
 
     let get_field_name = fn_get_field_name(&fields);
@@ -66,7 +55,7 @@ pub fn fn_get_field_name(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStr
 pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
-        let value = crate::get_field_value_ext::get_field_value(field);
+        let value = crate::get_field_value::get_field_value(field);
 
         result.push(
             quote! {
