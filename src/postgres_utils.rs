@@ -97,7 +97,7 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, To
         if itm.ty.is_date_time() {
             if !itm.has_sql_type_attr() {
                 let result = syn::Error::new_spanned(
-                    itm.get_field_name_ident(),
+                    itm.field,
                     format!("Please specify sql_type for {}", itm.name),
                 );
 
