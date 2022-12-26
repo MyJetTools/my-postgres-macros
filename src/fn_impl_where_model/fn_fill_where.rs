@@ -20,6 +20,8 @@ pub fn fn_fill_where(
 
         let op = fill_op(struct_property)?;
 
+        println!("OP: {}", op);
+
         let db_field_name = match struct_property.get_db_field_name() {
             Ok(result) => result,
             Err(err) => {
