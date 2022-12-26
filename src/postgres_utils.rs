@@ -1,4 +1,4 @@
-use proc_macro2::TokenStream;
+use proc_macro::TokenStream;
 use types_reader::{PropertyType, StructProperty};
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
@@ -96,7 +96,13 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, To
 
         if itm.ty.is_date_time() {
             if !itm.has_sql_type_attr() {
-                panic!("Please specify sql_type for {}", itm.name);
+                let result = syn::Error::new_spanned(
+                    itm.get_field_name_ident(),
+                    format!("Please specify sql_type for {}", itm.name),
+                );
+
+                let err = result.to_compile_error();
+                return Err(quote::quote!(#err).into());
             }
         }
 

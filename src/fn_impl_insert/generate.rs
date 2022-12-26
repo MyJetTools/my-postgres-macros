@@ -7,9 +7,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let fields = match crate::postgres_utils::filter_fields(StructProperty::read(ast)) {
         Ok(result) => result,
-        Err(err) => {
-            return err.into();
-        }
+        Err(err) => return err,
     };
 
     let fields_amount = fields.len();
