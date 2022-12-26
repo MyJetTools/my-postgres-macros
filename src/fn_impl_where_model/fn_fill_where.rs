@@ -1,4 +1,4 @@
-use macros_utils::AttributeParams;
+use macros_utils::{AttributeParams, ParamValue};
 use types_reader::{PropertyType, StructProperty};
 
 use quote::quote;
@@ -36,7 +36,6 @@ pub fn fn_fill_where(
         }
 
         if let PropertyType::OptionOf(_) = &struct_property.ty {
-            /*
             lines.push(quote! {
                 if let Some(value) = self.#prop_name_ident{
                     sql.push_str(#db_field_name);
@@ -45,7 +44,6 @@ pub fn fn_fill_where(
                     no+=1;
                 }
             });
-             */
         } else {
             lines.push(quote! {
                 sql.push_str(#db_field_name);
@@ -68,11 +66,11 @@ pub fn fn_fill_where(
 
 fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream, syn::Error> {
     let prop_name_ident = struct_property.get_field_name_ident();
-    //sql.push_str(self.#prop_name_ident.get_default_operator());
 
     if let Some(params) = struct_property.attrs.get("operator") {
         if let Some(params) = params {
-            let op = extract_and_verify_operation(params, struct_property)?;
+            let op_value = extract_and_verify_operation(params, struct_property)?;
+            let op = op_value.get_value_as_str();
             return Ok(quote! {
                 sql.push_str(#op);
             }
@@ -91,10 +89,10 @@ fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream,
     }
 }
 
-fn extract_and_verify_operation(
-    params: &AttributeParams,
-    prop: &StructProperty,
-) -> Result<String, syn::Error> {
+fn extract_and_verify_operation<'s>(
+    params: &'s AttributeParams,
+    prop: &'s StructProperty,
+) -> Result<ParamValue<'s>, syn::Error> {
     let result = params.get_single_param();
 
     if result.is_none() {
@@ -104,21 +102,21 @@ fn extract_and_verify_operation(
         ));
     }
 
-    let result = result.as_ref().unwrap().get_value_as_str();
+    let result = result.unwrap();
 
-    if result == "="
-        || result == "!="
-        || result == "<"
-        || result == "<="
-        || result == ">"
-        || result == ">="
-        || result == "<>"
+    if result.get_value_as_str() == "="
+        || result.get_value_as_str() == "!="
+        || result.get_value_as_str() == "<"
+        || result.get_value_as_str() == "<="
+        || result.get_value_as_str() == ">"
+        || result.get_value_as_str() == ">="
+        || result.get_value_as_str() == "<>"
     {
-        return Ok(result.to_string());
+        return Ok(result);
     }
 
     return Err(syn::Error::new_spanned(
         prop.field,
-        format!("Invalid operator {}", result),
+        format!("Invalid operator {}", result.get_value_as_str()),
     ));
 }
