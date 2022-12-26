@@ -73,15 +73,9 @@ fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream,
             let op = op_value.get_value_as_str();
 
             return Ok(quote! {
-                sql.push_str(self.#prop_name_ident.get_default_operator());
-            }
-            .into());
-            /*
-            return Ok(quote! {
                 sql.push_str(#op);
             }
             .into());
-             */
         } else {
             return Ok(quote! {
                 sql.push_str(self.#prop_name_ident.get_default_operator());
