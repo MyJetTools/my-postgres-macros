@@ -36,6 +36,7 @@ pub fn fn_fill_where(
         }
 
         if let PropertyType::OptionOf(_) = &struct_property.ty {
+            /*
             lines.push(quote! {
                 if let Some(value) = self.#prop_name_ident{
                     sql.push_str(#db_field_name);
@@ -44,6 +45,7 @@ pub fn fn_fill_where(
                     no+=1;
                 }
             });
+             */
         } else {
             lines.push(quote! {
                 sql.push_str(#db_field_name);
@@ -61,7 +63,6 @@ pub fn fn_fill_where(
         #(#lines)*
     };
 
-    println!("{}", result.to_string());
     Ok(result)
 }
 
