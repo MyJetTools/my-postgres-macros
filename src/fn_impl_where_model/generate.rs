@@ -5,6 +5,8 @@ use types_reader::StructProperty;
 pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let struct_name = &ast.ident;
 
+    println!("Name: {}, Generics: {:?}", struct_name, ast.generics);
+
     let src_fields = StructProperty::read(ast);
 
     let mut limit = None;
