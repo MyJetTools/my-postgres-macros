@@ -1,4 +1,5 @@
 use macros_utils::{AttributeParams, ParamValue};
+use proc_macro2::TokenStream;
 use types_reader::{PropertyType, StructProperty};
 
 use quote::quote;
@@ -18,8 +19,6 @@ pub fn fn_fill_where(
         let prop_name_ident = struct_property.get_field_name_ident();
         let sql_type = crate::get_field_value::fill_sql_type(struct_property);
 
-        let op = fill_op(struct_property)?;
-
         let db_field_name = match struct_property.get_db_field_name() {
             Ok(result) => result,
             Err(err) => {
@@ -36,6 +35,8 @@ pub fn fn_fill_where(
         }
 
         if let PropertyType::OptionOf(_) = &struct_property.ty {
+            let op = fill_op(quote!(value), struct_property)?;
+
             lines.push(quote! {
                 if let Some(value) = self.#prop_name_ident{
                     sql.push_str(#db_field_name);
@@ -45,6 +46,7 @@ pub fn fn_fill_where(
                 }
             });
         } else {
+            let op = fill_op(quote!(self.#prop_name_ident), struct_property)?;
             lines.push(quote! {
                 sql.push_str(#db_field_name);
                 #op
@@ -64,9 +66,10 @@ pub fn fn_fill_where(
     Ok(result)
 }
 
-fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream, syn::Error> {
-    let prop_name_ident = struct_property.get_field_name_ident();
-
+fn fill_op(
+    property: TokenStream,
+    struct_property: &StructProperty,
+) -> Result<proc_macro2::TokenStream, syn::Error> {
     if let Some(params) = struct_property.attrs.get("operator") {
         if let Some(params) = params {
             let op_value = extract_and_verify_operation(params, struct_property)?;
@@ -78,13 +81,13 @@ fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream,
             .into());
         } else {
             return Ok(quote! {
-                sql.push_str(self.#prop_name_ident.get_default_operator());
+                sql.push_str(#property.get_default_operator());
             }
             .into());
         }
     } else {
         return Ok(quote! {
-            sql.push_str(self.#prop_name_ident.get_default_operator());
+            sql.push_str(#property.get_default_operator());
         }
         .into());
     }
