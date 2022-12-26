@@ -1,8 +1,9 @@
+use quote::quote;
 use types_reader::StructProperty;
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-pub fn get_group_by_fields(result: &mut String, fields: &[StructProperty]) {
+pub fn get_group_by_fields(fields: &[StructProperty]) -> proc_macro2::TokenStream {
     let mut group_by = Vec::with_capacity(fields.len());
 
     for prop in fields {
@@ -13,14 +14,16 @@ pub fn get_group_by_fields(result: &mut String, fields: &[StructProperty]) {
     }
 
     if group_by.is_empty() {
-        result.push_str("None");
-        return;
+        return quote! { None }.into();
     }
 
-    result.push_str("Some(\" GROUP BY");
+    let mut group_by_str = String::new();
+
+    group_by_str.push_str(" GROUP BY");
     for prop in group_by {
-        result.push(' ');
-        result.push_str(prop);
+        group_by_str.push(' ');
+        group_by_str.push_str(prop);
     }
-    result.push_str("\")");
+
+    quote! { Some(#group_by_str) }.into()
 }

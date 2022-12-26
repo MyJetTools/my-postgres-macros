@@ -1,30 +1,23 @@
-use types_reader::{PropertyType, StructProperty};
-
 use crate::postgres_utils::PostgresStructPropertyExt;
+use quote::quote;
+use types_reader::StructProperty;
 
-pub fn fn_from(result: &mut String, fields: &[StructProperty]) {
-    result.push_str("use my_postgres::sql_select::FromDbRow;");
-
-    result.push_str("Self{");
+pub fn fn_from(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
+    let mut result = Vec::with_capacity(fields.len());
 
     for field in fields {
-        result.push_str(field.name.as_str());
-        result.push_str(": ");
+        let name_ident = field.get_field_name_ident();
 
-        if let PropertyType::OptionOf(sub_type) = &field.ty {
-            result.push_str("Option::<");
-            result.push_str(sub_type.as_str().as_str());
-            result.push_str(">");
-        } else {
-            result.push_str(field.ty.as_str().as_str());
-        }
+        let type_ident = field.get_syn_type_as_token_stream();
 
-        result.push_str("::from_db_row(db_row, \"");
-        result.push_str(field.get_db_field_name());
-        result.push_str("\",");
-        super::fill_sql_type(result, field);
-        result.push_str("),");
+        let db_field_name = field.get_db_field_name();
+
+        let sql_type = super::fill_sql_type(field);
+
+        result.push(quote! {
+            #name_ident: #type_ident::from_db_row(db_row, #db_field_name, #sql_type),
+        });
     }
 
-    result.push_str("}");
+    result
 }

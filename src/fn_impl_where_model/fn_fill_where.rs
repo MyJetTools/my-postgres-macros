@@ -8,7 +8,7 @@ pub fn fn_fill_where(struct_properties: &[StructProperty]) -> proc_macro2::Token
     let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
 
     for struct_property in struct_properties {
-        let prop_name_ident = struct_property.name_ident;
+        let prop_name_ident = struct_property.get_field_name_ident();
         let sql_type = crate::get_field_value::fill_sql_type(struct_property);
 
         let op = fill_op(struct_property);
@@ -40,7 +40,7 @@ pub fn fn_fill_where(struct_properties: &[StructProperty]) -> proc_macro2::Token
 }
 
 fn fill_op(struct_property: &StructProperty) -> proc_macro2::TokenStream {
-    let prop_name_ident = struct_property.name_ident;
+    let prop_name_ident = struct_property.get_field_name_ident();
     //sql.push_str(self.#prop_name_ident.get_default_operator());
 
     if let Some(op) = struct_property.attrs.try_get("operator") {

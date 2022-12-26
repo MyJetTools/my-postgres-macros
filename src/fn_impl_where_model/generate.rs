@@ -37,7 +37,7 @@ pub fn generate_implementation(
     offset: Option<StructProperty>,
 ) -> proc_macro2::TokenStream {
     let limit: TokenStream = if let Some(limit) = &limit {
-        let name = limit.name_ident;
+        let name = limit.get_field_name_ident();
         quote! {
             fn get_limit(&self) -> Option<usize> {
                 self.#name.as_str()
@@ -54,7 +54,7 @@ pub fn generate_implementation(
     };
 
     let offset: TokenStream = if let Some(offset) = &offset {
-        let name = offset.name_ident;
+        let name = offset.get_field_name_ident();
         quote! {
             fn get_offset(&self) -> Option<usize> {
                 self.#name.as_str()

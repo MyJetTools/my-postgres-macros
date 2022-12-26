@@ -4,16 +4,16 @@ mod fn_fill_select_fields;
 mod fn_from;
 mod generate;
 pub use generate::generate;
+use proc_macro2::TokenStream;
+use quote::quote;
 use types_reader::StructProperty;
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-fn fill_sql_type(result: &mut String, prop: &StructProperty) {
+fn fill_sql_type(prop: &StructProperty) -> TokenStream {
     if let Some(sql_type) = prop.get_sql_type() {
-        result.push_str("Some(\"");
-        result.push_str(sql_type.as_str());
-        result.push_str("\")");
+        quote!(Some(#sql_type)).into()
     } else {
-        result.push_str("None");
+        quote!(None).into()
     }
 }

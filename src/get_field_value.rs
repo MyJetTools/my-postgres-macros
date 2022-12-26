@@ -50,7 +50,7 @@ fn fill_option_of(
 }
 
 fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
-    let name = struct_propery.name_ident;
+    let name = struct_propery.get_field_name_ident();
 
     let sql_type = fill_sql_type(struct_propery);
 
@@ -64,7 +64,7 @@ fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
 }
 
 fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
-    let prop_name = struct_propery.name_ident;
+    let prop_name = struct_propery.get_field_name_ident();
 
     let sql_type = fill_sql_type(struct_propery);
 
