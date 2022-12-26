@@ -5,7 +5,14 @@ use types_reader::StructProperty;
 pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let struct_name = &ast.ident;
 
-    println!("Name: {}, Generics: {:?}", struct_name, ast.generics);
+    for lifetime in ast.generics.lifetimes() {
+        println!("Name: {}, Lifetime: {:?}", struct_name, lifetime);
+
+        println!(
+            "Name: {}, Lifetime ident: {}",
+            struct_name, lifetime.lifetime.ident
+        );
+    }
 
     let src_fields = StructProperty::read(ast);
 
