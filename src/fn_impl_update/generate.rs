@@ -1,12 +1,15 @@
 use proc_macro::TokenStream;
-use types_reader::StructProperty;
+use types_reader::{StructProperty, TypeName};
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 use quote::quote;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
-    let ident = &ast.ident;
-    let struct_name = quote!(#ident);
+    let type_name = TypeName::new(ast);
+
+    let struct_name = type_name.get_type_name();
+
+    let life_time = type_name.get_default_lifetime_generic();
 
     let fields = StructProperty::read(ast);
 
@@ -31,7 +34,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     }
 
     let where_impl = crate::fn_impl_where_model::generate_implementation(
-        &struct_name,
+        &type_name,
         with_primary_key.as_slice(),
         None,
         None,
@@ -39,11 +42,11 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     quote! {
 
-        impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for #struct_name{
+        impl #life_time my_postgres::sql_update::SqlUpdateModel #life_time for #struct_name{
             fn get_fields_amount() -> usize{
                 #fields_ammount
             }
-            fn get_field_value(&'s self, no: usize) -> my_postgres::sql_update::SqlUpdateValue<'s>{
+            fn get_field_value(& #life_time self, no: usize) -> my_postgres::sql_update::SqlUpdateValue #life_time{
                 match no{
                     #(#get_field_value_case)*
                     _=>panic!("no such field with number {}", no)

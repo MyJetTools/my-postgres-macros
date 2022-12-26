@@ -1,18 +1,9 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use types_reader::StructProperty;
+use types_reader::{StructProperty, TypeName};
 
 pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
-    let struct_name: TokenStream = {
-        let ident = &ast.ident;
-
-        if ast.generics.lifetimes().count() > 0 {
-            let generics = &ast.generics;
-            quote!(#ident #generics)
-        } else {
-            quote!(#ident)
-        }
-    };
+    let type_name = TypeName::new(ast);
 
     let src_fields = StructProperty::read(ast);
 
@@ -31,7 +22,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         }
     }
 
-    let result = generate_implementation(&struct_name, fields.as_slice(), limit, offset);
+    let result = generate_implementation(&type_name, fields.as_slice(), limit, offset);
 
     quote! {
         #result
@@ -40,11 +31,14 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 }
 
 pub fn generate_implementation(
-    struct_name: &TokenStream,
+    type_name: &TypeName,
     fields: &[StructProperty],
     limit: Option<StructProperty>,
     offset: Option<StructProperty>,
 ) -> proc_macro2::TokenStream {
+    let struct_name = type_name.get_type_name();
+    let life_time = type_name.get_default_lifetime_generic();
+
     let limit: TokenStream = if let Some(limit) = &limit {
         let name = limit.get_field_name_ident();
         quote! {
@@ -81,8 +75,8 @@ pub fn generate_implementation(
 
     let where_data = super::fn_fill_where::fn_fill_where(fields);
     quote! {
-       impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
-        fn fill_where(&'s self, sql: &mut String, params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,) {
+       impl #life_time my_postgres::sql_where::SqlWhereModel #life_time for #struct_name{
+        fn fill_where(&#life_time self, sql: &mut String, params: &mut Vec<&#life_time (dyn tokio_postgres::types::ToSql + Sync)>,) {
             #where_data
         }
         #limit
