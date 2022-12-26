@@ -1,3 +1,4 @@
+use proc_macro2::TokenStream;
 use types_reader::{PropertyType, StructProperty};
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
@@ -9,7 +10,6 @@ pub const ATTR_JSON: &str = "json";
 
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
-    fn check_for_sql_type(&self);
 
     fn has_sql_type_attr(&self) -> bool;
     fn get_sql_type(&self) -> Option<String>;
@@ -46,10 +46,6 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
 
     fn has_ignore_attr(&self) -> bool {
         self.attrs.has_attr("ignore")
-    }
-
-    fn check_for_sql_type(&self) {
-        panic!("please specify sql_type attribute for {}", self.name);
     }
 
     fn has_sql_type_attr(&self) -> bool {
@@ -90,7 +86,7 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
     }
 }
 
-pub fn filter_fields(src: Vec<StructProperty>) -> Vec<StructProperty> {
+pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, TokenStream> {
     let mut result = Vec::with_capacity(src.len());
 
     for itm in src {
@@ -107,7 +103,7 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Vec<StructProperty> {
         result.push(itm);
     }
 
-    return result;
+    return Ok(result);
 }
 
 pub fn extract_attr_value(src: &[u8]) -> &str {

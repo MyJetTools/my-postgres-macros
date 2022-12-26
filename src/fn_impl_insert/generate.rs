@@ -5,7 +5,12 @@ use types_reader::StructProperty;
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
 
-    let fields = crate::postgres_utils::filter_fields(StructProperty::read(ast));
+    let fields = match crate::postgres_utils::filter_fields(StructProperty::read(ast)) {
+        Ok(result) => result,
+        Err(err) => {
+            return err.into();
+        }
+    };
 
     let fields_amount = fields.len();
 
