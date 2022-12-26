@@ -20,8 +20,6 @@ pub fn fn_fill_where(
 
         let op = fill_op(struct_property)?;
 
-        println!("OP: {}", op);
-
         let db_field_name = match struct_property.get_db_field_name() {
             Ok(result) => result,
             Err(err) => {
@@ -73,6 +71,9 @@ fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream,
         if let Some(params) = params {
             let op_value = extract_and_verify_operation(params, struct_property)?;
             let op = op_value.get_value_as_str();
+
+            println!("OP: {}", op);
+
             return Ok(quote! {
                 sql.push_str(#op);
             }
