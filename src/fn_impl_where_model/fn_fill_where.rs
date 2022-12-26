@@ -8,19 +8,24 @@ pub fn fn_fill_where(struct_properties: &[StructProperty]) -> proc_macro2::Token
     let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
 
     for struct_property in struct_properties {
-        if no > 0 {
-            lines.push(quote! {
-                sql.push_str(" AND ");
-            });
-        }
-        let name = struct_property.name.as_str();
         let prop_name_ident = struct_property.name_ident;
         let sql_type = crate::get_field_value::fill_sql_type(struct_property);
 
         let op = fill_op(struct_property);
 
+        if no > 0 {
+            let name = format!(" AND {}", struct_property.name.as_str());
+            lines.push(quote! {
+                sql.push_str(#name);
+            });
+        } else {
+            let name = struct_property.name.as_str();
+            lines.push(quote! {
+                sql.push_str(#name);
+            });
+        }
         lines.push(quote! {
-            sql.push_str(#name);
+
             #op
             self.#prop_name_ident.write(sql, params, #sql_type);
         });
