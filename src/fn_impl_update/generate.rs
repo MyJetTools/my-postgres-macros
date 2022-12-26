@@ -9,8 +9,6 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let struct_name = type_name.get_type_name();
 
-    let life_time = type_name.get_default_lifetime_generic();
-
     let fields = StructProperty::read(ast);
 
     let mut primary_key_amount = 0;
@@ -42,11 +40,11 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     quote! {
 
-        impl #life_time my_postgres::sql_update::SqlUpdateModel #life_time for #struct_name{
+        impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for #struct_name{
             fn get_fields_amount() -> usize{
                 #fields_ammount
             }
-            fn get_field_value(& #life_time self, no: usize) -> my_postgres::sql_update::SqlUpdateValue #life_time{
+            fn get_field_value(&'s self, no: usize) -> my_postgres::sql_update::SqlUpdateValue<'s>{
                 match no{
                     #(#get_field_value_case)*
                     _=>panic!("no such field with number {}", no)
