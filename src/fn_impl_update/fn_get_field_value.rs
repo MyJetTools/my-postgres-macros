@@ -18,7 +18,7 @@ pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
 
         result.push(
             quote! {
-                #i => my_postgres::sql_update::SqlUpdateValue{ name: #db_field_name, value: #value}
+                #i => my_postgres::sql_update::SqlUpdateValue{ name: #db_field_name, value: #value},
             }
             .into(),
         );
