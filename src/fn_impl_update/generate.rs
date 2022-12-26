@@ -5,7 +5,8 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 use quote::quote;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
-    let struct_name = &ast.ident;
+    let ident = &ast.ident;
+    let struct_name = quote!(#ident);
 
     let fields = StructProperty::read(ast);
 
@@ -30,7 +31,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     }
 
     let where_impl = crate::fn_impl_where_model::generate_implementation(
-        struct_name,
+        &struct_name,
         with_primary_key.as_slice(),
         None,
         None,

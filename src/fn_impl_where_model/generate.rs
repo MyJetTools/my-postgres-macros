@@ -1,18 +1,18 @@
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::StructProperty;
 
 pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
-    let struct_name = &ast.ident;
+    let struct_name: TokenStream = {
+        let ident = &ast.ident;
 
-    for lifetime in ast.generics.lifetimes() {
-        println!("Name: {}, Lifetime: {:?}", struct_name, lifetime);
-
-        println!(
-            "Name: {}, Lifetime ident: {}",
-            struct_name, lifetime.lifetime.ident
-        );
-    }
+        if ast.generics.lifetimes().count() > 0 {
+            let generics = &ast.generics;
+            quote!(#ident #generics)
+        } else {
+            quote!(#ident)
+        }
+    };
 
     let src_fields = StructProperty::read(ast);
 
@@ -31,7 +31,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         }
     }
 
-    let result = generate_implementation(struct_name, fields.as_slice(), limit, offset);
+    let result = generate_implementation(&struct_name, fields.as_slice(), limit, offset);
 
     quote! {
         #result
@@ -40,7 +40,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 }
 
 pub fn generate_implementation(
-    struct_name: &Ident,
+    struct_name: &TokenStream,
     fields: &[StructProperty],
     limit: Option<StructProperty>,
     offset: Option<StructProperty>,
