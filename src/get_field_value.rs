@@ -22,7 +22,7 @@ pub fn get_field_value(struct_propery: &StructProperty) -> proc_macro2::TokenStr
         types_reader::PropertyType::OptionOf(sub_type) => {
             return fill_option_of(struct_propery, &sub_type)
         }
-        types_reader::PropertyType::Struct(_) => return get_value(struct_propery),
+        types_reader::PropertyType::Struct(..) => return get_value(struct_propery),
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
     }
 }
