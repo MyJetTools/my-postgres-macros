@@ -20,5 +20,23 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 serde_json::from_str(&str_value).unwrap()
             }
         }
+
+        impl<'s> SqlValueWriter<'s> for #struct_name {
+            fn write(
+                &'s self,
+                sql: &mut String,
+                params: &mut Vec<my_postgres::SqlValueToWrite<'s>>,
+                _sql_type: Option<&'static str>,
+            ) {
+                let value = serde_json::to_string(self).unwrap();
+                params.push(my_postgres::SqlValueToWrite::ValueAsString(value));
+                sql.push('$');
+                sql.push_str(params.len().to_string().as_str());
+            }
+        
+            fn get_default_operator(&self) -> &str {
+                "="
+            }
+        }
     }.into()
 }
