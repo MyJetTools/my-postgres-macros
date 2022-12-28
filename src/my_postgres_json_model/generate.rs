@@ -14,14 +14,14 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
         }
 
-        impl FromDbRow<#struct_name> for #struct_name {
+        impl my_postgres::sql_select::FromDbRow<#struct_name> for #struct_name {
             fn from_db_row(row: &tokio_postgres::Row, name: &str, _sql_type: Option<&str>) -> #struct_name {
                 let str_value: String = row.get(name);
                 serde_json::from_str(&str_value).unwrap()
             }
         }
 
-        impl<'s> SqlValueWriter<'s> for #struct_name {
+        impl<'s> my_postgres::SqlValueWriter<'s> for #struct_name {
             fn write(
                 &'s self,
                 sql: &mut String,
