@@ -11,6 +11,8 @@ mod get_field_value;
 
 mod db_enum;
 
+mod my_postgres_json_model;
+
 mod postgres_utils;
 
 use syn;
@@ -124,4 +126,10 @@ pub fn db_enum_as_u64(input: TokenStream) -> TokenStream {
 pub fn db_enum_as_i64(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::db_enum::generate(&ast, EnumType::I64)
+}
+
+#[proc_macro_derive(MyPostgresJsonModel, attributes(enum_case))]
+pub fn my_potgres_json_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::my_postgres_json_model::generate(&ast)
 }
