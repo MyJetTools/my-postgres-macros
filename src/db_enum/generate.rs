@@ -106,7 +106,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
             fn write(
                 &'s self,
                 sql: &mut String,
-                params: &mut Vec<&'s (dyn tokio_postgres::types::ToSql + Sync)>,
+                params: &mut Vec<my_postgres::SqlValueToWrite<'s>>,
                 sql_type: Option<&'static str>,
             ) {
                 sql.push_str(self.as_numbered_str());
