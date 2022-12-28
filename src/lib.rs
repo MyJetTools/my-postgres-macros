@@ -21,7 +21,6 @@ use syn;
     SelectDbEntity,
     attributes(
         db_field_name,
-        json,
         line_no,
         sql,
         sql_type,
