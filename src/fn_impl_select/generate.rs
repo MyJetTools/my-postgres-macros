@@ -5,8 +5,6 @@ use types_reader::StructProperty;
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let struct_name = &ast.ident;
 
-    let fields = StructProperty::read(ast);
-    /*
     let fields = match crate::postgres_utils::filter_fields(StructProperty::read(ast)) {
         Ok(result) => result,
         Err(err) => {
@@ -14,12 +12,10 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
-
     let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
-
 
     let orders_by_fields = match super::fn_fill_order_by::fn_get_order_by_fields(&fields) {
         Ok(result) => result,
@@ -35,30 +31,29 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
-     */
 
     quote! {
         impl my_postgres::sql_select::SelectEntity for #struct_name{
 
             fn fill_select_fields(sql: &mut String) {
                 use my_postgres::sql_select::SelectPartValue;
-               // #(#select_fields)*
+                #(#select_fields)*
             }
 
-                fn get_order_by_fields() -> Option<&'static str>{
-                   // #orders_by_fields
-                }
+            fn get_order_by_fields() -> Option<&'static str>{
+                #orders_by_fields
+            }
 
-                fn get_group_by_fields() -> Option<&'static str>{
-                   //#group_by_fields
-                }
+            fn get_group_by_fields() -> Option<&'static str>{
+               #group_by_fields
+            }
 
-                fn from(db_row: &tokio_postgres::Row) -> Self {
-                    use my_postgres::sql_select::FromDbRow;
-                    Self{
-                    // #(#from_fields)*
-                    }
+            fn from(db_row: &tokio_postgres::Row) -> Self {
+                use my_postgres::sql_select::FromDbRow;
+                Self{
+                 #(#from_fields)*
                 }
+            }
         }
     }
     .into()
