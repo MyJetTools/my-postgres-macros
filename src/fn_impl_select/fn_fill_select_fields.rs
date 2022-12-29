@@ -43,14 +43,14 @@ pub fn fn_fill_select_fields(
         } else {
             let db_field_name = prop.get_db_field_name()?;
 
-            let sql_type = super::fill_sql_type(prop);
+            let metadata = crate::render_field_value::render_metadata(prop);
 
             if let PropertyType::OptionOf(sub_type) = &prop.ty {
                 let type_ident = sub_type.get_token_stream();
 
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, #db_field_name, #sql_type);
+                        #type_ident::fill_select_part(sql, #db_field_name, #metadata);
                     }
                     .into(),
                 );
@@ -58,7 +58,7 @@ pub fn fn_fill_select_fields(
                 let type_ident = prop.ty.get_token_stream();
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, #db_field_name, #sql_type);
+                        #type_ident::fill_select_part(sql, #db_field_name, #metadata);
                     }
                     .into(),
                 );

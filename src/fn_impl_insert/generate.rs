@@ -58,7 +58,7 @@ pub fn fn_get_field_name(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStr
 pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
-        let value = crate::get_field_value::render_field_value(field);
+        let value = crate::render_field_value::render_field_value(field);
 
         result.push(
             quote! {

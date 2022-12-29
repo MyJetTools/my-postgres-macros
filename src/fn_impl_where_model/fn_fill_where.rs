@@ -17,7 +17,7 @@ pub fn fn_fill_where(
 
     for struct_property in struct_properties {
         let prop_name_ident = struct_property.get_field_name_ident();
-        let metadata = crate::get_field_value::render_metadata(struct_property);
+        let metadata = crate::render_field_value::render_metadata(struct_property);
 
         let db_field_name = match struct_property.get_db_field_name() {
             Ok(result) => result,

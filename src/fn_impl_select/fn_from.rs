@@ -12,10 +12,10 @@ pub fn fn_from(fields: &[StructProperty]) -> Result<Vec<proc_macro2::TokenStream
 
         let db_field_name = field.get_db_field_name()?;
 
-        let sql_type = super::fill_sql_type(field);
+        let metadata = crate::render_field_value::render_metadata(field);
 
         result.push(quote! {
-            #name_ident: #type_ident::from_db_row(db_row, #db_field_name, #sql_type),
+            #name_ident: #type_ident::from_db_row(db_row, #db_field_name, #metadata),
         });
     }
 
