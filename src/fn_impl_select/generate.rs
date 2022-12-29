@@ -12,12 +12,13 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
+    /*
     let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
 
-    /*
+
     let orders_by_fields = match super::fn_fill_order_by::fn_get_order_by_fields(&fields) {
         Ok(result) => result,
         Err(err) => err.to_compile_error(),
@@ -39,7 +40,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
             fn fill_select_fields(sql: &mut String) {
                 use my_postgres::sql_select::SelectPartValue;
-                #(#select_fields)*
+               // #(#select_fields)*
             }
 
                 fn get_order_by_fields() -> Option<&'static str>{
