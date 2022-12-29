@@ -17,7 +17,7 @@ pub fn fn_fill_where(
 
     for struct_property in struct_properties {
         let prop_name_ident = struct_property.get_field_name_ident();
-        let sql_type = crate::get_field_value::fill_sql_type(struct_property);
+        let metadata = crate::get_field_value::render_metadata(struct_property);
 
         let db_field_name = match struct_property.get_db_field_name() {
             Ok(result) => result,
@@ -41,7 +41,7 @@ pub fn fn_fill_where(
                 if let Some(value) = &self.#prop_name_ident{
                     sql.push_str(#db_field_name);
                     #op
-                    value.write(sql, params, &#sql_type);
+                    value.write(sql, params, &#metadata);
                     no+=1;
                 }
             });
@@ -50,7 +50,7 @@ pub fn fn_fill_where(
             lines.push(quote! {
                 sql.push_str(#db_field_name);
                 #op
-                self.#prop_name_ident.write(sql, params, &#sql_type);
+                self.#prop_name_ident.write(sql, params, &#metadata);
                 no+=1;
             });
         }

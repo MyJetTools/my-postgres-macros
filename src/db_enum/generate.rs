@@ -107,7 +107,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
                 &'s self,
                 sql: &mut String,
                 params: &mut Vec<my_postgres::SqlValue<'s>>,
-                metadata: &Option<SqlValueMetadata>,
+                metadata: &Option<my_postgress::sql_value::SqlValueMetadata>,
             ) {
                 sql.push_str(self.as_numbered_str());
             }

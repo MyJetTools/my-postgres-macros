@@ -52,12 +52,12 @@ fn fill_option_of(
 fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     let name = struct_propery.get_field_name_ident();
 
-    let sql_type = fill_sql_type(struct_propery);
+    let metadata = render_metadata(struct_propery);
 
     quote! {
-        my_postgres::SqlValue::Value {
+        my_postgres::sql_value::SqlValueWrapper::Value {
             value: &self.#name,
-            sql_type: #sql_type
+            metadata: #metadata
         }
     }
     .into()
@@ -66,24 +66,24 @@ fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
 fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     let prop_name = struct_propery.get_field_name_ident();
 
-    let sql_type = fill_sql_type(struct_propery);
+    let metadata = render_metadata(struct_propery);
 
     let else_case: TokenStream = if struct_propery.has_ignore_if_null_attr() {
-        quote!(my_postgres::SqlValue::Ignore).into()
+        quote!(my_postgres::sql_value::SqlValueWrapper::Ignore).into()
     } else {
-        quote!(my_postgres::SqlValue::Null).into()
+        quote!(my_postgres::sql_value::SqlValueWrapper::Null).into()
     };
 
     quote! {
        if let Some(value) = &self.#prop_name{
-          my_postgres::SqlValue::Value {value, sql_type: #sql_type}
+          my_postgres::sql_value::SqlValueWrapper::Value {value, sql_type: #metadata}
        }else{
             #else_case
        }
     }
 }
 
-pub fn fill_sql_type(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
+pub fn render_metadata(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     if let Some(sql_type) = struct_propery.get_sql_type() {
         return quote! {
             Some(#sql_type)

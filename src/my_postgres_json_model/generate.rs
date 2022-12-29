@@ -25,11 +25,11 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             fn write(
                 &'s self,
                 sql: &mut String,
-                params: &mut Vec<my_postgres::SqlValue<'s>>,
-                metadata: &Option<my_postgres::SqlValueMetadata>,
+                params: &mut Vec<my_postgres::sql_value::SqlValue<'s>>,
+                metadata: &Option<my_postgres::sql_value::SqlValueMetadata>,
             ) {
                 let value = serde_json::to_string(self).unwrap();
-                params.push(my_postgres::SqlValue::ValueAsString(value));
+                params.push(my_postgres::sql_value::SqlValue::ValueAsString(value));
                 sql.push('$');
                 sql.push_str(params.len().to_string().as_str());
             }
