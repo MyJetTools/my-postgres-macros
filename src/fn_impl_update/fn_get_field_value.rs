@@ -24,7 +24,7 @@ pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
             }
         };
 
-        let value = crate::get_field_value::get_field_value(field);
+        let value = crate::get_field_value::render_field_value(field);
 
         result.push(
             quote! {

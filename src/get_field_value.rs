@@ -4,7 +4,7 @@ use types_reader::{PropertyType, StructProperty};
 
 use crate::postgres_utils::PostgresStructPropertyExt;
 
-pub fn get_field_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
+pub fn render_field_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     match &struct_propery.ty {
         types_reader::PropertyType::U8 => return get_value(struct_propery),
         types_reader::PropertyType::I8 => return get_value(struct_propery),
@@ -76,9 +76,9 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
 
     quote! {
        if let Some(value) = &self.#prop_name{
-        //  my_postgres::SqlValueWrapper::Value {value, metadata: #metadata}
+          my_postgres::SqlValueWrapper::Value {value, metadata: #metadata}
        }else{
-          //  #else_case
+            #else_case
        }
     }
 }

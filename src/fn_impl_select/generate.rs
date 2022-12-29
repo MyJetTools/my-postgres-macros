@@ -32,13 +32,15 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(err) => vec![err.to_compile_error()],
     };
 
+    /*
+    fn fill_select_fields(sql: &mut String) {
+        use my_postgres::sql_select::SelectPartValue;
+        #(#select_fields)*
+    } */
+
     quote! {
             impl my_postgres::sql_select::SelectEntity for #struct_name{
 
-                fn fill_select_fields(sql: &mut String) {
-                    use my_postgres::sql_select::SelectPartValue;
-                    #(#select_fields)*
-                }
 
                 fn get_order_by_fields() -> Option<&'static str>{
                     #orders_by_fields
