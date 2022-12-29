@@ -76,7 +76,7 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
 
     quote! {
        if let Some(value) = &self.#prop_name{
-          my_postgres::SqlValueWrapper::Value {value, sql_type: #metadata}
+          my_postgres::SqlValueWrapper::Value {value, metadata: #metadata}
        }else{
             #else_case
        }
@@ -84,13 +84,12 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
 }
 
 pub fn render_metadata(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
-    /*
-       if let Some(sql_type) = struct_propery.get_sql_type() {
-           return quote! {
-               Some(my_postgres::SqlValueMetadata::with_sql_type(#sql_type))
-           }
-           .into();
-       }
-    */
+    if let Some(sql_type) = struct_propery.get_sql_type() {
+        return quote! {
+            Some(my_postgres::SqlValueMetadata::with_sql_type(#sql_type))
+        }
+        .into();
+    }
+
     quote!(None).into()
 }
