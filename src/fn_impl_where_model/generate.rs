@@ -79,7 +79,7 @@ pub fn generate_implementation(
 
     quote! {
        impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
-        fn fill_where(&'s self, sql: &mut String, params: &mut Vec<my_postgres::SqlValueToWrite<'s>>,) {
+        fn fill_where(&'s self, sql: &mut String, params: &mut Vec<my_postgres::SqlValue<'s>>,) {
             #where_data
         }
         #limit
