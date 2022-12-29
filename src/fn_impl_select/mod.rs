@@ -12,7 +12,8 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 
 fn fill_sql_type(prop: &StructProperty) -> TokenStream {
     if let Some(sql_type) = prop.get_sql_type() {
-        quote!(Some(#sql_type)).into()
+        quote!(None).into()
+        //quote!(Some(#sql_type)).into()
     } else {
         quote!(None).into()
     }
