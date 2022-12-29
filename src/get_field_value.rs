@@ -76,9 +76,9 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
 
     quote! {
        if let Some(value) = &self.#prop_name{
-          my_postgres::SqlValueWrapper::Value {value, metadata: #metadata}
+        //  my_postgres::SqlValueWrapper::Value {value, metadata: #metadata}
        }else{
-            #else_case
+          //  #else_case
        }
     }
 }
