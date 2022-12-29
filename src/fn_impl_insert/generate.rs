@@ -29,7 +29,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 }
             }
 
-            fn get_field_value(&'s self, no: usize) -> my_postgres::SqlValue<'s>{
+            fn get_field_value(&'s self, no: usize) -> my_postgres::SqlValueWrapper<'s>{
                 match no{
                     #(#get_field_value)*
                     _=>panic!("no such field with number {}", no)
