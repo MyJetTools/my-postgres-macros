@@ -27,39 +27,36 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(err) => err.to_compile_error(),
     };
 
+    /*
     let from_fields = match super::fn_from::fn_from(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
+     */
 
-    /*
-    fn fill_select_fields(sql: &mut String) {
-        use my_postgres::sql_select::SelectPartValue;
-        #(#select_fields)*
-    }
+    let from_fields: Vec<proc_macro2::TokenStream> = vec![];
 
-
+    quote! {
+        impl my_postgres::sql_select::SelectEntity for #struct_name{
+            fn fill_select_fields(sql: &mut String) {
+                use my_postgres::sql_select::SelectPartValue;
+                #(#select_fields)*
+            }
 
                 fn get_order_by_fields() -> Option<&'static str>{
                     #orders_by_fields
                 }
 
                 fn get_group_by_fields() -> Option<&'static str>{
-                    #group_by_fields
+                   #group_by_fields
                 }
 
                 fn from(db_row: &tokio_postgres::Row) -> Self {
                     use my_postgres::sql_select::FromDbRow;
                     Self{
-                        #(#from_fields)*
+                     #(#from_fields)*
                     }
-
                 }
-    */
-
-    quote! {
-            impl my_postgres::sql_select::SelectEntity for #struct_name{
-
             }
     }
     .into()
