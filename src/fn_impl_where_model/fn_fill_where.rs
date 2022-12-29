@@ -41,7 +41,7 @@ pub fn fn_fill_where(
                 if let Some(value) = &self.#prop_name_ident{
                     sql.push_str(#db_field_name);
                     #op
-                    value.write(sql, params, #sql_type);
+                    value.write(sql, params, &#sql_type);
                     no+=1;
                 }
             });
@@ -50,7 +50,7 @@ pub fn fn_fill_where(
             lines.push(quote! {
                 sql.push_str(#db_field_name);
                 #op
-                self.#prop_name_ident.write(sql, params, #sql_type);
+                self.#prop_name_ident.write(sql, params, &#sql_type);
                 no+=1;
             });
         }
