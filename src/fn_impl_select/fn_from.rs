@@ -15,7 +15,7 @@ pub fn fn_from(fields: &[StructProperty]) -> Result<Vec<proc_macro2::TokenStream
         let metadata = crate::render_field_value::render_metadata(field);
 
         result.push(quote! {
-            #name_ident: #type_ident::from_db_row(db_row, #db_field_name, #metadata),
+            #name_ident: #type_ident::from_db_row(db_row, #db_field_name, &#metadata),
         });
     }
 
