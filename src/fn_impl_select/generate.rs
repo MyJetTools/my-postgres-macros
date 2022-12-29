@@ -4,6 +4,8 @@ use types_reader::StructProperty;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let struct_name = &ast.ident;
+
+    let fields = StructProperty::read(ast);
     /*
     let fields = match crate::postgres_utils::filter_fields(StructProperty::read(ast)) {
         Ok(result) => result,
