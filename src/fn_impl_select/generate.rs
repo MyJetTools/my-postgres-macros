@@ -11,13 +11,14 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             return err.into();
         }
     };
+    */
 
+    let fields = StructProperty::read(ast);
 
     let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
-
 
     let orders_by_fields = match super::fn_fill_order_by::fn_get_order_by_fields(&fields) {
         Ok(result) => result,
@@ -29,13 +30,15 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(err) => err.to_compile_error(),
     };
 
-
     let from_fields = match super::fn_from::fn_from(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
 
-                fn fill_select_fields(sql: &mut String) {
+    quote! {
+        impl my_postgres::sql_select::SelectEntity for #struct_name{
+
+            fn fill_select_fields(sql: &mut String) {
                 use my_postgres::sql_select::SelectPartValue;
                 #(#select_fields)*
             }
@@ -54,16 +57,6 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                      #(#from_fields)*
                     }
                 }
-
-
-     */
-
-    let from_fields: Vec<proc_macro2::TokenStream> = vec![];
-
-    let select_fields: Vec<proc_macro2::TokenStream> = vec![];
-
-    quote! {
-        impl my_postgres::sql_select::SelectEntity for #struct_name{
         }
     }
     .into()
