@@ -1,3 +1,4 @@
+use macros_utils::ParamValue;
 use types_reader::{PropertyType, StructProperty};
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
@@ -10,7 +11,7 @@ pub const ATTR_JSON: &str = "json";
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
 
-    fn get_sql_type(&self) -> Option<String>;
+    fn get_sql_type(&self) -> Option<ParamValue>;
 
     fn get_db_field_name(&self) -> Result<String, syn::Error>;
     fn has_json_attr(&self) -> bool;
@@ -46,14 +47,11 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.contains_key("ignore")
     }
 
-    fn get_sql_type(&self) -> Option<String> {
+    fn get_sql_type(&self) -> Option<ParamValue> {
         let attr = self.attrs.get(ATTR_SQL_TYPE)?;
 
         match attr {
-            Some(result) => {
-                let result = result.get_from_single_or_named("name")?;
-                Some(result.get_value_as_str().to_string())
-            }
+            Some(result) => result.get_from_single_or_named("name"),
             None => None,
         }
     }
@@ -110,6 +108,7 @@ pub fn filter_fields(
 
         if itm.ty.is_date_time() {
             if let Some(attr) = itm.get_sql_type() {
+                let attr = attr.get_value_as_str();
                 if attr != "timestamp" && attr != "bigint" {
                     let result = syn::Error::new_spanned(
                         itm.field,
