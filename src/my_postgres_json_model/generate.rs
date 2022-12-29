@@ -26,7 +26,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 &'s self,
                 sql: &mut String,
                 params: &mut Vec<my_postgres::SqlValue<'s>>,
-                _sql_type: Option<&'static str>,
+                metadata: &Option<my_postgres::SqlValueMetadata>,
             ) {
                 let value = serde_json::to_string(self).unwrap();
                 params.push(my_postgres::SqlValue::ValueAsString(value));
