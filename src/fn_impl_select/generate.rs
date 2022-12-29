@@ -34,15 +34,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
-     */
 
-    let from_fields: Vec<proc_macro2::TokenStream> = vec![];
-
-    let select_fields: Vec<proc_macro2::TokenStream> = vec![];
-
-    quote! {
-        impl my_postgres::sql_select::SelectEntity for #struct_name{
-            fn fill_select_fields(sql: &mut String) {
+                fn fill_select_fields(sql: &mut String) {
                 use my_postgres::sql_select::SelectPartValue;
                 #(#select_fields)*
             }
@@ -61,7 +54,17 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                      #(#from_fields)*
                     }
                 }
-            }
+
+
+     */
+
+    let from_fields: Vec<proc_macro2::TokenStream> = vec![];
+
+    let select_fields: Vec<proc_macro2::TokenStream> = vec![];
+
+    quote! {
+        impl my_postgres::sql_select::SelectEntity for #struct_name{
+        }
     }
     .into()
 }
