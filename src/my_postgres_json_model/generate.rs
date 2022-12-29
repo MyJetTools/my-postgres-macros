@@ -29,7 +29,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 metadata: &Option<my_postgres::SqlValueMetadata>,
             ) {
                 let value = serde_json::to_string(self).unwrap();
-                params.push(my_postgres:::SqlValue::ValueAsString(value));
+                params.push(my_postgres::SqlValue::ValueAsString(value));
                 sql.push('$');
                 sql.push_str(params.len().to_string().as_str());
             }
