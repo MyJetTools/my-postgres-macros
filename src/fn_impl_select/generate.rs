@@ -17,7 +17,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
-    */
+
 
     let orders_by_fields = match super::fn_fill_order_by::fn_get_order_by_fields(&fields) {
         Ok(result) => result,
@@ -29,7 +29,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(err) => err.to_compile_error(),
     };
 
-    /*
+
     let from_fields = match super::fn_from::fn_from(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
