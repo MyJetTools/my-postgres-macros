@@ -60,7 +60,7 @@ pub fn fn_get_field_name(
             .into(),
         );
     }
-    result
+    Ok(result)
 }
 
 pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
