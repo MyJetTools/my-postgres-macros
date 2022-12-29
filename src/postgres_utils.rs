@@ -106,29 +106,30 @@ pub fn filter_fields(
             continue;
         }
 
-        if itm.ty.is_date_time() {
-            if let Some(attr) = itm.get_sql_type() {
-                let attr = attr.get_value_as_str();
-                if attr != "timestamp" && attr != "bigint" {
-                    let result = syn::Error::new_spanned(
-                        itm.field,
-                        format!("Sql type must be 'timestamp' or 'bigint'"),
-                    );
+        /*
+               if itm.ty.is_date_time() {
+                   if let Some(attr) = itm.get_sql_type() {
+                       let attr = attr.get_value_as_str();
+                       if attr != "timestamp" && attr != "bigint" {
+                           let result = syn::Error::new_spanned(
+                               itm.field,
+                               format!("Sql type must be 'timestamp' or 'bigint'"),
+                           );
 
-                    let err = result.to_compile_error();
-                    return Err(quote::quote!(#err).into());
-                }
-            } else {
-                let result = syn::Error::new_spanned(
-                    itm.field,
-                    format!("Please specify sql_type for {}", itm.name),
-                );
+                           let err = result.to_compile_error();
+                           return Err(quote::quote!(#err).into());
+                       }
+                   } else {
+                       let result = syn::Error::new_spanned(
+                           itm.field,
+                           format!("Please specify sql_type for {}", itm.name),
+                       );
 
-                let err = result.to_compile_error();
-                return Err(quote::quote!(#err).into());
-            }
-        }
-
+                       let err = result.to_compile_error();
+                       return Err(quote::quote!(#err).into());
+                   }
+               }
+        */
         result.push(itm);
     }
 

@@ -84,14 +84,13 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
 }
 
 pub fn render_metadata(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
-    /*
-       if let Some(metadata) = struct_propery.get_sql_type() {
-           let metadata = metadata.get_value_as_str();
-           return quote! {
-               Some(my_postgres::SqlValueMetadata::with_sql_type(#metadata))
-           }
-           .into();
-       }
-    */
+    if let Some(metadata) = struct_propery.get_sql_type() {
+        let metadata = metadata.get_value_as_str();
+        return quote! {
+            Some(my_postgres::SqlValueMetadata::with_sql_type(#metadata))
+        }
+        .into();
+    }
+
     quote!(None).into()
 }
