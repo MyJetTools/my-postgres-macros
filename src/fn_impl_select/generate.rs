@@ -12,10 +12,12 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
+    /*
     let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
     };
+    */
 
     let orders_by_fields = match super::fn_fill_order_by::fn_get_order_by_fields(&fields) {
         Ok(result) => result,
@@ -35,6 +37,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
      */
 
     let from_fields: Vec<proc_macro2::TokenStream> = vec![];
+
+    let select_fields: Vec<proc_macro2::TokenStream> = vec![];
 
     quote! {
         impl my_postgres::sql_select::SelectEntity for #struct_name{
