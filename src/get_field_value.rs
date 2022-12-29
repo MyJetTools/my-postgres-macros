@@ -55,7 +55,7 @@ fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     let metadata = render_metadata(struct_propery);
 
     quote! {
-        my_postgres::sql_value::SqlValueWrapper::Value {
+        my_postgres::SqlValueWrapper::Value {
             value: &self.#name,
             metadata: #metadata
         }
@@ -69,14 +69,14 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
     let metadata = render_metadata(struct_propery);
 
     let else_case: TokenStream = if struct_propery.has_ignore_if_null_attr() {
-        quote!(my_postgres::sql_value::SqlValueWrapper::Ignore).into()
+        quote!(my_postgres::SqlValueWrapper::Ignore).into()
     } else {
-        quote!(my_postgres::sql_value::SqlValueWrapper::Null).into()
+        quote!(my_postgres::SqlValueWrapper::Null).into()
     };
 
     quote! {
        if let Some(value) = &self.#prop_name{
-          my_postgres::sql_value::SqlValueWrapper::Value {value, sql_type: #metadata}
+          my_postgres::SqlValueWrapper::Value {value, sql_type: #metadata}
        }else{
             #else_case
        }
