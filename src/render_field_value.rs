@@ -57,7 +57,7 @@ fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     quote! {
         my_postgres::SqlValueWrapper::Value {
             value: &self.#name,
-            metadata: &#metadata
+            metadata: #metadata
         }
     }
     .into()
@@ -76,7 +76,7 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
 
     quote! {
        if let Some(value) = &self.#prop_name{
-          my_postgres::SqlValueWrapper::Value {value, metadata: &#metadata}
+          my_postgres::SqlValueWrapper::Value {value, metadata: #metadata}
        }else{
             #else_case
        }
