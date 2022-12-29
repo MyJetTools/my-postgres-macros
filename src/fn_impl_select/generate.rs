@@ -4,7 +4,7 @@ use types_reader::StructProperty;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let struct_name = &ast.ident;
-
+    /*
     let fields = match crate::postgres_utils::filter_fields(StructProperty::read(ast)) {
         Ok(result) => result,
         Err(err) => {
@@ -12,7 +12,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
-    /*
+
     let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
