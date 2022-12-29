@@ -50,7 +50,7 @@ pub fn fn_fill_select_fields(
 
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, #db_field_name, #metadata);
+                        #type_ident::fill_select_part(sql, #db_field_name, &#metadata);
                     }
                     .into(),
                 );
@@ -58,7 +58,7 @@ pub fn fn_fill_select_fields(
                 let type_ident = prop.ty.get_token_stream();
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, #db_field_name, #metadata);
+                        #type_ident::fill_select_part(sql, #db_field_name, &#metadata);
                     }
                     .into(),
                 );
