@@ -70,11 +70,11 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
 
     let from_db_result: TokenStream = if enum_type.is_comlient_with_db_name() {
         quote! {
-            #type_name::from_db_value(result)
+            Self::from_db_value(result)
         }
     } else {
         quote! {
-            #type_name::from_db_value(result as #type_name)
+            Self::from_db_value(result as #type_name)
         }
     };
 
