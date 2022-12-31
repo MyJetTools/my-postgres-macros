@@ -122,7 +122,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
         }
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
-            fn from_db_row(row: &tokio_postgres::Row, name: &str, sql_type: Option<&str>) -> Self{
+            fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<SqlValueMetadata>) -> Self{
                 let result: #type_name = row.get(name);
                 #from_db_result
             }
