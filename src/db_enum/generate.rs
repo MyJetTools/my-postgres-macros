@@ -94,7 +94,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
             }
 
             pub fn from_db_value(src: #type_name)->Self{
-                match self{
+                match src{
                   #(#from_db_value)*
                   _ => panic!("Invalid value {}", src)
                 }
