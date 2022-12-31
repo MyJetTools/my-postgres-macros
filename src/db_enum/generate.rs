@@ -115,6 +115,10 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
             ) {
                 sql.push_str(self.as_numbered_str());
             }
+
+            fn get_default_operator(&self) -> &str{
+                "="
+            }
         }
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
