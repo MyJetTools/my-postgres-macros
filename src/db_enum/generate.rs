@@ -95,7 +95,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
 
             pub fn from_db_value(src: #type_name)->Self{
                 match self{
-                  #(#from_db_value),*
+                  #(#from_db_value)*
                   _ => panic!("Invalid value {}", src)
                 }
             }
@@ -168,7 +168,7 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
 
         let name_ident = enum_case.get_name_ident();
 
-        result.push(quote! (#no => Self::#name_ident));
+        result.push(quote! (#no => Self::#name_ident,));
         i += 1;
     }
 
