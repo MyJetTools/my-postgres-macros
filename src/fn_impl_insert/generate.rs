@@ -53,12 +53,7 @@ pub fn fn_get_field_name(
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
         let field_name = field.get_db_field_name()?;
-        result.push(
-            quote! {
-                #i=>#field_name,
-            }
-            .into(),
-        );
+        result.push(quote! (#i=>#field_name).into());
     }
     Ok(result)
 }
@@ -68,12 +63,7 @@ pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<proc_macro2::TokenSt
     for (i, field) in fields.iter().enumerate() {
         let value = crate::render_field_value::render_field_value(field);
 
-        result.push(
-            quote! {
-                #i => #value,
-            }
-            .into(),
-        );
+        result.push(quote! (#i => #value).into());
     }
     result
 }

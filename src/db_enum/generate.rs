@@ -83,20 +83,24 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
         impl #enum_name{
             pub fn #to_func_name(&self)->#type_name{
                 match self {
-                    #(#to_typed_number)*
+                    #(#to_typed_number),*
                 }
             }
 
             pub fn as_numbered_str(&self)->&'static str {
-                #(#as_numbered)*
+                match self{
+                #(#as_numbered),*
+                }
             }
 
             pub fn from_db_value(src: #type_name)->Self{
-                #(#from_db_value)*
-                _ => panic!("Invalid value {}", src)
+                match self{
+                  #(#from_db_value),*
+                  _ => panic!("Invalid value {}", src)
+                }
             }
 
-            fn fill_select_part(sql: &mut String, field_name: &str, sql_type: Option<&str>) {
+            fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
                 sql.push_str(field_name);
             }
 
@@ -132,9 +136,7 @@ fn fn_to_typed_number(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
         let enum_case_name = enum_case.get_name_ident();
         let no = proc_macro2::Literal::usize_unsuffixed(i);
 
-        result.push(quote! {
-            Self::#enum_case_name => #no,
-        });
+        result.push(quote!(Self::#enum_case_name => #no));
 
         i += 1;
     }
@@ -148,12 +150,7 @@ pub fn fn_as_numbered_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
         let no = i.to_string();
-        result.push(
-            quote! {
-                Self::#enum_case_name => #no
-            }
-            .into(),
-        );
+        result.push(quote!(Self::#enum_case_name => #no).into());
 
         i += 1;
     }
@@ -161,38 +158,6 @@ pub fn fn_as_numbered_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     result
 }
 
-/*
-pub fn fn_from_db_row(result: &mut String, enum_type: &EnumType) -> Vec<TokenStream> {
-    let result = Vec::with_capacity(capacity);
-    result.push_str("impl my_postgres::sql_select::FromDbRow<");
-    result.push_str(type_name);
-    result.push_str("> for ");
-    result.push_str(type_name);
-    result.push_str(
-        "{fn from_db_row(row: &tokio_postgres::Row, name: &str, sql_type: Option<&str>) -> ",
-    );
-    result.push_str(type_name);
-
-    result.push_str("{let result: ");
-    result.push_str(enum_type.db_complient_type_name());
-
-    result.push_str(" = row.get(");
-    result.push_str("name");
-    result.push_str(");");
-
-    if enum_type.db_complient_type_name() == enum_type.as_type_name() {
-        result.push_str(type_name);
-        result.push_str("::from_db_value(result)");
-    } else {
-        result.push_str(type_name);
-        result.push_str("::from_db_value(result as ");
-        result.push_str(enum_type.as_type_name());
-        result.push(')');
-    }
-
-    result.push_str("}}");
-}
- */
 fn fn_from_db_value(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     let mut result = Vec::with_capacity(enum_cases.len());
 
@@ -203,9 +168,7 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
 
         let name_ident = enum_case.get_name_ident();
 
-        result.push(quote! {
-            #no => Self::#name_ident,
-        });
+        result.push(quote! (#no => Self::#name_ident));
         i += 1;
     }
 
