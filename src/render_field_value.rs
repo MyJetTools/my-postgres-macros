@@ -19,6 +19,7 @@ pub fn render_field_value(struct_propery: &StructProperty) -> proc_macro2::Token
         types_reader::PropertyType::String => return get_value(struct_propery),
         types_reader::PropertyType::Str => return get_value(struct_propery),
         types_reader::PropertyType::DateTime => return get_value(struct_propery),
+        types_reader::PropertyType::Bool => return get_value(struct_propery),
         types_reader::PropertyType::OptionOf(sub_type) => {
             return fill_option_of(struct_propery, &sub_type)
         }
@@ -45,6 +46,7 @@ fn fill_option_of(
         types_reader::PropertyType::String => return fill_option_of_value(struct_propery),
         types_reader::PropertyType::Str => return fill_option_of_value(struct_propery),
         types_reader::PropertyType::DateTime => return fill_option_of_value(struct_propery),
+        types_reader::PropertyType::Bool => return fill_option_of_value(struct_propery),
         _ => panic!("{} is not supported", struct_propery.ty.as_str()),
     }
 }
