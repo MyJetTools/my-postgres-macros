@@ -26,19 +26,20 @@ pub fn fn_fill_where(
             }
         };
 
-        if no > 0 {
-            lines.push(quote! {
-                if no > 0{
-                    sql.push_str(" AND ");
-                }
-            });
-        }
-
         if let PropertyType::OptionOf(_) = &struct_property.ty {
             let op = fill_op(quote!(value), struct_property)?;
 
             lines.push(quote! {
                 if let Some(value) = &self.#prop_name_ident{
+
+                    if no > 0 {
+                        lines.push(quote! {
+                            if no > 0{
+                                sql.push_str(" AND ");
+                            }
+                        });
+                    }
+
                     sql.push_str(#db_field_name);
                     #op
                     value.write(sql, params, &#metadata);
@@ -48,6 +49,15 @@ pub fn fn_fill_where(
         } else {
             let op = fill_op(quote!(self.#prop_name_ident), struct_property)?;
             lines.push(quote! {
+
+                if no > 0 {
+                    lines.push(quote! {
+                        if no > 0{
+                            sql.push_str(" AND ");
+                        }
+                    });
+                }
+
                 sql.push_str(#db_field_name);
                 #op
                 self.#prop_name_ident.write(sql, params, &#metadata);
