@@ -9,8 +9,6 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 pub fn fn_fill_where(
     struct_properties: &[StructProperty],
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
-    let mut no = 0;
-
     let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
 
     lines.push(quote!(let mut no = 0;));
@@ -64,8 +62,6 @@ pub fn fn_fill_where(
                 no+=1;
             });
         }
-
-        no += 1;
     }
 
     let result = quote! {
