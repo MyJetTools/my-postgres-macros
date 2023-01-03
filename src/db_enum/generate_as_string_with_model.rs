@@ -20,6 +20,8 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
         Err(e) => return e.to_compile_error().into(),
     };
 
+    let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
+
     quote! {
 
         impl #enum_name{
@@ -54,17 +56,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                 fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
                     let name: String = row.get(name);
 
-                    let model_field_name = if let Some(metadata) = metadata{
-                       if metadata.related_field_name.is_none(){
-                        panic!("Metadata model field_name is none");
-                       }
-                       metadata.related_field_name.unwrap()
-                    }
-                    else{
-                        panic!("Metadata is not defined for enum with model");
-                    };
-
-                    let model:String = row.get(model_field_name);
+                    #reading_db_model_from_metadata
 
                     Self::from_str(name.as_str(), model.as_str())
                 }

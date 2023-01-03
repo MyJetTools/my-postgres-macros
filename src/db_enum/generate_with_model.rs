@@ -23,13 +23,15 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
     let sql_db_type = enum_type.get_comlient_with_db_type();
 
+    let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
+
     let from_db_result = if type_name.to_string() == sql_db_type.to_string() {
         quote! {
-            Self::from_db_value(result)
+            Self::from_db_value(result, model.as_str())
         }
     } else {
         quote! {
-            Self::from_db_value(result as #type_name)
+            Self::from_db_value(result as #type_name, model.as_str())
         }
     };
 
@@ -79,6 +81,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
             fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
                 let result: #sql_db_type = row.get(name);
+                #reading_db_model_from_metadata
                 #from_db_result
             }
         }
