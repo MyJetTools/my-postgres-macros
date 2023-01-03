@@ -24,6 +24,8 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
     let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
 
+    let select_part = super::utils::render_select_part();
+
     let from_db_result = if type_name.to_string() == sql_db_type.to_string() {
         quote! {
             Self::from_db_value(result, model.as_str())
@@ -54,7 +56,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
             }
 
             fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
-                sql.push_str(field_name);
+               #select_part
             }
 
         }

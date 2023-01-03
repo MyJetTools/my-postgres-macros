@@ -27,3 +27,16 @@ pub fn render_sql_writing() -> proc_macro2::TokenStream {
                     sql.push_str(params.len().to_string().as_str());
     }
 }
+
+pub fn render_select_part() -> proc_macro2::TokenStream {
+    quote::quote! {
+        sql.push_str(field_name);
+
+        if let Some(metadata) = metadata {
+            if let Some(field_name) = metadata.related_field_name{
+                sql.push(',');
+                sql.push_str(field_name);
+            }
+        }
+    }
+}

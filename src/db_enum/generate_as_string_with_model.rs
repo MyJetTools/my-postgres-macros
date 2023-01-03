@@ -24,6 +24,8 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
 
     let render_sql_writing = super::utils::render_sql_writing();
 
+    let select_part = super::utils::render_select_part();
+
     quote! {
 
         impl #enum_name{
@@ -42,15 +44,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
             }
 
             fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
-                sql.push_str(field_name);
-
-                if let Some(metadata) = metadata {
-                    if let Some(field_name) = metadata.related_field_name{
-                        sql.push(',');
-                        sql.push_str(field_name);
-                    }
-
-                }
+                #select_part
             }
         }
 
