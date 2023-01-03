@@ -134,6 +134,54 @@ pub fn db_enum_as_string(input: TokenStream) -> TokenStream {
     crate::db_enum::generate_as_string(&ast)
 }
 
+#[proc_macro_derive(DbEnumAsU8WithModel, attributes(enum_case))]
+pub fn db_enum_as_u8_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::U8)
+}
+
+#[proc_macro_derive(DbEnumAsI8WithModel, attributes(enum_case))]
+pub fn db_enum_as_i8_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::I8)
+}
+
+#[proc_macro_derive(DbEnumAsU16WithModel, attributes(enum_case))]
+pub fn db_enum_as_u16_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::U16)
+}
+
+#[proc_macro_derive(DbEnumAsI16WithModel, attributes(enum_case))]
+pub fn db_enum_as_i16_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::I16)
+}
+
+#[proc_macro_derive(DbEnumAsU32WithModel, attributes(enum_case))]
+pub fn db_enum_as_u32_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::U32)
+}
+
+#[proc_macro_derive(DbEnumAsI32WithModel, attributes(enum_case))]
+pub fn db_enum_as_i32_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::I32)
+}
+
+#[proc_macro_derive(DbEnumAsU64WithModel, attributes(enum_case))]
+pub fn db_enum_as_u64_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::U64)
+}
+
+#[proc_macro_derive(DbEnumAsI64WithModel, attributes(enum_case))]
+pub fn db_enum_as_i64_with_model(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_with_model(&ast, EnumType::I64)
+}
+
 #[proc_macro_derive(DbEnumAsStringWithModel, attributes(enum_case))]
 pub fn db_enum_as_string_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
