@@ -46,7 +46,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                 fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
                     let name: String = row.get(name);
 
-                    let model = if let Some(metadata) = metadata{
+                    let model_field_name = if let Some(metadata) = metadata{
                        if metadata.related_field_name.is_none(){
                         panic!("Metadata model field_name is none");
                        }
@@ -55,6 +55,8 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                     else{
                         panic!("Metadata is not defined for enum with model");
                     };
+
+                    let model = row.get(model_field_name);
 
                     Self::from_str(name.as_str(), model)
                 }
