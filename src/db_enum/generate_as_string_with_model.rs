@@ -41,7 +41,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                 sql.push_str(field_name);
 
                 if let Some(metadata) = metadata {
-                    if let Some(field_name) =  metadata.related_field_name.is_none() {
+                    if let Some(field_name) = metadata.related_field_name{
                         sql.push(',');
                         sql.push_str(field_name);
                     }
