@@ -1,5 +1,7 @@
 use quote::quote;
 use types_reader::EnumCase;
+
+use crate::postgre_enum_ext::PostgresEnumExt;
 pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let enum_name = &ast.ident;
 
@@ -8,7 +10,10 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         Err(e) => return e.to_compile_error().into(),
     };
 
-    let fn_to_str = generate_fn_to_str(&enum_cases);
+    let fn_to_str = match generate_fn_to_str(&enum_cases) {
+        Ok(result) => result,
+        Err(e) => return e.to_compile_error().into(),
+    };
 
     quote! {
 
@@ -60,16 +65,18 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     .into()
 }
 
-fn generate_fn_to_str(enum_cases: &[EnumCase]) -> proc_macro2::TokenStream {
+fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut result = proc_macro2::TokenStream::new();
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_name = case_ident.to_string();
+        let case_name = case.get_case_name()?;
+
+        let case_name = case_name.as_str();
 
         result.extend(quote! {
             Self::#case_ident => #case_name
         });
     }
-    result
+    Ok(result)
 }
