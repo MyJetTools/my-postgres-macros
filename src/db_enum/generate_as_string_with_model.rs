@@ -59,6 +59,29 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                     Self::from_str(name.as_str(), model)
                 }
             }
+
+            impl<'s> my_postgres::SqlValueWriter<'s> for #enum_name{
+                fn write(
+                    &'s self,
+                    sql: &mut String,
+                    params: &mut Vec<my_postgres::SqlValue<'s>>,
+                    metadata: &Option<my_postgres::SqlValueMetadata>,
+                ) {
+                    let (name, model) = self.to_str();
+                    params.push(SqlValue::Ref(name));
+                    sql.push('$');
+                    sql.push_str(params.len().to_string().as_str());
+                    
+                    params.push(SqlValue::Ref(model));
+                    sql.push('$');
+                    sql.push_str(params.len().to_string().as_str());
+                }
+    
+                fn get_default_operator(&self) -> &str{
+                   panic!("Enum with model can not be used in where clause");
+                }
+            }
+    
     }
     .into()
 }

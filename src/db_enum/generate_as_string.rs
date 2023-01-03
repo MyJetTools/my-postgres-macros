@@ -54,7 +54,7 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
 
             fn get_default_operator(&self) -> &str{
-                "="
+               "="
             }
         }
 
