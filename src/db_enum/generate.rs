@@ -56,7 +56,10 @@ impl EnumType {
 
 pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::TokenStream {
     let enum_name = &ast.ident;
-    let enum_cases = EnumCase::read(ast);
+    let enum_cases = match EnumCase::read(ast) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    };
 
     let to_func_name = enum_type.get_func_name();
 
