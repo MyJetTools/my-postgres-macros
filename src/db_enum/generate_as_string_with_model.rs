@@ -68,11 +68,11 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                     metadata: &Option<my_postgres::SqlValueMetadata>,
                 ) {
                     let (name, model) = self.to_str();
-                    params.push(SqlValue::Ref(name));
+                    params.push(my_postgres::SqlValue::Ref(*name));
                     sql.push('$');
                     sql.push_str(params.len().to_string().as_str());
-                    
-                    params.push(SqlValue::Ref(model));
+
+                    params.push(my_postgres::SqlValue::ValueAsString(model));
                     sql.push('$');
                     sql.push_str(params.len().to_string().as_str());
                 }
