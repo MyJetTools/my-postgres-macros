@@ -12,9 +12,12 @@ pub trait PostgresStructPropertyExt {
 
     fn get_sql_type(&self) -> Result<ParamValue, syn::Error>;
 
-    fn get_db_field_names(&self) -> proc_macro2::TokenStream;
+    fn get_db_field_name_as_token(&self) -> proc_macro2::TokenStream;
 
     fn get_db_field_name_as_string(&self) -> String;
+
+    fn get_model_db_field_name_as_string(&self) -> Option<ParamValue>;
+
     fn has_json_attr(&self) -> bool;
 
     fn has_ignore_attr(&self) -> bool;
@@ -64,25 +67,17 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.has_attr("line_no") || self.name == "line_no"
     }
 
-    fn get_db_field_names(&self) -> proc_macro2::TokenStream {
+    fn get_db_field_name_as_token(&self) -> proc_macro2::TokenStream {
         if let Ok(attr) = self.attrs.get_attr(ATTR_DB_FIELD_NAME) {
-            let field_1 = if let Ok(result) = attr.get_from_single_or_named("name") {
-                result.as_str().to_string()
-            } else {
-                self.name.to_string()
-            };
-
-            if let Ok(result) = attr.get_from_single_or_named("model_field_name") {
-                let field_2 = result.as_str().to_string();
-                return quote::quote!(&[#field_1, #field_2]);
+            if let Ok(result) = attr.get_from_single_or_named("name") {
+                let name = result.as_str().to_string();
+                return quote::quote!(#name);
             }
-
-            return quote::quote!(&[#field_1]);
         }
 
-        let field_1 = self.name.to_string();
+        let name = self.name.as_str();
 
-        quote::quote!(&[#field_1])
+        quote::quote!(#name)
     }
 
     fn get_db_field_name_as_string(&self) -> String {
@@ -94,6 +89,17 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         }
 
         return self.name.to_string();
+    }
+
+    fn get_model_db_field_name_as_string(&self) -> Option<ParamValue> {
+        if let Ok(attr) = self
+            .attrs
+            .get_single_or_named_param(ATTR_DB_FIELD_NAME, "model_field_name")
+        {
+            return Some(attr);
+        }
+
+        return None;
     }
 }
 
