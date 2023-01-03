@@ -11,15 +11,14 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
         Err(e) => return e.to_compile_error().into(),
     };
 
-    let to_func_name = enum_type.get_func_name();
-
     let type_name = enum_type.get_return_type_name();
 
     let fn_to_str = fn_to_str(enum_cases.as_slice());
 
-    let from_db_value = fn_from_db_value(enum_cases.as_slice());
-
-    let to_typed_number = fn_to_typed_number(enum_cases.as_slice());
+    let from_db_value = match fn_from_db_value(enum_cases.as_slice()) {
+        Ok(result) => result,
+        Err(e) => return e.to_compile_error().into(),
+    };
 
     let sql_db_type = enum_type.get_comlient_with_db_type();
 
@@ -40,11 +39,6 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
     quote! {
 
         impl #enum_name{
-            pub fn #to_func_name(&self)->#type_name{
-                match self {
-                    #(#to_typed_number),*
-                }
-            }
 
             pub fn to_str(&self)->(&'static str, String) {
                 match self{
@@ -93,21 +87,6 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
     .into()
 }
 
-fn fn_to_typed_number(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
-    let mut result = Vec::with_capacity(enum_cases.len());
-    let mut i = 0;
-    for enum_case in enum_cases {
-        let enum_case_name = enum_case.get_name_ident();
-        let no = proc_macro2::Literal::usize_unsuffixed(i);
-
-        result.push(quote!(Self::#enum_case_name => #no));
-
-        i += 1;
-    }
-
-    result
-}
-
 pub fn fn_to_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     let mut result = Vec::with_capacity(enum_cases.len());
     let mut i = 0;
@@ -122,7 +101,7 @@ pub fn fn_to_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     result
 }
 
-fn fn_from_db_value(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
+fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(enum_cases.len());
 
     let mut i = 0;
@@ -132,9 +111,18 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
 
         let name_ident = enum_case.get_name_ident();
 
-        result.push(quote! (#no => Self::#name_ident::from_str(model),));
+        if enum_case.model.is_none() {
+            return Err(syn::Error::new_spanned(
+                enum_case.get_name_ident(),
+                "Model is not defined for this enum case",
+            ));
+        }
+
+        let model = enum_case.model.as_ref().unwrap().get_name_ident();
+
+        result.push(quote! (#no => Self::#name_ident(#model::from_str(model)),));
         i += 1;
     }
 
-    result
+    Ok(result)
 }
