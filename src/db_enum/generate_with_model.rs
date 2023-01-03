@@ -15,6 +15,8 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
     let fn_to_str = fn_to_str(enum_cases.as_slice());
 
+    let fn_to_numbered = fn_to_numbered(enum_cases.as_slice());
+
     let from_db_value = match fn_from_db_value(enum_cases.as_slice()) {
         Ok(result) => result,
         Err(e) => return e.to_compile_error().into(),
@@ -45,6 +47,12 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
             pub fn to_str(&self)->(&'static str, String) {
                 match self{
                 #(#fn_to_str),*
+                }
+            }
+
+            pub fn to_numbered(&self)->(#type_name, String) {
+                match self{
+                #(#fn_to_numbered),*
                 }
             }
 
@@ -95,6 +103,20 @@ pub fn fn_to_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
         let no = i.to_string();
+        result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
+
+        i += 1;
+    }
+
+    result
+}
+
+pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
+    let mut result = Vec::with_capacity(enum_cases.len());
+    let mut i = 0;
+    for enum_case in enum_cases {
+        let enum_case_name = enum_case.get_name_ident();
+        let no = proc_macro2::Literal::i32_unsuffixed(i);
         result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
 
         i += 1;
