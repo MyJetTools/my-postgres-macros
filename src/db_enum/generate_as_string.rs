@@ -15,6 +15,11 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         Err(e) => return e.to_compile_error().into(),
     };
 
+    let fn_from_str = match generate_fn_from_str(&enum_cases) {
+        Ok(result) => result,
+        Err(e) => return e.to_compile_error().into(),
+    };
+
     quote! {
 
         impl #enum_name{
@@ -27,7 +32,7 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
             pub fn from_str(src: &str)->Self{
                 match src{
-                    "" => todo!("Implement"),
+                    #fn_from_str
                   _ => panic!("Invalid value {}", src)
                 }
             }
@@ -63,6 +68,20 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
     }
     .into()
+}
+
+fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStream, syn::Error> {
+    let mut result = proc_macro2::TokenStream::new();
+    for case in enum_cases {
+        let case_ident = &case.get_name_ident();
+
+        let case_value = case.get_case_value();
+
+        result.extend(quote! {
+            #case_value => Self::#case_ident,
+        });
+    }
+    Ok(result)
 }
 
 fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStream, syn::Error> {
