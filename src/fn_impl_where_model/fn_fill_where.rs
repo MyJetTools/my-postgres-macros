@@ -20,8 +20,6 @@ pub fn fn_fill_where(
 
         let db_field_name = struct_property.get_db_field_name_as_string();
 
-        let model_db_field_name = struct_property.get_model_db_field_name_as_string();
-
         let push_and = if no > 0 {
             Some(quote! {
                 if no > 0{
