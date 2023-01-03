@@ -40,6 +40,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
             fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
                 sql.push_str(field_name);
             }
+        }
 
             impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
                 fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
@@ -55,7 +56,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                         panic!("Metadata is not defined for enum with model");
                     }
 
-                    Self::from_str(result.as_str(), model.as_str())
+                    Self::from_str(name.as_str(), model)
                 }
             }
 
