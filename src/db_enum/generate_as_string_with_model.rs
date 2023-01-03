@@ -54,7 +54,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                     }
                     else{
                         panic!("Metadata is not defined for enum with model");
-                    }
+                    };
 
                     Self::from_str(name.as_str(), model)
                 }
