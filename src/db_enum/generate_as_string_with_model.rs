@@ -22,6 +22,8 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
 
     let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
 
+    let render_sql_writing = super::utils::render_sql_writing();
+
     quote! {
 
         impl #enum_name{
@@ -69,14 +71,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                     params: &mut Vec<my_postgres::SqlValue<'s>>,
                     metadata: &Option<my_postgres::SqlValueMetadata>,
                 ) {
-                    let (name, model) = self.to_str();
-                    params.push(my_postgres::SqlValue::ValueAsStaticStr(name));
-                    sql.push('$');
-                    sql.push_str(params.len().to_string().as_str());
-
-                    params.push(my_postgres::SqlValue::ValueAsString(model));
-                    sql.push('$');
-                    sql.push_str(params.len().to_string().as_str());
+                    #render_sql_writing
                 }
     
                 fn get_default_operator(&self) -> &str{

@@ -15,7 +15,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
     let type_name = enum_type.get_return_type_name();
 
-    let as_numbered = fn_as_numbered_str(enum_cases.as_slice());
+    let fn_to_str = fn_to_str(enum_cases.as_slice());
 
     let from_db_value = fn_from_db_value(enum_cases.as_slice());
 
@@ -35,6 +35,8 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
         }
     };
 
+    let render_sql_writing = super::utils::render_sql_writing();
+
     quote! {
 
         impl #enum_name{
@@ -44,9 +46,9 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
                 }
             }
 
-            pub fn as_numbered_str(&self)->(&'static str, String) {
+            pub fn to_str(&self)->(&'static str, String) {
                 match self{
-                #(#as_numbered),*
+                #(#fn_to_str),*
                 }
             }
 
@@ -70,7 +72,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
                 params: &mut Vec<my_postgres::SqlValue<'s>>,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
             ) {
-                sql.push_str(self.as_numbered_str());
+                #render_sql_writing
             }
 
             fn get_default_operator(&self) -> &str{
@@ -106,7 +108,7 @@ fn fn_to_typed_number(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     result
 }
 
-pub fn fn_as_numbered_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
+pub fn fn_to_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     let mut result = Vec::with_capacity(enum_cases.len());
     let mut i = 0;
     for enum_case in enum_cases {
