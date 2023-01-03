@@ -57,8 +57,7 @@ pub fn fn_get_field_name(
 ) -> Result<Vec<proc_macro2::TokenStream>, syn::Error> {
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
-        let field_name = field.get_db_field_name()?;
-        let field_name = field_name.as_str();
+        let field_name = field.get_db_field_name();
         result.push(quote! (#i=>#field_name,).into());
     }
     Ok(result)

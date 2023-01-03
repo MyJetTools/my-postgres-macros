@@ -10,8 +10,7 @@ pub fn fn_from(fields: &[StructProperty]) -> Result<Vec<proc_macro2::TokenStream
 
         let type_ident = field.ty.get_token_stream();
 
-        let db_field_name = field.get_db_field_name()?;
-        let db_field_name = db_field_name.as_str();
+        let db_field_name = field.get_db_field_name();
 
         let metadata = crate::render_field_value::render_metadata(field);
 

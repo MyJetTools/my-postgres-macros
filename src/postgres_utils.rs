@@ -12,7 +12,7 @@ pub trait PostgresStructPropertyExt {
 
     fn get_sql_type(&self) -> Result<ParamValue, syn::Error>;
 
-    fn get_db_field_name(&self) -> Result<ParamValue, syn::Error>;
+    fn get_db_field_name(&self) -> String;
     fn has_json_attr(&self) -> bool;
 
     fn has_ignore_attr(&self) -> bool;
@@ -62,9 +62,15 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.has_attr("line_no") || self.name == "line_no"
     }
 
-    fn get_db_field_name(&self) -> Result<ParamValue, syn::Error> {
-        self.attrs
+    fn get_db_field_name(&self) -> String {
+        if let Ok(result) = self
+            .attrs
             .get_single_or_named_param(ATTR_DB_FIELD_NAME, "name")
+        {
+            return result.as_str().to_string();
+        }
+
+        self.get_field_name_ident().to_string()
     }
 }
 

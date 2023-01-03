@@ -12,19 +12,7 @@ pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
             continue;
         }
 
-        let db_field_name = match field.get_db_field_name() {
-            Ok(result) => result,
-            Err(err) => {
-                result.push(
-                    syn::Error::new_spanned(field.field, err)
-                        .to_compile_error()
-                        .into(),
-                );
-                return result;
-            }
-        };
-
-        let db_field_name = db_field_name.as_str();
+        let db_field_name = field.get_db_field_name();
 
         let value = crate::render_field_value::render_field_value(field);
 

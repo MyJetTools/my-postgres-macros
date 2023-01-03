@@ -18,14 +18,7 @@ pub fn fn_fill_where(
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = crate::render_field_value::render_metadata(struct_property);
 
-        let db_field_name = match struct_property.get_db_field_name() {
-            Ok(result) => result,
-            Err(err) => {
-                return Err(syn::Error::new_spanned(struct_property.field, err));
-            }
-        };
-
-        let db_field_name = db_field_name.as_str();
+        let db_field_name = struct_property.get_db_field_name();
 
         let push_and = if no > 0 {
             Some(quote! {

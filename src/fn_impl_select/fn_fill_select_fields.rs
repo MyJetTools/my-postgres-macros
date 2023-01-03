@@ -27,8 +27,7 @@ pub fn fn_fill_select_fields(
                 sql.push_str(#attr_value);
             });
         } else {
-            let db_field_name = prop.get_db_field_name()?;
-            let db_field_name = db_field_name.as_str();
+            let db_field_name = prop.get_db_field_name();
 
             let metadata = crate::render_field_value::render_metadata(prop);
 
