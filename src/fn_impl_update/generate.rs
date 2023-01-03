@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use types_reader::{StructProperty, TypeName};
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 use quote::quote;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {

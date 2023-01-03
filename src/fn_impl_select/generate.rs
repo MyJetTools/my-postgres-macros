@@ -10,7 +10,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(e) => return e.into_compile_error().into(),
     };
 
-    let fields = match crate::postgres_utils::filter_fields(fields) {
+    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
         Ok(result) => result,
         Err(err) => {
             return err.into();

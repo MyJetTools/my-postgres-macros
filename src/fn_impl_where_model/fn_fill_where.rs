@@ -3,7 +3,7 @@ use types_reader::{attribute_params::ParamValue, PropertyType, StructProperty};
 
 use quote::quote;
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
 pub fn fn_fill_where(
     struct_properties: &[StructProperty],
@@ -18,7 +18,7 @@ pub fn fn_fill_where(
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = crate::render_field_value::render_metadata(struct_property);
 
-        let db_field_name = struct_property.get_db_field_name();
+        let db_field_name = struct_property.get_db_field_name_as_string();
 
         let push_and = if no > 0 {
             Some(quote! {

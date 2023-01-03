@@ -1,4 +1,4 @@
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 use quote::quote;
 use types_reader::StructProperty;
 
@@ -37,13 +37,13 @@ pub fn fn_get_order_by_fields(
     if !order_by_desc.is_empty() {
         for field in order_by_desc {
             result.push(' ');
-            result.push_str(field.get_db_field_name().as_str());
+            result.push_str(field.get_db_field_name_as_string().as_str());
         }
         result.push_str(" DESC");
     } else if !order_by.is_empty() {
         for field in order_by {
             result.push(' ');
-            result.push_str(field.get_db_field_name().as_str());
+            result.push_str(field.get_db_field_name_as_string().as_str());
         }
     }
 

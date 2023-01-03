@@ -1,4 +1,4 @@
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 use quote::quote;
 use types_reader::StructProperty;
 
@@ -10,7 +10,7 @@ pub fn fn_from(fields: &[StructProperty]) -> Result<Vec<proc_macro2::TokenStream
 
         let type_ident = field.ty.get_token_stream();
 
-        let db_field_name = field.get_db_field_name();
+        let db_field_name = field.get_db_field_name_as_string();
 
         let metadata = crate::render_field_value::render_metadata(field);
 

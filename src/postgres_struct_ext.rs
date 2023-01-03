@@ -12,7 +12,9 @@ pub trait PostgresStructPropertyExt {
 
     fn get_sql_type(&self) -> Result<ParamValue, syn::Error>;
 
-    fn get_db_field_name(&self) -> String;
+    fn get_db_field_names(&self) -> proc_macro2::TokenStream;
+
+    fn get_db_field_name_as_string(&self) -> String;
     fn has_json_attr(&self) -> bool;
 
     fn has_ignore_attr(&self) -> bool;
@@ -62,15 +64,36 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.has_attr("line_no") || self.name == "line_no"
     }
 
-    fn get_db_field_name(&self) -> String {
-        if let Ok(result) = self
-            .attrs
-            .get_single_or_named_param(ATTR_DB_FIELD_NAME, "name")
-        {
-            return result.as_str().to_string();
+    fn get_db_field_names(&self) -> proc_macro2::TokenStream {
+        if let Ok(attr) = self.attrs.get_attr(ATTR_DB_FIELD_NAME) {
+            let field_1 = if let Ok(result) = attr.get_from_single_or_named("name") {
+                result.as_str().to_string()
+            } else {
+                self.name.to_string()
+            };
+
+            if let Ok(result) = attr.get_from_single_or_named("model_field_name") {
+                let field_2 = result.as_str().to_string();
+                return quote::quote!(&[#field_1, #field_2]);
+            }
+
+            return quote::quote!(&[#field_1]);
         }
 
-        self.get_field_name_ident().to_string()
+        let field_1 = self.name.to_string();
+
+        quote::quote!(&[#field_1])
+    }
+
+    fn get_db_field_name_as_string(&self) -> String {
+        if let Ok(attr) = self
+            .attrs
+            .get_single_or_named_param(ATTR_DB_FIELD_NAME, "model_field_name")
+        {
+            return attr.as_str().to_string();
+        }
+
+        return self.name.to_string();
     }
 }
 

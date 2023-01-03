@@ -2,7 +2,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use types_reader::StructProperty;
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;

@@ -14,7 +14,7 @@ mod db_enum;
 mod my_postgres_json_model;
 
 mod postgre_enum_ext;
-mod postgres_utils;
+mod postgres_struct_ext;
 
 use syn;
 

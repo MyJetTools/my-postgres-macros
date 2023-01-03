@@ -1,6 +1,6 @@
 use types_reader::{PropertyType, StructProperty};
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 use quote::quote;
 
 pub fn fn_fill_select_fields(
@@ -27,7 +27,7 @@ pub fn fn_fill_select_fields(
                 sql.push_str(#attr_value);
             });
         } else {
-            let db_field_name = prop.get_db_field_name();
+            let db_field_names = prop.get_db_field_names();
 
             let metadata = crate::render_field_value::render_metadata(prop);
 
@@ -36,7 +36,7 @@ pub fn fn_fill_select_fields(
 
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, &[#db_field_name], &#metadata);
+                        #type_ident::fill_select_part(sql, #db_field_names, &#metadata);
                     }
                     .into(),
                 );
@@ -44,7 +44,7 @@ pub fn fn_fill_select_fields(
                 let type_ident = prop.ty.get_token_stream();
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, &[#db_field_name], &#metadata);
+                        #type_ident::fill_select_part(sql, #db_field_names, &#metadata);
                     }
                     .into(),
                 );

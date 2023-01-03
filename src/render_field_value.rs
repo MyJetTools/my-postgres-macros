@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::{PropertyType, StructProperty};
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
 pub fn render_field_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     match &struct_propery.ty {

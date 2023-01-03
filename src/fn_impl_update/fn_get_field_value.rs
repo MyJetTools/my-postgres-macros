@@ -1,4 +1,4 @@
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::StructProperty;
@@ -12,7 +12,7 @@ pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
             continue;
         }
 
-        let db_field_name = field.get_db_field_name();
+        let db_field_name = field.get_db_field_name_as_string();
 
         let value = crate::render_field_value::render_field_value(field);
 

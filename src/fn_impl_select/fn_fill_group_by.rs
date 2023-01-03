@@ -1,7 +1,7 @@
 use quote::quote;
 use types_reader::StructProperty;
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
 pub fn get_group_by_fields(
     fields: &[StructProperty],
@@ -10,7 +10,7 @@ pub fn get_group_by_fields(
 
     for prop in fields {
         if prop.attrs.has_attr("group_by") {
-            group_by.push(prop.get_db_field_name());
+            group_by.push(prop.get_db_field_name_as_string());
             continue;
         }
     }

@@ -2,7 +2,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use types_reader::StructProperty;
 
-use crate::postgres_utils::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
@@ -12,7 +12,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(e) => return e.into_compile_error().into(),
     };
 
-    let fields = match crate::postgres_utils::filter_fields(fields) {
+    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
         Ok(result) => result,
         Err(err) => return err,
     };
@@ -57,7 +57,7 @@ pub fn fn_get_field_name(
 ) -> Result<Vec<proc_macro2::TokenStream>, syn::Error> {
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
-        let field_name = field.get_db_field_name();
+        let field_name = field.get_db_field_name_as_string();
         result.push(quote! (#i=>#field_name,).into());
     }
     Ok(result)
