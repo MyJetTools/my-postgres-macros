@@ -33,7 +33,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
             pub fn from_str(name: &str, model: &str)->Self{
                 match name {
                     #fn_from_str
-                  _ => panic!("Invalid value {}", src)
+                  _ => panic!("Invalid value {}", name)
                 }
             }
 
@@ -45,7 +45,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
             fn from_db_row(row: &tokio_postgres::Row, name: &str, model_name: &str) -> Self{
                 let name: String = row.get(name);
                 let model: String = row.get(model_name);
-                Self::from_str(result.as_str(), model.as_str())
+                Self::from_str(name.as_str(), model.as_str())
             }
 
         }
