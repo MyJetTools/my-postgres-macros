@@ -48,7 +48,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
                 }
             }
 
-            pub fn from_db_value(src: #type_name)->Self{
+            pub fn from_db_value(src: #type_name, model: &str)->Self{
                 match src{
                   #(#from_db_value)*
                   _ => panic!("Invalid value {}", src)
@@ -127,7 +127,7 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
 
         let name_ident = enum_case.get_name_ident();
 
-        result.push(quote! (#no => Self::#name_ident,));
+        result.push(quote! (#no => Self::#name_ident::from_str(model),));
         i += 1;
     }
 
