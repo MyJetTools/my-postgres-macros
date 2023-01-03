@@ -128,10 +128,10 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         };
 
         quote::quote!({
-            my_postgres::SqlValueMetadata{
+            Some(my_postgres::SqlValueMetadata{
                 sql_type: #sql_type,
                 related_field_name: #model_field_name
-            }
+            })
         })
     }
 }
