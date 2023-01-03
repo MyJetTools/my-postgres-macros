@@ -70,12 +70,10 @@ fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStrea
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_name = case.get_case_name()?;
-
-        let case_name = case_name.as_str();
+        let case_value = case.get_case_value();
 
         result.extend(quote! {
-            Self::#case_ident => #case_name
+            Self::#case_ident => #case_value
         });
     }
     Ok(result)
