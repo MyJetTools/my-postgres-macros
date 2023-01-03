@@ -1,12 +1,22 @@
 use quote::quote;
+use types_reader::EnumCase;
 pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let enum_name = &ast.ident;
+
+    let enum_cases = match EnumCase::read(ast) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    };
+
+    let fn_to_str = generate_fn_to_str(&enum_cases);
 
     quote! {
 
         impl #enum_name{
             pub fn to_str(&self)->&'static str {
-                todo!("Implement")
+                match self{
+                    #fn_to_str
+                }
             }
 
 
@@ -48,4 +58,16 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
     }
     .into()
+}
+
+fn generate_fn_to_str(enum_cases: &[EnumCase]) -> proc_macro2::TokenStream {
+    let mut result = proc_macro2::TokenStream::new();
+    for case in enum_cases {
+        let case_name = &case.name;
+        let case_str = case.name.to_string();
+        result.extend(quote! {
+            Self::#case_name => #case_str
+        });
+    }
+    result
 }
