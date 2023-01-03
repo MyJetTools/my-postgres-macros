@@ -10,7 +10,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
         impl #struct_name{
             pub fn from_str(src:&str)->Self{
-                serde_json::from_str(&str_value).unwrap()
+                serde_json::from_str(src).unwrap()
             }
         }
 
