@@ -7,6 +7,13 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let struct_name = type_name.get_type_name();
 
     quote! {
+
+        impl #struct_name{
+            pub fn from_str(src:&str)->Self{
+                serde_json::from_str(&str_value).unwrap()
+            }
+        }
+
         impl my_postgres::sql_select::SelectPartValue for #struct_name {
             fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
                 sql.push_str(field_name);
@@ -17,7 +24,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         impl my_postgres::sql_select::FromDbRow<#struct_name> for #struct_name {
             fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> #struct_name {
                 let str_value: String = row.get(name);
-                serde_json::from_str(&str_value).unwrap()
+                Self::from_str(str_value.as_str())                
             }
         }
 
