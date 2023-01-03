@@ -23,7 +23,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
     quote! {
 
         impl #enum_name{
-            pub fn to_str(&self)->(&'static str, &'static str) {
+            pub fn to_str(&self)->(&'static str, String) {
                 match self{
                     #fn_to_str
                 }
