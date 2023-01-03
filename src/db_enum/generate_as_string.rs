@@ -64,9 +64,10 @@ fn generate_fn_to_str(enum_cases: &[EnumCase]) -> proc_macro2::TokenStream {
     let mut result = proc_macro2::TokenStream::new();
     for case in enum_cases {
         let case_name = &case.name;
-        let case_str = case.name.to_string();
+        let case_ident = &case.get_name_ident();
+
         result.extend(quote! {
-            Self::#case_name => #case_str
+            Self::#case_ident => #case_name
         });
     }
     result
