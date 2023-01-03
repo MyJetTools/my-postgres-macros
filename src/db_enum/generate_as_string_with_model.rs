@@ -56,7 +56,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                         panic!("Metadata is not defined for enum with model");
                     };
 
-                    let model = row.get(model_field_name);
+                    let model:String = row.get(model_field_name);
 
                     Self::from_str(name.as_str(), model.as_str())
                 }
