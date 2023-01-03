@@ -105,7 +105,8 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
                 }
             }
 
-            fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
+            fn fill_select_part(sql: &mut String, field_names: &[&str], metadata: &Option<my_postgres::SqlValueMetadata>) {
+                let field_name = field_names.get(0).unwrap();
                 sql.push_str(field_name);
             }
 
