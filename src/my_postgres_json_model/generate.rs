@@ -12,6 +12,10 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             pub fn from_str(src:&str)->Self{
                 serde_json::from_str(src).unwrap()
             }
+
+            pub fn to_string(&self)->String{
+                serde_json::to_string(self).unwrap()
+            }
         }
 
         impl my_postgres::sql_select::SelectPartValue for #struct_name {
@@ -35,8 +39,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 params: &mut Vec<my_postgres::SqlValue<'s>>,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
             ) {
-                let value = serde_json::to_string(self).unwrap();
-                params.push(my_postgres::SqlValue::ValueAsString(value));
+                params.push(my_postgres::SqlValue::ValueAsString(self.to_string()));
                 sql.push('$');
                 sql.push_str(params.len().to_string().as_str());
             }
