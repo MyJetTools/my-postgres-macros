@@ -29,7 +29,7 @@ pub fn fn_fill_select_fields(
         } else {
             let db_field_name = prop.get_db_field_name_as_token();
 
-            let metadata = crate::render_field_value::render_metadata(prop);
+            let metadata = prop.get_field_metadata();
 
             if let PropertyType::OptionOf(sub_type) = &prop.ty {
                 let type_ident = sub_type.get_token_stream();

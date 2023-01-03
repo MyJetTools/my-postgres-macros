@@ -26,6 +26,8 @@ pub trait PostgresStructPropertyExt {
     fn is_line_no(&self) -> bool;
 
     fn sql_value_to_mask(&self) -> bool;
+
+    fn get_field_metadata(&self) -> proc_macro2::TokenStream;
 }
 
 impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
@@ -100,6 +102,37 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         }
 
         return None;
+    }
+
+    fn get_field_metadata(&self) -> proc_macro2::TokenStream {
+        let model_field_name = self.get_model_db_field_name_as_string();
+
+        let sql_type = self.get_sql_type();
+
+        if model_field_name.is_none() && sql_type.is_err() {
+            return quote::quote!(None);
+        }
+
+        let model_field_name = if let Some(model_field_name) = model_field_name {
+            let model_field_name = model_field_name.as_str();
+            quote::quote!(Some(#model_field_name))
+        } else {
+            quote::quote!(None)
+        };
+
+        let sql_type = if let Ok(sql_type) = sql_type {
+            let sql_type = sql_type.as_str();
+            quote::quote!(Some(#sql_type))
+        } else {
+            quote::quote!(None)
+        };
+
+        quote::quote!({
+            my_postgres::SqlValueMetadata{
+                sql_type: #sql_type,
+                related_field_name: #model_field_name
+            }
+        })
     }
 }
 

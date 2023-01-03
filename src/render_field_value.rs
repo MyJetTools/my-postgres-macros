@@ -54,7 +54,7 @@ fn fill_option_of(
 fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     let name = struct_propery.get_field_name_ident();
 
-    let metadata = render_metadata(struct_propery);
+    let metadata = struct_propery.get_field_metadata();
 
     quote! {
         my_postgres::SqlValueWrapper::Value {
@@ -68,7 +68,7 @@ fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
 fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
     let prop_name = struct_propery.get_field_name_ident();
 
-    let metadata = render_metadata(struct_propery);
+    let metadata = struct_propery.get_field_metadata();
 
     let else_case: TokenStream = if struct_propery.has_ignore_if_null_attr() {
         quote!(my_postgres::SqlValueWrapper::Ignore).into()
@@ -83,16 +83,4 @@ fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenSt
             #else_case
        }
     }
-}
-
-pub fn render_metadata(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
-    if let Ok(sql_type) = struct_propery.get_sql_type() {
-        let sql_type = sql_type.as_str();
-        return quote! {
-            Some(my_postgres::SqlValueMetadata::with_sql_type(#sql_type))
-        }
-        .into();
-    }
-
-    quote!(None).into()
 }
