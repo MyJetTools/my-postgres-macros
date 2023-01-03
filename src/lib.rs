@@ -127,6 +127,12 @@ pub fn db_enum_as_i64(input: TokenStream) -> TokenStream {
     crate::db_enum::generate(&ast, EnumType::I64)
 }
 
+#[proc_macro_derive(DbEnumAsString, attributes(enum_case))]
+pub fn db_enum_as_string(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    crate::db_enum::generate_as_string(&ast)
+}
+
 #[proc_macro_derive(MyPostgresJsonModel, attributes(enum_case))]
 pub fn my_potgres_json_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
