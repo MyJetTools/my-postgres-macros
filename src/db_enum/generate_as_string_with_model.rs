@@ -59,9 +59,6 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                     Self::from_str(name.as_str(), model)
                 }
             }
-
-        }
-
     }
     .into()
 }
