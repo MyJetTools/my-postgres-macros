@@ -40,16 +40,16 @@ impl EnumType {
         }
     }
 
-    pub fn is_comlient_with_db_name(&self) -> bool {
+    pub fn get_comlient_with_db_type(&self) -> proc_macro2::TokenStream {
         match self {
-            EnumType::U8 => false,
-            EnumType::I8 => false,
-            EnumType::U16 => false,
-            EnumType::I16 => false,
-            EnumType::U32 => false,
-            EnumType::I32 => true,
-            EnumType::U64 => false,
-            EnumType::I64 => true,
+            EnumType::U8 => quote!(i32).into(),
+            EnumType::I8 => quote!(i32).into(),
+            EnumType::U16 => quote!(i32).into(),
+            EnumType::I16 => quote!(i32).into(),
+            EnumType::U32 => quote!(i32).into(),
+            EnumType::I32 => quote!(i32).into(),
+            EnumType::U64 => quote!(i64).into(),
+            EnumType::I64 => quote!(i32).into(),
         }
     }
 }
@@ -68,7 +68,9 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
 
     let to_typed_number = fn_to_typed_number(enum_cases.as_slice());
 
-    let from_db_result: TokenStream = if enum_type.is_comlient_with_db_name() {
+    let sql_db_type = enum_type.get_comlient_with_db_type();
+
+    let from_db_result = if type_name.to_string() == sql_db_type.to_string() {
         quote! {
             Self::from_db_value(result)
         }
@@ -123,7 +125,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
             fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
-                let result: #type_name = row.get(name);
+                let result: #sql_db_type = row.get(name);
                 #from_db_result
             }
         }
