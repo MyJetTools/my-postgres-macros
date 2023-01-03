@@ -9,7 +9,6 @@ edition = "2021"
 proc-macro = true
 
 [dependencies]
-macros-utils = { tag = "0.1.0", git = "https://github.com/MyJetTools/macros-utils.git" }
 types-reader = { branch = "main", git = "https://github.com/MyJetTools/types-reader.git" }
 
 syn = { version = "*", features = ["extra-traits"] }

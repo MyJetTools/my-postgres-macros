@@ -9,7 +9,7 @@ pub fn fn_fill_select_fields(
     let mut result = Vec::with_capacity(fields.len() * 2);
     let mut no = 0;
     for prop in fields {
-        if prop.attrs.contains_key("line_no") {
+        if prop.is_line_no() {
             continue;
         }
 
@@ -21,27 +21,14 @@ pub fn fn_fill_select_fields(
 
         no += 1;
 
-        if let Some(sql) = prop.attrs.get("sql") {
-            if let Some(sql) = sql {
-                if let Some(attr_value) = sql.get_single_param() {
-                    let attr_value = attr_value.get_value_as_str();
-                    result.push(quote! {
-                        sql.push_str(#attr_value);
-                    });
-                } else {
-                    return Err(syn::Error::new_spanned(
-                        prop.field,
-                        "#1 please specify content inside sql attribute",
-                    ));
-                }
-            } else {
-                return Err(syn::Error::new_spanned(
-                    prop.field,
-                    "#2 please specify content inside sql attribute",
-                ));
-            }
+        if let Ok(sql) = prop.attrs.get_single_or_named_param("sql", "sql") {
+            let attr_value = sql.as_str();
+            result.push(quote! {
+                sql.push_str(#attr_value);
+            });
         } else {
             let db_field_name = prop.get_db_field_name()?;
+            let db_field_name = db_field_name.as_str();
 
             let metadata = crate::render_field_value::render_metadata(prop);
 

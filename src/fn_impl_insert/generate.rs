@@ -7,7 +7,12 @@ use crate::postgres_utils::PostgresStructPropertyExt;
 pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
 
-    let fields = match crate::postgres_utils::filter_fields(StructProperty::read(ast)) {
+    let fields = match StructProperty::read(ast) {
+        Ok(fields) => fields,
+        Err(e) => return e.into_compile_error().into(),
+    };
+
+    let fields = match crate::postgres_utils::filter_fields(fields) {
         Ok(result) => result,
         Err(err) => return err,
     };
@@ -53,6 +58,7 @@ pub fn fn_get_field_name(
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
         let field_name = field.get_db_field_name()?;
+        let field_name = field_name.as_str();
         result.push(quote! (#i=>#field_name,).into());
     }
     Ok(result)

@@ -5,7 +5,10 @@ use types_reader::{StructProperty, TypeName};
 pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let type_name = TypeName::new(ast);
 
-    let src_fields = StructProperty::read(ast);
+    let src_fields = match StructProperty::read(ast) {
+        Ok(fields) => fields,
+        Err(e) => return e.into_compile_error().into(),
+    };
 
     let mut limit = None;
     let mut offset = None;
@@ -13,9 +16,9 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let mut fields = Vec::with_capacity(src_fields.len());
 
     for field in src_fields {
-        if field.attrs.contains_key("limit") {
+        if field.attrs.has_attr("limit") {
             limit = Some(field);
-        } else if field.attrs.contains_key("offset") {
+        } else if field.attrs.has_attr("offset") {
             offset = Some(field);
         } else {
             fields.push(field);

@@ -9,12 +9,12 @@ pub fn fn_get_order_by_fields(
     let mut order_by = Vec::with_capacity(fields.len());
 
     for prop in fields {
-        if prop.attrs.contains_key("order_by_desc") {
+        if prop.attrs.has_attr("order_by_desc") {
             order_by_desc.push(prop);
             continue;
         }
 
-        if prop.attrs.contains_key("order_by") {
+        if prop.attrs.has_attr("order_by") {
             order_by.push(prop);
             continue;
         }

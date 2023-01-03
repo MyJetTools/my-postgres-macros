@@ -9,7 +9,10 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let struct_name = type_name.get_type_name();
 
-    let fields = StructProperty::read(ast);
+    let fields = match StructProperty::read(ast) {
+        Ok(fields) => fields,
+        Err(e) => return e.into_compile_error().into(),
+    };
 
     let mut primary_key_amount = 0;
 
