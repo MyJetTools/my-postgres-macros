@@ -49,6 +49,16 @@ pub fn fn_fill_select_fields(
                     .into(),
                 );
             }
+
+            if let Some(model_field) = prop.get_model_db_field_name_as_string() {
+                let model_field = format!(",{}", model_field.as_str());
+                result.push(
+                    quote! {
+                        sql.push_str(#model_field);
+                    }
+                    .into(),
+                );
+            }
         }
     }
 
