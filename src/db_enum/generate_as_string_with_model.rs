@@ -41,11 +41,22 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                 sql.push_str(field_name);
             }
 
+            impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
+                fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
+                    let name: String = row.get(name);
 
-            fn from_db_row(row: &tokio_postgres::Row, name: &str, model_name: &str) -> Self{
-                let name: String = row.get(name);
-                let model: String = row.get(model_name);
-                Self::from_str(name.as_str(), model.as_str())
+                    let model = if let Some(metadata) = metadata{
+                       if metadata.related_field_name.is_none(){
+                        panic!("Metadata model field_name is none");
+                       }
+                       metadata.related_field_name.unwrap()
+                    }
+                    else{
+                        panic!("Metadata is not defined for enum with model");
+                    }
+
+                    Self::from_str(result.as_str(), model.as_str())
+                }
             }
 
         }
