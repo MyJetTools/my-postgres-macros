@@ -9,7 +9,7 @@ edition = "2021"
 proc-macro = true
 
 [dependencies]
-types-reader = { branch = "main", git = "https://github.com/MyJetTools/types-reader.git" }
+types-reader = { tag = "0.2.0", git = "https://github.com/MyJetTools/types-reader.git" }
 
 syn = { version = "*", features = ["extra-traits"] }
 quote = "*"
