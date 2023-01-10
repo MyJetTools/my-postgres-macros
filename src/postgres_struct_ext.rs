@@ -85,7 +85,7 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
     fn get_db_field_name_as_string(&self) -> String {
         if let Ok(attr) = self
             .attrs
-            .get_single_or_named_param(ATTR_DB_FIELD_NAME, "model_field_name")
+            .get_single_or_named_param(ATTR_DB_FIELD_NAME, "name")
         {
             return attr.as_str().to_string();
         }
@@ -94,10 +94,7 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
     }
 
     fn get_model_db_field_name_as_string(&self) -> Option<ParamValue> {
-        if let Ok(attr) = self
-            .attrs
-            .get_named_param(ATTR_DB_FIELD_NAME, "model_field_name")
-        {
+        if let Ok(attr) = self.attrs.get_named_param(ATTR_DB_FIELD_NAME, "name") {
             return Some(attr);
         }
 
