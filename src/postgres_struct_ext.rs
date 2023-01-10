@@ -143,13 +143,13 @@ pub fn filter_fields(
             continue;
         }
 
-        let id_date_time = match itm.ty {
+        let is_date_time = match &itm.ty {
             PropertyType::DateTime => true,
             PropertyType::OptionOf(sub_ty) => sub_ty.is_date_time(),
             _ => false,
         };
 
-        if id_date_time {
+        if is_date_time {
             if let Ok(attr) = itm.get_sql_type() {
                 let attr = attr.as_str();
                 if attr != "timestamp" && attr != "bigint" {
