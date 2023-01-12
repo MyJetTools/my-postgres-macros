@@ -24,7 +24,7 @@ pub fn render_field_value(struct_propery: &StructProperty) -> proc_macro2::Token
             return fill_option_of(struct_propery, &sub_type)
         }
         types_reader::PropertyType::Struct(..) => return get_value(struct_propery),
-        _ => panic!("{} is not supported", struct_propery.ty.as_str()),
+        _ => return get_value(struct_propery),
     }
 }
 
