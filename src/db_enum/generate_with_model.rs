@@ -2,6 +2,8 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::EnumCase;
 
+use crate::postgre_enum_ext::PostgresEnumExt;
+
 use super::EnumType;
 
 pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::TokenStream {
@@ -99,13 +101,11 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
 pub fn fn_to_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     let mut result = Vec::with_capacity(enum_cases.len());
-    let mut i = 0;
+
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
-        let no = i.to_string();
+        let no = enum_case.get_case_value();
         result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
-
-        i += 1;
     }
 
     result
