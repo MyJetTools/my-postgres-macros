@@ -10,6 +10,11 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         Err(e) => return e.into_compile_error().into(),
     };
 
+    let src_fields = match crate::postgres_struct_ext::filter_fields(src_fields) {
+        Ok(result) => result,
+        Err(err) => return err.into(),
+    };
+
     let mut limit = None;
     let mut offset = None;
 
