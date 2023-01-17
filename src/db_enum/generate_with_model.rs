@@ -113,13 +113,12 @@ pub fn fn_to_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
 
 pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
     let mut result = Vec::with_capacity(enum_cases.len());
-    let mut i = 0;
+
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
-        let no = proc_macro2::Literal::i32_unsuffixed(i);
+        let no = enum_case.get_case_value();
+        let no: TokenStream = no.parse().unwrap();
         result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
-
-        i += 1;
     }
 
     result
@@ -128,11 +127,7 @@ pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
 fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(enum_cases.len());
 
-    let mut i = 0;
-
     for enum_case in enum_cases {
-        let no = proc_macro2::Literal::usize_unsuffixed(i);
-
         let name_ident = enum_case.get_name_ident();
 
         if enum_case.model.is_none() {
@@ -144,8 +139,10 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Er
 
         let model = enum_case.model.as_ref().unwrap().get_name_ident();
 
+        let no = enum_case.get_case_value();
+        let no: TokenStream = no.parse().unwrap();
+
         result.push(quote! (#no => Self::#name_ident(#model::from_str(model)),));
-        i += 1;
     }
 
     Ok(result)
