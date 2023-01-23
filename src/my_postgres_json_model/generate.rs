@@ -40,7 +40,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 metadata: &Option<my_postgres::SqlValueMetadata>,
             ) {
                 params.push(my_postgres::SqlValue::ValueAsString(self.to_string()));
-                sql.push('$');
+                sql.push_str("#>>$");
                 sql.push_str(params.len().to_string().as_str());
                 sql.push_str("::json");
             }
