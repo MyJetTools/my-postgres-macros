@@ -42,7 +42,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 params.push(my_postgres::SqlValue::ValueAsString(self.to_string()));
                 sql.push_str("to_json($");
                 sql.push_str(params.len().to_string().as_str());
-                sql.push_str(")");
+                sql.push_str("::text)");
             }
         }
     }.into()
