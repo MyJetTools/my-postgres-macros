@@ -4,44 +4,80 @@ use types_reader::StructProperty;
 
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
-pub fn render_field_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
+pub fn render_field_value(
+    struct_propery: &StructProperty,
+    is_update: bool,
+) -> proc_macro2::TokenStream {
     match &struct_propery.ty {
-        types_reader::PropertyType::OptionOf(_) => return fill_option_of_value(struct_propery),
-        types_reader::PropertyType::Struct(..) => return get_value(struct_propery),
-        _ => return get_value(struct_propery),
+        types_reader::PropertyType::OptionOf(_) => {
+            return fill_option_of_value(struct_propery, is_update)
+        }
+        types_reader::PropertyType::Struct(..) => return get_value(struct_propery, is_update),
+        _ => return get_value(struct_propery, is_update),
     }
 }
 
-fn get_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
+fn get_value(struct_propery: &StructProperty, is_update: bool) -> proc_macro2::TokenStream {
     let name = struct_propery.get_field_name_ident();
 
     let metadata = struct_propery.get_field_metadata();
 
-    quote! {
-        my_postgres::SqlValueWrapper::Value {
-            value: &self.#name,
-            metadata: #metadata
+    if is_update {
+        quote! {
+            my_postgres::SqlUpdateValueWrapper::Value {
+                value: &self.#name,
+                metadata: #metadata
+            }
         }
+        .into()
+    } else {
+        quote! {
+            my_postgres::SqlWhereValueWrapper::Value {
+                value: &self.#name,
+                metadata: #metadata
+            }
+        }
+        .into()
     }
-    .into()
 }
 
-fn fill_option_of_value(struct_propery: &StructProperty) -> proc_macro2::TokenStream {
+fn fill_option_of_value(
+    struct_propery: &StructProperty,
+    is_update: bool,
+) -> proc_macro2::TokenStream {
     let prop_name = struct_propery.get_field_name_ident();
 
     let metadata = struct_propery.get_field_metadata();
 
     let else_case: TokenStream = if struct_propery.has_ignore_if_null_attr() {
-        quote!(my_postgres::SqlValueWrapper::Ignore).into()
+        if is_update {
+            quote!(my_postgres::SqlUpdateValueWrapper::Ignore).into()
+        } else {
+            quote!(my_postgres::SqlWhereValueWrapper::Ignore).into()
+        }
     } else {
-        quote!(my_postgres::SqlValueWrapper::Null).into()
+        if is_update {
+            quote!(my_postgres::SqlUpdateValueWrapper::Null).into()
+        } else {
+            quote!(my_postgres::SqlWhereValueWrapper::Null).into()
+        }
     };
 
-    quote! {
-       if let Some(value) = &self.#prop_name{
-          my_postgres::SqlValueWrapper::Value {value, metadata: #metadata}
-       }else{
-            #else_case
-       }
+    if is_update {
+        quote! {
+           if let Some(value) = &self.#prop_name{
+              my_postgres::SqlUpdateValueWrapper::Value {value, metadata: #metadata}
+           }else{
+                #else_case
+           }
+        }
+    } else {
+        quote! {
+           if let Some(value) = &self.#prop_name{
+              my_postgres::SqlWhereValueWrapper::Value {value, metadata: #metadata}
+           }else{
+                #else_case
+           }
+        }
     }
 }

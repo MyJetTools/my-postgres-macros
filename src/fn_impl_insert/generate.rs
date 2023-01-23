@@ -40,7 +40,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 }
             }
 
-            fn get_field_value(&'s self, no: usize) -> my_postgres::SqlValueWrapper<'s>{
+            fn get_field_value(&'s self, no: usize) -> my_postgres::SqlUpdateValueWrapper<'s>{
                 match no{
                     #(#get_field_value)*
                     _=>panic!("no such field with number {}", no)
@@ -66,7 +66,7 @@ pub fn fn_get_field_name(
 pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
-        let value = crate::render_field_value::render_field_value(field);
+        let value = crate::render_field_value::render_field_value(field, true);
 
         result.push(quote! (#i => #value,).into());
     }
