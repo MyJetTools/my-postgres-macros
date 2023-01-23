@@ -21,7 +21,9 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         impl my_postgres::sql_select::SelectPartValue for #struct_name {
             fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
                 sql.push_str(field_name);
-                sql.push_str("::text");
+                sql.push_str(" #>> '{}' as \"");
+                sql.push_str(field_name);
+                sql.push('"');
             }
         }
 
