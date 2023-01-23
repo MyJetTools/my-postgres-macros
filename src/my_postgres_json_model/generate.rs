@@ -32,7 +32,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
         }
 
-        impl<'s> my_postgres::SqlValueWriter<'s> for #struct_name {
+        impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #struct_name {
             fn write(
                 &'s self,
                 sql: &mut String,
@@ -42,10 +42,6 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 params.push(my_postgres::SqlValue::ValueAsString(self.to_string()));
                 sql.push('$');
                 sql.push_str(params.len().to_string().as_str());
-            }
-        
-            fn get_default_operator(&self) -> &str {
-                "="
             }
         }
     }.into()

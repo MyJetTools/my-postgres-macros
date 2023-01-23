@@ -58,7 +58,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                 }
             }
 
-            impl<'s> my_postgres::SqlValueWriter<'s> for #enum_name{
+            impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #enum_name{
                 fn write(
                     &'s self,
                     sql: &mut String,
@@ -67,11 +67,9 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                 ) {
                     #render_sql_writing
                 }
-    
-                fn get_default_operator(&self) -> &str{
-                   panic!("Enum with model can not be used in where clause");
-                }
+
             }
+
     
     }
     .into()

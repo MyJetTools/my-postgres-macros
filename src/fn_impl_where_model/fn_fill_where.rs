@@ -57,7 +57,7 @@ pub fn fn_fill_where(
     }
 
     let result = quote! {
-        use my_postgres::SqlValueWriter;
+        use my_postgres::SqlWhereValueWriter;
         #(#lines)*
     };
 

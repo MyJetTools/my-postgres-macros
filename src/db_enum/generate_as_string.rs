@@ -43,7 +43,19 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
         }
 
-        impl<'s> my_postgres::SqlValueWriter<'s> for #enum_name{
+        impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #enum_name{
+            fn write(
+                &'s self,
+                sql: &mut String,
+                params: &mut Vec<my_postgres::SqlValue<'s>>,
+                metadata: &Option<my_postgres::SqlValueMetadata>,
+            ) {
+                sql.push_str(self.to_str());
+            }
+
+        }
+
+        impl<'s> my_postgres::SqlWhereValueWriter<'s> for #enum_name{
             fn write(
                 &'s self,
                 sql: &mut String,

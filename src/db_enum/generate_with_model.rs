@@ -71,7 +71,18 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
         }
 
-        impl<'s> my_postgres::SqlValueWriter<'s> for #enum_name{
+        impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #enum_name{
+            fn write(
+                &'s self,
+                sql: &mut String,
+                params: &mut Vec<my_postgres::SqlValue<'s>>,
+                metadata: &Option<my_postgres::SqlValueMetadata>,
+            ) {
+                #render_sql_writing
+            }
+        }
+
+        impl<'s> my_postgres::SqlWhereValueWriter<'s> for #enum_name{
             fn write(
                 &'s self,
                 sql: &mut String,
@@ -84,7 +95,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
             fn get_default_operator(&self) -> &str{
                 "="
             }
-        }
+        }        
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
             fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
