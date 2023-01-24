@@ -14,6 +14,11 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(e) => return e.into_compile_error().into(),
     };
 
+    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
+        Ok(result) => result,
+        Err(err) => return err,
+    };
+
     let mut primary_key_amount = 0;
 
     for field in &fields {
