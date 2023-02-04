@@ -41,7 +41,7 @@ fn impl_db_columns(
         let is_option = field.ty.is_option();
         let is_primary_key = field.is_primary_key();
         result.push(quote::quote! {
-            DbColumn{
+            TableColumn{
                 name: #field_name,
                 sql_type: #sql_type,
                 is_primary_key: #is_primary_key,
@@ -52,9 +52,9 @@ fn impl_db_columns(
     }
 
     let result = quote::quote! {
-        impl my_postgres::db_schema::DbSchema for #struct_name{
-            fn get_columns() -> Vec<my_postgres::db_schema::DbColumn>{
-                use my_postgres::db_schema::*;
+        impl my_postgres::table_schema::TableSchema for #struct_name{
+            fn get_columns() -> Vec<my_postgres::table_schema::DbColumn>{
+                use my_postgres::table_schema::*;
                 vec![#(#result),*]
             }
         }
@@ -69,30 +69,30 @@ fn get_sql_type(
     ty: &PropertyType,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     let result = match &ty {
-        types_reader::PropertyType::U8 => quote::quote!(SqlType::SmallInt),
-        types_reader::PropertyType::I8 => quote::quote!(SqlType::SmallInt),
-        types_reader::PropertyType::U16 => quote::quote!(SqlType::Integer),
-        types_reader::PropertyType::I16 => quote::quote!(SqlType::SmallInt),
-        types_reader::PropertyType::U32 => quote::quote!(SqlType::Integer),
-        types_reader::PropertyType::I32 => quote::quote!(SqlType::Integer),
-        types_reader::PropertyType::U64 => quote::quote!(SqlType::BigInt),
-        types_reader::PropertyType::I64 => quote::quote!(SqlType::BigInt),
-        types_reader::PropertyType::F32 => quote::quote!(SqlType::Real),
-        types_reader::PropertyType::F64 => quote::quote!(SqlType::Double),
-        types_reader::PropertyType::USize => quote::quote!(SqlType::BigInt),
-        types_reader::PropertyType::ISize => quote::quote!(SqlType::BigInt),
-        types_reader::PropertyType::String => quote::quote!(SqlType::Text),
-        types_reader::PropertyType::Str => quote::quote!(SqlType::Text),
-        types_reader::PropertyType::Bool => quote::quote!(SqlType::Boolean),
+        types_reader::PropertyType::U8 => quote::quote!(TableColumnType::SmallInt),
+        types_reader::PropertyType::I8 => quote::quote!(TableColumnType::SmallInt),
+        types_reader::PropertyType::U16 => quote::quote!(TableColumnType::Integer),
+        types_reader::PropertyType::I16 => quote::quote!(TableColumnType::SmallInt),
+        types_reader::PropertyType::U32 => quote::quote!(TableColumnType::Integer),
+        types_reader::PropertyType::I32 => quote::quote!(TableColumnType::Integer),
+        types_reader::PropertyType::U64 => quote::quote!(TableColumnType::BigInt),
+        types_reader::PropertyType::I64 => quote::quote!(TableColumnType::BigInt),
+        types_reader::PropertyType::F32 => quote::quote!(TableColumnType::Real),
+        types_reader::PropertyType::F64 => quote::quote!(TableColumnType::Double),
+        types_reader::PropertyType::USize => quote::quote!(TableColumnType::BigInt),
+        types_reader::PropertyType::ISize => quote::quote!(TableColumnType::BigInt),
+        types_reader::PropertyType::String => quote::quote!(TableColumnType::Text),
+        types_reader::PropertyType::Str => quote::quote!(TableColumnType::Text),
+        types_reader::PropertyType::Bool => quote::quote!(TableColumnType::Boolean),
         types_reader::PropertyType::DateTime => {
             let sql_type = field.get_sql_type()?;
 
             let sql_type = sql_type.as_str();
 
             if sql_type == "timestamp" {
-                quote::quote!(SqlType::Timestamp)
+                quote::quote!(TableColumnType::Timestamp)
             } else if sql_type == "bigint" {
-                quote::quote!(SqlType::BigInt)
+                quote::quote!(TableColumnType::BigInt)
             } else {
                 return Err(syn::Error::new_spanned(
                     field.field,
@@ -102,9 +102,9 @@ fn get_sql_type(
         }
 
         types_reader::PropertyType::OptionOf(sub_type) => get_sql_type(field, &sub_type)?,
-        types_reader::PropertyType::VecOf(_) => quote::quote!(SqlType::Json),
-        types_reader::PropertyType::Struct(_, _) => quote::quote!(SqlType::Json),
-        types_reader::PropertyType::HashMap(_, _) => quote::quote!(SqlType::Json),
+        types_reader::PropertyType::VecOf(_) => quote::quote!(TableColumnType::Json),
+        types_reader::PropertyType::Struct(_, _) => quote::quote!(TableColumnType::Json),
+        types_reader::PropertyType::HashMap(_, _) => quote::quote!(TableColumnType::Json),
     };
 
     Ok(result)

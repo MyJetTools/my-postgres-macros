@@ -2,13 +2,13 @@ extern crate proc_macro;
 use db_enum::EnumType;
 use proc_macro::TokenStream;
 
-mod db_schema;
 mod fn_impl_bulk_select;
 mod fn_impl_insert;
 mod fn_impl_select;
 mod fn_impl_update;
 mod fn_impl_where_model;
 mod render_field_value;
+mod table_schema;
 
 mod db_enum;
 
@@ -205,7 +205,7 @@ pub fn my_potgres_json_model(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(
-    DbSchema,
+    TableSchema,
     attributes(
         db_field_name,
         bigint,
@@ -219,5 +219,5 @@ pub fn my_potgres_json_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_schema(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_schema::generate(&ast)
+    crate::table_schema::generate(&ast)
 }
