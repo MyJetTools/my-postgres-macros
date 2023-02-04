@@ -57,7 +57,7 @@ fn get_sql_type(
         types_reader::PropertyType::ISize => quote::quote!(SqlType::BigInt),
         types_reader::PropertyType::String => quote::quote!(SqlType::Text),
         types_reader::PropertyType::Str => quote::quote!(SqlType::Text),
-        types_reader::PropertyType::Bool => quote::quote!(SqlType::Bool),
+        types_reader::PropertyType::Bool => quote::quote!(SqlType::Boolean),
         types_reader::PropertyType::DateTime => {
             let sql_type = field.get_sql_type()?;
 
