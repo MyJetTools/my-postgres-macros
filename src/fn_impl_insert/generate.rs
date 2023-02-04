@@ -17,6 +17,13 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(err) => return err,
     };
 
+    let dto_schema = match crate::impl_dto_schema::impl_dto_schema(name, &fields) {
+        Ok(dto_schema) => dto_schema,
+        Err(err) => {
+            return err.into_compile_error().into();
+        }
+    };
+
     let fields_amount = fields.len();
 
     let get_field_name = match fn_get_field_name(&fields) {
@@ -48,6 +55,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
             }
 
         }
+
+        #dto_schema
     }
     .into()
 }
