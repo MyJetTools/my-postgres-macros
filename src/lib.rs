@@ -7,6 +7,7 @@ mod fn_impl_insert;
 mod fn_impl_select;
 mod fn_impl_update;
 mod fn_impl_where_model;
+mod impl_dto_schema;
 mod render_field_value;
 
 mod db_enum;

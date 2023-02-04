@@ -17,6 +17,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
 
+    let dto_schema = crate::impl_dto_schema::impl_dto_schema(struct_name, &fields);
+
     let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
         Ok(result) => result,
         Err(err) => vec![err.to_compile_error()],
@@ -60,6 +62,8 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                 }
             }
         }
+
+        #dto_schema
     }
     .into()
 }
