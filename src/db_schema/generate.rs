@@ -4,7 +4,32 @@ use types_reader::{PropertyType, StructProperty};
 
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
-pub fn impl_dto_schema(
+pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
+    let struct_name = &ast.ident;
+
+    let fields = match StructProperty::read(ast) {
+        Ok(fields) => fields,
+        Err(e) => return e.into_compile_error().into(),
+    };
+
+    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
+        Ok(result) => result,
+        Err(err) => {
+            return err.into();
+        }
+    };
+
+    let dto_schema = match impl_dto_schema(struct_name, &fields) {
+        Ok(dto_schema) => dto_schema,
+        Err(err) => {
+            return err.into_compile_error().into();
+        }
+    };
+
+    quote::quote!(#dto_schema).into()
+}
+
+fn impl_dto_schema(
     struct_name: &Ident,
     fields: &[StructProperty],
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
