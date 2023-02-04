@@ -17,7 +17,7 @@ pub fn impl_dto_schema(
         result.push(quote::quote! {
             DtoColumn{
                 name: #field_name,
-                sql_type: #sql_type
+                sql_type: #sql_type,
                 is_primary_key: false,
                 is_nullable: #is_option
 
