@@ -34,6 +34,16 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
         }
 
+        impl my_postgres::sql_select::FromDbRow<Option<#struct_name>> for Option<#struct_name> {
+            fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<#struct_name> {
+                let str_value: Option<String> = row.get(name);
+                let str_value = str_value.as_ref()?;
+        
+                let result = Self::from_str(str_value);
+                Some(result)            
+            }
+        }
+
         impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #struct_name {
             fn write(
                 &'s self,
