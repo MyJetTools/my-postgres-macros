@@ -103,6 +103,13 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
                 #reading_db_model_from_metadata
                 #from_db_result
             }
+
+            fn from_db_row_opt(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
+                let result: Option<#sql_db_type> = row.get(name);
+                let result = result?;
+                #reading_db_model_from_metadata
+                Some(#from_db_result)
+            }
         }
 
 

@@ -56,6 +56,15 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
 
                     Self::from_str(name.as_str(), model.as_str())
                 }
+
+                fn from_db_row_opt(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
+                    let name: Option<String> = row.get(name);
+                    let name = name?;
+
+                    #reading_db_model_from_metadata
+
+                    Some(Self::from_str(name.as_str(), model.as_str()))
+                }
             }
 
             impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #enum_name{

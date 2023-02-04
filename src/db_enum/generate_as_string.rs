@@ -75,6 +75,12 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 let result: String = row.get(name);
                 Self::from_str(result.as_str())
             }
+
+            fn from_db_row_opt(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
+                let result: Option<String> = row.get(name);
+                let result = result?;
+                Some(Self::from_str(result.as_str()))
+            }
         }
 
 
