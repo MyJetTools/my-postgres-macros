@@ -19,17 +19,17 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         }
     };
 
-    let dto_schema = match impl_dto_schema(struct_name, &fields) {
-        Ok(dto_schema) => dto_schema,
+    let db_columns = match impl_db_columns(struct_name, &fields) {
+        Ok(db_columns) => db_columns,
         Err(err) => {
             return err.into_compile_error().into();
         }
     };
 
-    quote::quote!(#dto_schema).into()
+    quote::quote!(#db_columns).into()
 }
 
-fn impl_dto_schema(
+fn impl_db_columns(
     struct_name: &Ident,
     fields: &[StructProperty],
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
@@ -41,7 +41,7 @@ fn impl_dto_schema(
         let is_option = field.ty.is_option();
         let is_primary_key = field.is_primary_key();
         result.push(quote::quote! {
-            DtoColumn{
+            DbColumn{
                 name: #field_name,
                 sql_type: #sql_type,
                 is_primary_key: #is_primary_key,
@@ -52,9 +52,9 @@ fn impl_dto_schema(
     }
 
     let result = quote::quote! {
-        impl my_postgres::sql_schema::DtoSchema for #struct_name{
-            fn get_columns() -> Vec<my_postgres::sql_schema::DtoColumn>{
-                use my_postgres::sql_schema::*;
+        impl my_postgres::db_schema::DbSchema for #struct_name{
+            fn get_columns() -> Vec<my_postgres::db_schema::DbColumn>{
+                use my_postgres::db_schema::*;
                 vec![#(#result),*]
             }
         }
