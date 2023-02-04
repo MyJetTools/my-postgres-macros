@@ -28,7 +28,8 @@ use syn;
         sql_type,
         order_by,
         order_by_desc,
-        group_by
+        group_by,
+        primary_key
     )
 )]
 pub fn postgres_select_model(input: TokenStream) -> TokenStream {
@@ -65,7 +66,15 @@ pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     InsertDbEntity,
-    attributes(db_field_name, ignore_if_null, ignore, bigint, json, sql_type,)
+    attributes(
+        db_field_name,
+        ignore_if_null,
+        ignore,
+        bigint,
+        json,
+        sql_type,
+        primary_key
+    )
 )]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

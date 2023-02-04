@@ -14,11 +14,12 @@ pub fn impl_dto_schema(
         let field_name = field.get_db_field_name_as_string();
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option = field.ty.is_option();
+        let is_primary_key = field.is_primary_key();
         result.push(quote::quote! {
             DtoColumn{
                 name: #field_name,
                 sql_type: #sql_type,
-                is_primary_key: false,
+                is_primary_key: #is_primary_key,
                 is_nullable: #is_option
 
             }
