@@ -11,7 +11,7 @@ pub fn impl_dto_schema(
     let mut result = Vec::new();
 
     for field in fields {
-        let field_name = field.get_field_name_ident();
+        let field_name = field.get_db_field_name_as_string();
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option = field.ty.is_option();
         result.push(quote::quote! {
@@ -27,7 +27,7 @@ pub fn impl_dto_schema(
 
     let result = quote::quote! {
         impl my_postgres::sql_schema::DtoSchema for #struct_name{
-            fn get_columns() -> Vec<DtoColumn>{
+            fn get_columns() -> Vec<my_postgres::sql_schema::DtoColumn>{
                 use my_postgres::sql_schema::*;
                 vec![#(#result),*]
             }
