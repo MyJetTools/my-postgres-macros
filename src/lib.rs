@@ -217,7 +217,7 @@ pub fn my_potgres_json_model(input: TokenStream) -> TokenStream {
         sql_type,
     )
 )]
-pub fn db_schema(input: TokenStream) -> TokenStream {
+pub fn table_schema(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::table_schema::generate(&ast)
 }
