@@ -215,6 +215,8 @@ pub fn my_potgres_json_model(input: TokenStream) -> TokenStream {
         limit,
         offset,
         sql_type,
+        ignore_table_column,
+        primary_key
     )
 )]
 pub fn table_schema(input: TokenStream) -> TokenStream {

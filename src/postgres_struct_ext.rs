@@ -28,6 +28,8 @@ pub trait PostgresStructPropertyExt {
     fn sql_value_to_mask(&self) -> bool;
 
     fn get_field_metadata(&self) -> proc_macro2::TokenStream;
+
+    fn has_ignore_table_column(&self) -> bool;
 }
 
 impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
@@ -59,6 +61,10 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
 
     fn has_ignore_if_null_attr(&self) -> bool {
         self.attrs.has_attr("ignore_if_null")
+    }
+
+    fn has_ignore_table_column(&self) -> bool {
+        self.attrs.has_attr("ignore_table_column")
     }
 
     fn has_json_attr(&self) -> bool {

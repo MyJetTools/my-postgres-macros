@@ -12,13 +12,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         Err(e) => return e.into_compile_error().into(),
     };
 
-    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
-        Ok(result) => result,
-        Err(err) => {
-            return err.into();
-        }
-    };
-
+    let fields = super::utils::filter_table_schema_fields(&fields);
     let db_columns = match impl_db_columns(struct_name, &fields) {
         Ok(db_columns) => db_columns,
         Err(err) => {
@@ -31,7 +25,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
 fn impl_db_columns(
     struct_name: &Ident,
-    fields: &[StructProperty],
+    fields: &Vec<&StructProperty>,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut result = Vec::new();
 
@@ -39,7 +33,11 @@ fn impl_db_columns(
         let field_name = field.get_db_field_name_as_string();
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option = field.ty.is_option();
-        let is_primary_key = field.is_primary_key();
+        let is_primary_key = if field.is_primary_key() {
+            quote::quote!(Some(0))
+        } else {
+            quote::quote!(None)
+        };
         result.push(quote::quote! {
             TableColumn{
                 name: #field_name.to_string(),
