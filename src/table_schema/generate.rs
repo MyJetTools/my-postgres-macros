@@ -42,7 +42,7 @@ fn impl_db_columns(
         let is_primary_key = field.is_primary_key();
         result.push(quote::quote! {
             TableColumn{
-                name: #field_name,
+                name: #field_name.to_string(),
                 sql_type: #sql_type,
                 is_primary_key: #is_primary_key,
                 is_nullable: #is_option
