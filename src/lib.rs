@@ -14,7 +14,7 @@ mod db_enum;
 
 mod my_postgres_json_model;
 
-mod postgre_enum_ext;
+mod postgres_enum_ext;
 mod postgres_struct_ext;
 
 use syn;
@@ -199,7 +199,7 @@ pub fn db_enum_as_string_with_model(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(MyPostgresJsonModel, attributes(enum_case))]
-pub fn my_potgres_json_model(input: TokenStream) -> TokenStream {
+pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     crate::my_postgres_json_model::generate(&ast)
 }

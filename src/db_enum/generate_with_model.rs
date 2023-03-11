@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::EnumCase;
 
-use crate::postgre_enum_ext::PostgresEnumExt;
+use crate::postgres_enum_ext::PostgresEnumExt;
 
 use super::EnumType;
 
@@ -24,7 +24,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
         Err(e) => return e.to_compile_error().into(),
     };
 
-    let sql_db_type = enum_type.get_comlient_with_db_type();
+    let sql_db_type = enum_type.get_compliant_with_db_type();
 
     let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
 

@@ -40,7 +40,7 @@ impl EnumType {
         }
     }
 
-    pub fn get_comlient_with_db_type(&self) -> proc_macro2::TokenStream {
+    pub fn get_compliant_with_db_type(&self) -> proc_macro2::TokenStream {
         match self {
             EnumType::U8 => quote!(i32).into(),
             EnumType::I8 => quote!(i32).into(),
@@ -71,7 +71,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
 
     let to_typed_number = fn_to_typed_number(enum_cases.as_slice());
 
-    let sql_db_type = enum_type.get_comlient_with_db_type();
+    let sql_db_type = enum_type.get_compliant_with_db_type();
 
     let from_db_result = if type_name.to_string() == sql_db_type.to_string() {
         quote! {

@@ -1,7 +1,7 @@
 use quote::quote;
 use types_reader::EnumCase;
 
-use crate::postgre_enum_ext::PostgresEnumExt;
+use crate::postgres_enum_ext::PostgresEnumExt;
 pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let enum_name = &ast.ident;
 
