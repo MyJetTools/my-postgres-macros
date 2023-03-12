@@ -50,7 +50,9 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 params: &mut Vec<my_postgres::SqlValue<'s>>,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
             ) {
+                sql.push("'");
                 sql.push_str(self.to_str());
+                sql.push("'");
             }
 
         }
@@ -62,7 +64,9 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 params: &mut Vec<my_postgres::SqlValue<'s>>,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
             ) {
+                sql.push("'");
                 sql.push_str(self.to_str());
+                sql.push("'");
             }
 
             fn get_default_operator(&self) -> &str{
