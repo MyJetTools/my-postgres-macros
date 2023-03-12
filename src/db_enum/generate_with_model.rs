@@ -151,7 +151,7 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Er
         if enum_case.model.is_none() {
             return Err(syn::Error::new_spanned(
                 enum_case.get_name_ident(),
-                "Model is not defined for this enum case",
+                "Please specify #[enum_case()]",
             ));
         }
 
