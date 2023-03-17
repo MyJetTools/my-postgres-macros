@@ -98,13 +98,13 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
         }        
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
-            fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
+            fn from_db_row(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
                 let result: #sql_db_type = row.get(name);
                 #reading_db_model_from_metadata
                 #from_db_result
             }
 
-            fn from_db_row_opt(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
+            fn from_db_row_opt(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
                 let result: Option<#sql_db_type> = row.get(name);
                 let result = result?;
                 #reading_db_model_from_metadata

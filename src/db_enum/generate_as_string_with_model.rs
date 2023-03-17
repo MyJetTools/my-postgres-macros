@@ -49,7 +49,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
         }
 
             impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
-                fn from_db_row(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
+                fn from_db_row(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
                     let name: String = row.get(name);
 
                     #reading_db_model_from_metadata
@@ -57,7 +57,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
                     Self::from_str(name.as_str(), model.as_str())
                 }
 
-                fn from_db_row_opt(row: &tokio_postgres::Row, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
+                fn from_db_row_opt(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
                     let name: Option<String> = row.get(name);
                     let name = name?;
 

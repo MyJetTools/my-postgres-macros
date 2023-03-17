@@ -53,7 +53,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
                #group_by_fields
             }
 
-            fn from(db_row: &tokio_postgres::Row) -> Self {
+            fn from(db_row: &my_postgres::DbRow) -> Self {
                 use my_postgres::sql_select::FromDbRow;
                 Self{
                  #(#from_fields)*
