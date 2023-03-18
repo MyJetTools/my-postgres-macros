@@ -85,7 +85,7 @@ pub fn generate_implementation(
         Err(err) => err.to_compile_error(),
     };
 
-    quote! {
+    let result = quote! {
        impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
         fn fill_where(&'s self, sql: &mut String, params: &mut Vec<my_postgres::SqlValue<'s>>,) {
             #where_data
@@ -93,6 +93,9 @@ pub fn generate_implementation(
         #limit
         #offset
        }
-    }
-    .into()
+    };
+
+    println!("result: {}", result.to_string());
+
+    result.into()
 }
