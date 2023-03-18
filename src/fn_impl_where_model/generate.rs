@@ -22,7 +22,6 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
     for field in src_fields {
         if field.attrs.has_attr("limit") {
-            println!("Set limit for field name: {}", field.name);
             limit = Some(field);
         } else if field.attrs.has_attr("offset") {
             offset = Some(field);
@@ -58,7 +57,7 @@ pub fn generate_implementation(
     } else {
         quote! {
             fn get_limit(&self) -> Option<usize> {
-                None
+                Some(15)
             }
         }
         .into()
