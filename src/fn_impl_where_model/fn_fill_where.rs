@@ -77,11 +77,6 @@ fn fill_op(
         let op_value = extract_and_verify_operation(op_value, struct_property)?;
         let op = op_value.as_str();
 
-        println!(
-            "Found operation: {} for property:{}",
-            op, struct_property.name
-        );
-
         return Ok(quote! {
             sql.push_str(#op);
         }
@@ -98,6 +93,12 @@ fn extract_and_verify_operation<'s>(
     op_value: ParamValue<'s>,
     prop: &'s StructProperty,
 ) -> Result<ParamValue<'s>, syn::Error> {
+    println!(
+        "Found operation: {} for property:{}",
+        op_value.as_str(),
+        prop.name
+    );
+
     if op_value.as_str() == "="
         || op_value.as_str() == "!="
         || op_value.as_str() == "<"
