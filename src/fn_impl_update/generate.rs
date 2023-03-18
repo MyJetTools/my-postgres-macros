@@ -29,7 +29,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
     let get_field_value_case = super::fn_get_field_value::fn_get_field_value(fields.as_slice());
 
-    let fields_ammount = fields.len() - primary_key_amount;
+    let fields_amount = fields.len() - primary_key_amount;
 
     let mut with_primary_key = Vec::new();
 
@@ -50,7 +50,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
         impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for #struct_name{
             fn get_fields_amount() -> usize{
-                #fields_ammount
+                #fields_amount
             }
             fn get_field_value(&'s self, no: usize) -> my_postgres::sql_update::SqlUpdateValue<'s>{
                 match no{

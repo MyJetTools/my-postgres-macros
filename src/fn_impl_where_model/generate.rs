@@ -21,7 +21,7 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
     let mut fields = Vec::with_capacity(src_fields.len());
 
     for field in src_fields {
-        if field.attrs.has_attr("limit") {
+        if field.attrs.has_attr_debug(&field.name, "limit") {
             limit = Some(field);
         } else if field.attrs.has_attr("offset") {
             offset = Some(field);
