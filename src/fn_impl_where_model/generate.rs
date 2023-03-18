@@ -95,7 +95,5 @@ pub fn generate_implementation(
        }
     };
 
-    println!("result: {}", result);
-
     result.into()
 }
