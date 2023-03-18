@@ -91,12 +91,6 @@ fn extract_and_verify_operation<'s>(
     op_value: ParamValue<'s>,
     prop: &'s StructProperty,
 ) -> Result<ParamValue<'s>, syn::Error> {
-    println!(
-        "Found operation: {} for property:{}",
-        op_value.as_str(),
-        prop.name
-    );
-
     if op_value.as_str() == "="
         || op_value.as_str() == "!="
         || op_value.as_str() == "<"
