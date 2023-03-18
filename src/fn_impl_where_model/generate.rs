@@ -47,6 +47,7 @@ pub fn generate_implementation(
     let struct_name = type_name.get_type_name();
 
     let limit: TokenStream = if let Some(limit) = &limit {
+        println!("Rendering Limit for {}", type_name.struct_name);
         let name = limit.get_field_name_ident();
         quote! {
             fn get_limit(&self) -> Option<usize> {
@@ -55,9 +56,10 @@ pub fn generate_implementation(
         }
         .into()
     } else {
+        println!("Rendering NoLimit for {}", type_name.struct_name);
         quote! {
             fn get_limit(&self) -> Option<usize> {
-                Some(15)
+                None
             }
         }
         .into()
