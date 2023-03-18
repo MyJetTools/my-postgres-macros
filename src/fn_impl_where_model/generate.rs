@@ -95,7 +95,7 @@ pub fn generate_implementation(
        }
     };
 
-    println!("result: {}", result.to_string());
+    println!("result: {}", result);
 
     result.into()
 }
