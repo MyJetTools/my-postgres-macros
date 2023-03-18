@@ -77,6 +77,11 @@ fn fill_op(
         let op_value = extract_and_verify_operation(op_value, struct_property)?;
         let op = op_value.as_str();
 
+        println!(
+            "Found operation: {} for property:{}",
+            op, struct_property.name
+        );
+
         return Ok(quote! {
             sql.push_str(#op);
         }
