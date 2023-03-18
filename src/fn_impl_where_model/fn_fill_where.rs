@@ -33,6 +33,8 @@ pub fn fn_fill_where(
         if let PropertyType::OptionOf(_) = &struct_property.ty {
             let op = fill_op(quote!(value), struct_property)?;
 
+            println!("Operator: {}", op);
+
             lines.push(quote! {
                 if let Some(value) = &self.#prop_name_ident{
                     #push_and
