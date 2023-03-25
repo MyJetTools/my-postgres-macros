@@ -221,5 +221,7 @@ pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
 )]
 pub fn table_schema(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::table_schema::generate(&ast)
+    let result = crate::table_schema::generate(&ast);
+    println!("{}", result);
+    result
 }
