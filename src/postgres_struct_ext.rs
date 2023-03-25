@@ -10,6 +10,8 @@ pub const ATTR_JSON: &str = "json";
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
 
+    fn get_primary_key_id(&self) -> Option<u8>;
+
     fn get_sql_type(&self) -> Result<ParamValue, syn::Error>;
 
     fn get_db_field_name_as_token(&self) -> proc_macro2::TokenStream;
@@ -49,6 +51,15 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
 
     fn is_primary_key(&self) -> bool {
         self.attrs.has_attr(ATTR_PRIMARY_KEY)
+    }
+
+    fn get_primary_key_id(&self) -> Option<u8> {
+        if let Ok(value) = self.attrs.get_attr(ATTR_PRIMARY_KEY) {
+            let value = value.get_single_param().unwrap();
+            return Some(value.get_value());
+        }
+
+        None
     }
 
     fn has_ignore_attr(&self) -> bool {

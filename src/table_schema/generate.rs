@@ -33,8 +33,8 @@ fn impl_db_columns(
         let field_name = field.get_db_field_name_as_string();
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option = field.ty.is_option();
-        let is_primary_key = if field.is_primary_key() {
-            quote::quote!(Some(0))
+        let is_primary_key = if let Some(value) = field.get_primary_key_id() {
+            quote::quote!(Some(#value))
         } else {
             quote::quote!(None)
         };
