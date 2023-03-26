@@ -50,7 +50,7 @@ fn impl_db_columns(
     }
 
     let result = quote::quote! {
-        impl my_postgres::table_schema::TableSchema for #struct_name{
+        impl my_postgres::table_schema::TableSchemaProvider for #struct_name{
             fn get_columns() -> Vec<my_postgres::table_schema::TableColumn>{
                 use my_postgres::table_schema::*;
                 vec![#(#result),*]
