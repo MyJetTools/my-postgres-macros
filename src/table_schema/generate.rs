@@ -43,8 +43,8 @@ fn impl_db_columns(
                 name: #field_name.to_string(),
                 sql_type: #sql_type,
                 is_primary_key: #is_primary_key,
-                is_nullable: #is_option
-
+                is_nullable: #is_option,
+                default: None
             }
         });
     }
