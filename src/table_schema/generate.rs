@@ -51,11 +51,11 @@ fn impl_db_columns(
 
         if let Some(indexes) = field.get_index_attrs()? {
             for index in indexes {
-                if !indexes_list.contains_key(&index.name) {
-                    indexes_list.insert(index.name.clone(), BTreeMap::new());
+                if !indexes_list.contains_key(&index.index_name) {
+                    indexes_list.insert(index.index_name.clone(), BTreeMap::new());
                 }
 
-                let index_by_name = indexes_list.get_mut(&index.name).unwrap();
+                let index_by_name = indexes_list.get_mut(&index.index_name).unwrap();
 
                 if index_by_name.contains_key(&index.id) {
                     panic!("Duplicate index id {} for index {}", index.id, index.name);

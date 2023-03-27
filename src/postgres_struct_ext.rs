@@ -9,6 +9,7 @@ pub const ATTR_JSON: &str = "json";
 
 pub struct IndexAttr {
     pub id: u8,
+    pub index_name: String,
     pub name: String,
     pub is_unique: bool,
     pub order: String,
@@ -143,7 +144,7 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
                 .get_named_param("id")?
                 .get_value("id must be a number 0..255".into())?;
 
-            let name = attr.get_named_param("name")?.as_str().to_string();
+            let index_name = attr.get_named_param("index_name")?.as_str().to_string();
             let is_unique = attr.get_named_param("is_unique")?.get_bool_value()?;
 
             let order = attr.get_named_param("order")?.as_str().to_string();
@@ -156,9 +157,10 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
 
             result.push(IndexAttr {
                 id,
-                name,
+                index_name,
                 is_unique,
                 order,
+                name: self.get_db_field_name_as_string(),
             })
         }
 
