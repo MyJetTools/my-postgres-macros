@@ -64,13 +64,13 @@ fn impl_db_columns(
         for (_, value) in primary_keys {
             result.push(value);
         }
-        quote::quote!(Some(vec![#(#result),*]))
+        quote::quote!(Some(&[#(#result),*]))
     };
 
     let result = quote::quote! {
 
         impl my_postgres::table_schema::TableSchemaProvider for #struct_name{
-            const PRIMARY_KEY_COLUMNS: Option<Vec<&'static str>> = #primary_keys;
+            const PRIMARY_KEY_COLUMNS: Option<&'static [&'static str]> = #primary_keys;
             fn get_columns() -> Vec<my_postgres::table_schema::TableColumn>{
                 use my_postgres::table_schema::*;
                 vec![#(#result),*]
