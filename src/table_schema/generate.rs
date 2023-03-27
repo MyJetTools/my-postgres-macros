@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use proc_macro2::Ident;
 
 use types_reader::{PropertyType, StructProperty};
@@ -29,15 +31,22 @@ fn impl_db_columns(
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut result = Vec::new();
 
+    let mut primary_keys = BTreeMap::new();
+
     for field in fields {
         let field_name = field.get_db_field_name_as_string();
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option = field.ty.is_option();
-        let is_primary_key = if let Some(value) = field.get_primary_key_id() {
-            quote::quote!(Some(#value))
-        } else {
-            quote::quote!(None)
+        if let Some(value) = field.get_primary_key_id() {
+            if primary_keys.contains_key(&value) {
+                return Err(syn::Error::new_spanned(
+                    field.field,
+                    format!("Primary key id {} is already used", value),
+                ));
+            }
+            primary_keys.insert(value, field_name.clone());
         };
+
         result.push(quote::quote! {
             TableColumn{
                 name: #field_name.to_string(),
@@ -48,10 +57,20 @@ fn impl_db_columns(
         });
     }
 
+    let primary_keys = if primary_keys.is_empty() {
+        quote::quote!(None)
+    } else {
+        let mut result = Vec::new();
+        for (_, value) in primary_keys {
+            result.push(value);
+        }
+        quote::quote!(Some(vec![#(result)]))
+    };
+
     let result = quote::quote! {
 
         impl my_postgres::table_schema::TableSchemaProvider for #struct_name{
-            const PRIMARY_KEY_COLUMNS: Option<Vec<&'static str>> = None;
+            const PRIMARY_KEY_COLUMNS: Option<Vec<&'static str>> = #primary_keys;
             fn get_columns() -> Vec<my_postgres::table_schema::TableColumn>{
                 use my_postgres::table_schema::*;
                 vec![#(#result),*]
