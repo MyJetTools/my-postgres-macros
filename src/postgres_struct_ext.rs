@@ -7,10 +7,17 @@ pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
 pub const ATTR_SQL_TYPE: &str = "sql_type";
 pub const ATTR_JSON: &str = "json";
 
+pub struct IndexAttr {
+    pub id: u8,
+    pub name: String,
+    pub is_unique: bool,
+    pub order: String,
+}
+
 pub trait PostgresStructPropertyExt {
     fn is_primary_key(&self) -> bool;
 
-    fn get_primary_key_id(&self) -> Option<u8>;
+    fn get_primary_key_id(&self) -> Result<Option<u8>, syn::Error>;
 
     fn get_sql_type(&self) -> Result<ParamValue, syn::Error>;
 
@@ -32,6 +39,8 @@ pub trait PostgresStructPropertyExt {
     fn get_field_metadata(&self) -> proc_macro2::TokenStream;
 
     fn has_ignore_table_column(&self) -> bool;
+
+    fn get_index_attrs(&self) -> Result<Option<Vec<IndexAttr>>, syn::Error>;
 }
 
 impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
@@ -53,13 +62,13 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.has_attr(ATTR_PRIMARY_KEY)
     }
 
-    fn get_primary_key_id(&self) -> Option<u8> {
-        if let Ok(value) = self.attrs.get_attr(ATTR_PRIMARY_KEY) {
-            let value = value.get_single_param().unwrap();
-            return Some(value.get_value());
+    fn get_primary_key_id(&self) -> Result<Option<u8>, syn::Error> {
+        if let Some(value) = self.attrs.try_get_attr(ATTR_PRIMARY_KEY) {
+            let value = value.get_single_param()?;
+            return Ok(Some(value.get_value("must be value from 0..255".into())?));
         }
 
-        None
+        Ok(None)
     }
 
     fn has_ignore_attr(&self) -> bool {
@@ -116,6 +125,44 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         }
 
         return None;
+    }
+
+    fn get_index_attrs(&self) -> Result<Option<Vec<IndexAttr>>, syn::Error> {
+        let attrs = self.attrs.try_get_attrs("db_index");
+
+        if attrs.is_none() {
+            return Ok(None);
+        }
+
+        let attrs = attrs.unwrap();
+
+        let mut result = Vec::with_capacity(attrs.len());
+
+        for attr in attrs {
+            let id = attr
+                .get_named_param("id")?
+                .get_value("id must be a number 0..255".into())?;
+
+            let name = attr.get_named_param("name")?.as_str().to_string();
+            let is_unique = attr.get_named_param("is_unique")?.get_bool_value()?;
+
+            let order = attr.get_named_param("order")?.as_str().to_string();
+            if order != "DESC" && order != "ASC" {
+                return Err(syn::Error::new_spanned(
+                    attr.get_attr_token(),
+                    "order must be DESC or ASC",
+                ));
+            }
+
+            result.push(IndexAttr {
+                id,
+                name,
+                is_unique,
+                order,
+            })
+        }
+
+        Ok(Some(result))
     }
 
     fn get_field_metadata(&self) -> proc_macro2::TokenStream {

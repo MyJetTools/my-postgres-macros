@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use proc_macro2::Ident;
+use proc_macro2::{Ident, TokenStream};
 
 use types_reader::{PropertyType, StructProperty};
 
@@ -33,11 +33,13 @@ fn impl_db_columns(
 
     let mut primary_keys = BTreeMap::new();
 
+    let mut indexes_list = BTreeMap::new();
+
     for field in fields {
         let field_name = field.get_db_field_name_as_string();
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option = field.ty.is_option();
-        if let Some(value) = field.get_primary_key_id() {
+        if let Some(value) = field.get_primary_key_id()? {
             if primary_keys.contains_key(&value) {
                 return Err(syn::Error::new_spanned(
                     field.field,
@@ -46,6 +48,22 @@ fn impl_db_columns(
             }
             primary_keys.insert(value, field_name.clone());
         };
+
+        if let Some(indexes) = field.get_index_attrs()? {
+            for index in indexes {
+                if !indexes_list.contains_key(&index.name) {
+                    indexes_list.insert(index.name.clone(), BTreeMap::new());
+                }
+
+                let index_by_name = indexes_list.get_mut(&index.name).unwrap();
+
+                if index_by_name.contains_key(&index.id) {
+                    panic!("Duplicate index id {} for index {}", index.id, index.name);
+                }
+
+                index_by_name.insert(index.id, index);
+            }
+        }
 
         result.push(quote::quote! {
             TableColumn{
@@ -67,6 +85,30 @@ fn impl_db_columns(
         quote::quote!(Some(&[#(#result),*]))
     };
 
+    let indexes = if indexes_list.is_empty() {
+        quote::quote!(None)
+    } else {
+        let mut quotes: Vec<TokenStream> = Vec::new();
+
+        for (index_name, index_data) in indexes_list {
+            let mut fields = Vec::new();
+
+            for index_data in index_data.values() {
+                let name = &index_data.name;
+                fields.push(quote::quote!(IndexField { name: #name, order: IndexOrder::Asc }));
+            }
+
+            quotes.push(quote::quote!(result.insert(#index_name, vec![#(#fields,)*]);));
+        }
+
+        quote::quote!({
+            let mut result = std::collections::HashMap::new();
+            #(#quotes;)*
+
+            Some(result)
+        })
+    };
+
     let result = quote::quote! {
 
         impl my_postgres::table_schema::TableSchemaProvider for #struct_name{
@@ -76,7 +118,7 @@ fn impl_db_columns(
                 vec![#(#result),*]
             }
             fn get_indexes() -> Option<std::collections::HashMap<String, my_postgres::table_schema::IndexSchema>>{
-                None
+                #indexes
             }
         }
     }
