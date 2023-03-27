@@ -216,7 +216,8 @@ pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
         offset,
         sql_type,
         ignore_table_column,
-        primary_key
+        primary_key,
+        db_index,
     )
 )]
 pub fn table_schema(input: TokenStream) -> TokenStream {
