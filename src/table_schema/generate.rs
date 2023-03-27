@@ -100,7 +100,7 @@ fn impl_db_columns(
 
                 let order = match index_data.order.as_str() {
                     "ASC" => quote::quote!(IndexOrder::Asc),
-                    "DESC" => quote::quote!(IndexOrder::DESC),
+                    "DESC" => quote::quote!(IndexOrder::Desc),
                     _ => panic!("Unknown index order {}", index_data.order),
                 };
 
