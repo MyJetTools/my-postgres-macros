@@ -42,7 +42,6 @@ fn impl_db_columns(
             TableColumn{
                 name: #field_name.to_string(),
                 sql_type: #sql_type,
-                is_primary_key: #is_primary_key,
                 is_nullable: #is_option,
                 default: None
             }
@@ -50,10 +49,14 @@ fn impl_db_columns(
     }
 
     let result = quote::quote! {
+        const PRIMARY_KEY_COLUMNS: Option<Vec<&'static str>> = None;
         impl my_postgres::table_schema::TableSchemaProvider for #struct_name{
             fn get_columns() -> Vec<my_postgres::table_schema::TableColumn>{
                 use my_postgres::table_schema::*;
                 vec![#(#result),*]
+            }
+            fn get_indexes() -> Option<HashMap<String, IndexSchema>>{
+
             }
         }
     }
