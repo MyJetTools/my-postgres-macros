@@ -95,18 +95,19 @@ fn impl_db_columns(
 
             for index_data in index_data.values() {
                 let name = &index_data.name;
-                fields.push(quote::quote!(IndexField { name: #name, order: IndexOrder::Asc }));
+                fields
+                    .push(quote::quote!(IndexField { name: #name.into(), order: IndexOrder::Asc }));
             }
 
             quotes.push(quote::quote!(result.insert(#index_name, vec![#(#fields,)*]);));
         }
 
-        quote::quote!({
+        quote::quote! {
             let mut result = std::collections::HashMap::new();
             #(#quotes;)*
 
             Some(result)
-        })
+        }
     };
 
     let result = quote::quote! {
