@@ -56,7 +56,7 @@ fn impl_db_columns(
                 use my_postgres::table_schema::*;
                 vec![#(#result),*]
             }
-            fn get_indexes() -> Option<std::collections::HashMap<String, IndexSchema>>{
+            fn get_indexes() -> Option<std::collections::HashMap<String, my_postgres::table_schema::IndexSchema>>{
                 None
             }
         }
