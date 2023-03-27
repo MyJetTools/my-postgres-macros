@@ -49,8 +49,9 @@ fn impl_db_columns(
     }
 
     let result = quote::quote! {
-        const PRIMARY_KEY_COLUMNS: Option<Vec<&'static str>> = None;
+
         impl my_postgres::table_schema::TableSchemaProvider for #struct_name{
+            const PRIMARY_KEY_COLUMNS: Option<Vec<&'static str>> = None;
             fn get_columns() -> Vec<my_postgres::table_schema::TableColumn>{
                 use my_postgres::table_schema::*;
                 vec![#(#result),*]
