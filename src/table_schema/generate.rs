@@ -93,13 +93,17 @@ fn impl_db_columns(
         for (index_name, index_data) in indexes_list {
             let mut fields = Vec::new();
 
+            let mut is_unique = false;
+
             for index_data in index_data.values() {
                 let name = &index_data.name;
                 fields
                     .push(quote::quote!(IndexField { name: #name.into(), order: IndexOrder::Asc }));
+
+                is_unique = index_data.is_unique;
             }
 
-            quotes.push(quote::quote!(result.insert(#index_name, vec![#(#fields,)*]);));
+            quotes.push(quote::quote!(result.insert(#index_name.to_string(), IndexSchema::new(#is_unique, vec![#(#fields,)*]));));
         }
 
         quote::quote! {
