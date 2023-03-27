@@ -97,8 +97,14 @@ fn impl_db_columns(
 
             for index_data in index_data.values() {
                 let name = &index_data.name;
-                fields
-                    .push(quote::quote!(IndexField { name: #name.into(), order: IndexOrder::Asc }));
+
+                let order = match index_data.order.as_str() {
+                    "ASC" => quote::quote!(IndexOrder::Asc),
+                    "DESC" => quote::quote!(IndexOrder::DESC),
+                    _ => panic!("Unknown index order {}", index_data.order),
+                };
+
+                fields.push(quote::quote!(IndexField { name: #name.into(), order: #order }));
 
                 is_unique = index_data.is_unique;
             }
