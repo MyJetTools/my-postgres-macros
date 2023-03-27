@@ -64,7 +64,7 @@ fn impl_db_columns(
         for (_, value) in primary_keys {
             result.push(value);
         }
-        quote::quote!(Some(vec![#(result)]))
+        quote::quote!(Some(vec![#(#result),*]))
     };
 
     let result = quote::quote! {
