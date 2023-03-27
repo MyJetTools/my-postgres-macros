@@ -118,6 +118,7 @@ fn impl_db_columns(
                 vec![#(#result),*]
             }
             fn get_indexes() -> Option<std::collections::HashMap<String, my_postgres::table_schema::IndexSchema>>{
+                use my_postgres::table_schema::*;
                 #indexes
             }
         }
