@@ -142,7 +142,7 @@ fn get_sql_type(
     field: &StructProperty,
     ty: &PropertyType,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
-    let ty_token = ty.get_token_stream();
+    let ty_token = ty.get_token_stream_with_generics();
 
     let meta_data = field.get_field_metadata();
 
