@@ -142,6 +142,13 @@ fn get_sql_type(
     field: &StructProperty,
     ty: &PropertyType,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
+    let ty_token = ty.get_token_stream();
+
+    let meta_data = field.get_field_metadata();
+
+    Ok(quote::quote! {#ty_token:: get_sql_type(#meta_data)})
+
+    /*
     let result = match &ty {
         types_reader::PropertyType::U8 => quote::quote!(TableColumnType::SmallInt),
         types_reader::PropertyType::I8 => quote::quote!(TableColumnType::SmallInt),
@@ -182,4 +189,5 @@ fn get_sql_type(
     };
 
     Ok(result)
+     */
 }
