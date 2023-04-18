@@ -142,7 +142,7 @@ fn get_sql_type(
     field: &StructProperty,
     ty: &PropertyType,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
-    if let PropertyType::Option(ty) = ty {
+    if let PropertyType::OptionOf(ty) = ty {
         return get_sql_type(field, ty);
     }
 
