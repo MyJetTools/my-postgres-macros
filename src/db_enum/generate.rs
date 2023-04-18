@@ -159,14 +159,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
             }
         }
 
-        impl my_postgres::table_schema::SqlTypeProvider for Option<#enum_name> {
-            fn get_sql_type(
-                _metadata: Option<my_postgres::SqlValueMetadata>,
-            ) -> my_postgres::table_schema::TableColumnType {
-                use my_postgres::table_schema::*;
-                #type_name::get_sql_type(None)
-            }
-        }
+
 
 
     }

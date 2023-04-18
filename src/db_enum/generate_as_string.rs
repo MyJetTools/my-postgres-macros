@@ -96,13 +96,6 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
         }
 
 
-        impl my_postgres::table_schema::SqlTypeProvider for Option<#enum_name> {
-            fn get_sql_type(
-                _metadata: Option<my_postgres::SqlValueMetadata>,
-            ) -> my_postgres::table_schema::TableColumnType {
-                my_postgres::table_schema::TableColumnType::Text
-            }
-        }
 
 
     }
