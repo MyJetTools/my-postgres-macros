@@ -83,7 +83,7 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
         }
     };
 
-    quote! {
+    let result = quote! {
 
         impl #enum_name{
             pub fn #to_func_name(&self)->#type_name{
@@ -170,7 +170,11 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
 
 
     }
-    .into()
+    .into();
+
+    println!("{}", result);
+
+    result
 }
 
 fn fn_to_typed_number(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
