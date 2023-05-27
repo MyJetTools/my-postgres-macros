@@ -2,23 +2,14 @@ use quote::quote;
 use types_reader::EnumCase;
 
 use crate::postgres_enum_ext::PostgresEnumExt;
-pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
+pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::Error> {
     let enum_name = &ast.ident;
 
-    let enum_cases = match EnumCase::read(ast) {
-        Ok(cases) => cases,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    let enum_cases =  EnumCase::read(ast)?;
 
-    let fn_to_str = match generate_fn_to_str(&enum_cases) {
-        Ok(result) => result,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    let fn_to_str =  generate_fn_to_str(&enum_cases)?;
 
-    let fn_from_str = match generate_fn_from_str(&enum_cases) {
-        Ok(result) => result,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    let fn_from_str =  generate_fn_from_str(&enum_cases)?;
 
     let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
 
@@ -26,7 +17,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
 
     let select_part = super::utils::render_select_part();
 
-    quote! {
+    let result = quote! {
 
         impl #enum_name{
             pub fn to_str(&self)->(&'static str, String) {
@@ -81,7 +72,9 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> proc_macro::Toke
 
     
     }
-    .into()
+    .into();
+
+    Ok(result)
 }
 
 fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStream, syn::Error> {
@@ -89,7 +82,7 @@ fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStr
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value();
+        let case_value = case.get_case_value()?;
 
         if case.model.is_none() {
             return Err(syn::Error::new_spanned(
@@ -101,7 +94,7 @@ fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStr
         let model = case.model.as_ref().unwrap().get_name_ident();
 
         result.extend(quote! {
-            #case_value => Self::#case_ident(#model::from_str(model)),
+            #case_value => Self::#case_ident(#model::from_str(model))?,
         });
     }
     Ok(result)
@@ -112,7 +105,7 @@ fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStrea
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value();
+        let case_value = case.get_case_value()?;
 
         result.extend(quote! {
             Self::#case_ident(model) => (#case_value, model.to_string()),

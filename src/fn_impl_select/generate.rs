@@ -2,20 +2,12 @@ use proc_macro::TokenStream;
 use quote::quote;
 use types_reader::StructProperty;
 
-pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
+pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
     let struct_name = &ast.ident;
 
-    let fields = match StructProperty::read(ast) {
-        Ok(fields) => fields,
-        Err(e) => return e.into_compile_error().into(),
-    };
+    let fields = StructProperty::read(ast)?;
 
-    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
-        Ok(result) => result,
-        Err(err) => {
-            return err.into();
-        }
-    };
+    let fields = crate::postgres_struct_ext::filter_fields(fields)?;
 
     let select_fields = match super::fn_fill_select_fields::fn_fill_select_fields(&fields) {
         Ok(result) => result,
@@ -37,7 +29,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(err) => vec![err.to_compile_error()],
     };
 
-    quote! {
+    let result = quote! {
         impl my_postgres::sql_select::SelectEntity for #struct_name{
 
             fn fill_select_fields(sql: &mut String) {
@@ -62,5 +54,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
 
     }
-    .into()
+    .into();
+
+    Ok(result)
 }

@@ -1,4 +1,4 @@
-use types_reader::{attribute_params::ParamValue, PropertyType, StructProperty};
+use types_reader::{ParamValue, PropertyType, StructProperty};
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
 pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
@@ -20,13 +20,13 @@ pub trait PostgresStructPropertyExt {
 
     fn get_primary_key_id(&self) -> Result<Option<u8>, syn::Error>;
 
-    fn get_sql_type(&self) -> Result<ParamValue, syn::Error>;
+    fn get_sql_type(&self) -> Result<&ParamValue, syn::Error>;
 
-    fn get_db_field_name_as_token(&self) -> proc_macro2::TokenStream;
+    fn get_db_field_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error>;
 
-    fn get_db_field_name_as_string(&self) -> String;
+    fn get_db_field_name_as_string(&self) -> Result<String, syn::Error>;
 
-    fn get_model_db_field_name_as_string(&self) -> Option<ParamValue>;
+    fn get_model_db_field_name_as_string(&self) -> Option<&ParamValue>;
 
     fn has_json_attr(&self) -> bool;
 
@@ -37,7 +37,7 @@ pub trait PostgresStructPropertyExt {
 
     fn sql_value_to_mask(&self) -> bool;
 
-    fn get_field_metadata(&self) -> proc_macro2::TokenStream;
+    fn get_field_metadata(&self) -> Result<proc_macro2::TokenStream, syn::Error>;
 
     fn has_ignore_table_column(&self) -> bool;
 
@@ -76,7 +76,7 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.has_attr("ignore")
     }
 
-    fn get_sql_type(&self) -> Result<ParamValue, syn::Error> {
+    fn get_sql_type(&self) -> Result<&ParamValue, syn::Error> {
         self.attrs.get_single_or_named_param(ATTR_SQL_TYPE, "name")
     }
 
@@ -96,31 +96,31 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         self.attrs.has_attr("line_no") || self.name == "line_no"
     }
 
-    fn get_db_field_name_as_token(&self) -> proc_macro2::TokenStream {
+    fn get_db_field_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
         if let Ok(attr) = self.attrs.get_attr(ATTR_DB_FIELD_NAME) {
             if let Ok(result) = attr.get_from_single_or_named("name") {
-                let name = result.as_str().to_string();
-                return quote::quote!(#name);
+                let name = result.get_str_value_token()?;
+                return Ok(name);
             }
         }
 
         let name = self.name.as_str();
 
-        quote::quote!(#name)
+        Ok(quote::quote!(#name))
     }
 
-    fn get_db_field_name_as_string(&self) -> String {
+    fn get_db_field_name_as_string(&self) -> Result<String, syn::Error> {
         if let Ok(attr) = self
             .attrs
             .get_single_or_named_param(ATTR_DB_FIELD_NAME, "name")
         {
-            return attr.as_str().to_string();
+            return Ok(attr.get_str_value()?.to_string());
         }
 
-        return self.name.to_string();
+        return Ok(self.name.to_string());
     }
 
-    fn get_model_db_field_name_as_string(&self) -> Option<ParamValue> {
+    fn get_model_db_field_name_as_string(&self) -> Option<&ParamValue> {
         if let Ok(attr) = self.attrs.get_named_param(ATTR_DB_FIELD_NAME, "name") {
             return Some(attr);
         }
@@ -144,13 +144,16 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
                 .get_named_param("id")?
                 .get_value("id must be a number 0..255".into())?;
 
-            let index_name = attr.get_named_param("index_name")?.as_str().to_string();
+            let index_name = attr
+                .get_named_param("index_name")?
+                .get_str_value()?
+                .to_string();
             let is_unique = attr.get_named_param("is_unique")?.get_bool_value()?;
 
-            let order = attr.get_named_param("order")?.as_str().to_string();
+            let order = attr.get_named_param("order")?.get_str_value()?.to_string();
             if order != "DESC" && order != "ASC" {
                 return Err(syn::Error::new_spanned(
-                    attr.get_attr_token(),
+                    attr.get_token_stream(),
                     "order must be DESC or ASC",
                 ));
             }
@@ -160,48 +163,46 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
                 index_name,
                 is_unique,
                 order,
-                name: self.get_db_field_name_as_string(),
+                name: self.get_db_field_name_as_string()?,
             })
         }
 
         Ok(Some(result))
     }
 
-    fn get_field_metadata(&self) -> proc_macro2::TokenStream {
+    fn get_field_metadata(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
         let model_field_name = self.get_model_db_field_name_as_string();
 
         let sql_type = self.get_sql_type();
 
         if model_field_name.is_none() && sql_type.is_err() {
-            return quote::quote!(None);
+            return Ok(quote::quote!(None));
         }
 
         let model_field_name = if let Some(model_field_name) = model_field_name {
-            let model_field_name = model_field_name.as_str();
+            let model_field_name = model_field_name.get_str_value()?;
             quote::quote!(Some(#model_field_name))
         } else {
             quote::quote!(None)
         };
 
         let sql_type = if let Ok(sql_type) = sql_type {
-            let sql_type = sql_type.as_str();
+            let sql_type = sql_type.get_str_value()?;
             quote::quote!(Some(#sql_type))
         } else {
             quote::quote!(None)
         };
 
-        quote::quote!({
+        Ok(quote::quote!({
             Some(my_postgres::SqlValueMetadata{
                 sql_type: #sql_type,
                 related_field_name: #model_field_name
             })
-        })
+        }))
     }
 }
 
-pub fn filter_fields(
-    src: Vec<StructProperty>,
-) -> Result<Vec<StructProperty>, proc_macro::TokenStream> {
+pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, syn::Error> {
     let mut result = Vec::with_capacity(src.len());
 
     for itm in src {
@@ -217,15 +218,14 @@ pub fn filter_fields(
 
         if is_date_time {
             if let Ok(attr) = itm.get_sql_type() {
-                let attr = attr.as_str();
+                let attr = attr.get_str_value().unwrap();
                 if attr != "timestamp" && attr != "bigint" {
                     let result = syn::Error::new_spanned(
                         itm.field,
                         format!("Sql type must be 'timestamp' or 'bigint'"),
                     );
 
-                    let err = result.to_compile_error();
-                    return Err(quote::quote!(#err).into());
+                    return Err(result);
                 }
             } else {
                 let result = syn::Error::new_spanned(
@@ -233,8 +233,7 @@ pub fn filter_fields(
                     format!("Please specify sql_type for {}", itm.name),
                 );
 
-                let err = result.to_compile_error();
-                return Err(quote::quote!(#err).into());
+                return Err(result);
             }
         }
 

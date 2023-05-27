@@ -8,9 +8,9 @@ pub fn fn_from(fields: &[StructProperty]) -> Result<Vec<proc_macro2::TokenStream
     for field in fields {
         let name_ident = field.get_field_name_ident();
 
-        let db_field_name = field.get_db_field_name_as_string();
+        let db_field_name = field.get_db_field_name_as_string()?;
 
-        let metadata = field.get_field_metadata();
+        let metadata = field.get_field_metadata()?;
 
         let reading = if let PropertyType::OptionOf(sub_prop) = &field.ty {
             let type_ident = sub_prop.get_token_stream();

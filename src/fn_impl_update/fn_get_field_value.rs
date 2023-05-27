@@ -3,7 +3,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::StructProperty;
 
-pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
+pub fn fn_get_field_value(fields: &[StructProperty]) -> Result<Vec<TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(fields.len());
 
     let mut i: usize = 0;
@@ -12,9 +12,9 @@ pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
             continue;
         }
 
-        let db_field_name = field.get_db_field_name_as_string();
+        let db_field_name = field.get_db_field_name_as_string()?;
 
-        let value = crate::render_field_value::render_field_value(field, true);
+        let value = crate::render_field_value::render_field_value(field, true)?;
 
         result.push(
             quote! {
@@ -25,5 +25,5 @@ pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<TokenStream> {
         i += 1;
     }
 
-    result
+    Ok(result)
 }

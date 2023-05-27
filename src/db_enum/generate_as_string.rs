@@ -2,25 +2,16 @@ use quote::quote;
 use types_reader::EnumCase;
 
 use crate::postgres_enum_ext::PostgresEnumExt;
-pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
+pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::Error> {
     let enum_name = &ast.ident;
 
-    let enum_cases = match EnumCase::read(ast) {
-        Ok(cases) => cases,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    let enum_cases = EnumCase::read(ast)?;
 
-    let fn_to_str = match generate_fn_to_str(&enum_cases) {
-        Ok(result) => result,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    let fn_to_str = generate_fn_to_str(&enum_cases)?;
 
-    let fn_from_str = match generate_fn_from_str(&enum_cases) {
-        Ok(result) => result,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    let fn_from_str = generate_fn_from_str(&enum_cases)?;
 
-    quote! {
+    let result = quote! {
 
         impl #enum_name{
             pub fn to_str(&self)->&'static str {
@@ -95,11 +86,10 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
         }
 
-
-
-
     }
-    .into()
+    .into();
+
+    Ok(result)
 }
 
 fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStream, syn::Error> {
@@ -107,7 +97,7 @@ fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStr
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value();
+        let case_value = case.get_case_value()?;
 
         result.extend(quote! {
             #case_value => Self::#case_ident,
@@ -121,7 +111,7 @@ fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStrea
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value();
+        let case_value = case.get_case_value()?;
 
         result.extend(quote! {
             Self::#case_ident => #case_value,

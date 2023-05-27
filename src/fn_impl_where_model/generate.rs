@@ -2,18 +2,12 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::{StructProperty, TypeName};
 
-pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
+pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::Error> {
     let type_name = TypeName::new(ast);
 
-    let src_fields = match StructProperty::read(ast) {
-        Ok(fields) => fields,
-        Err(e) => return e.into_compile_error().into(),
-    };
+    let src_fields = StructProperty::read(ast)?;
 
-    let src_fields = match crate::postgres_struct_ext::filter_fields(src_fields) {
-        Ok(result) => result,
-        Err(err) => return err.into(),
-    };
+    let src_fields = crate::postgres_struct_ext::filter_fields(src_fields)?;
 
     let mut limit = None;
     let mut offset = None;
@@ -32,10 +26,10 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
     let result = generate_implementation(&type_name, fields.as_slice(), limit, offset);
 
-    quote! {
+    Ok(quote! {
         #result
     }
-    .into()
+    .into())
 }
 
 pub fn generate_implementation(

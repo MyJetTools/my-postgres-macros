@@ -36,7 +36,7 @@ fn impl_db_columns(
     let mut indexes_list = BTreeMap::new();
 
     for field in fields {
-        let field_name = field.get_db_field_name_as_string();
+        let field_name = field.get_db_field_name_as_string()?;
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option = field.ty.is_option();
         if let Some(value) = field.get_primary_key_id()? {
@@ -148,7 +148,7 @@ fn get_sql_type(
 
     let ty_token = ty.get_token_stream_with_generics();
 
-    let meta_data = field.get_field_metadata();
+    let meta_data = field.get_field_metadata()?;
 
     Ok(quote::quote! {#ty_token:: get_sql_type(#meta_data)})
 

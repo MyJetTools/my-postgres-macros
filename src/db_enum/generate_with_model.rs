@@ -6,23 +6,19 @@ use crate::postgres_enum_ext::PostgresEnumExt;
 
 use super::EnumType;
 
-pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::TokenStream {
+pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Result<TokenStream, syn::Error> {
     let enum_name = &ast.ident;
-    let enum_cases = match EnumCase::read(ast) {
-        Ok(cases) => cases,
-        Err(e) => return e.to_compile_error().into(),
-    };
+
+    let enum_cases = EnumCase::read(ast)?;
+
 
     let type_name = enum_type.get_return_type_name();
 
-    let fn_to_str = fn_to_str(enum_cases.as_slice());
+    let fn_to_str = fn_to_str(enum_cases.as_slice())?;
 
-    let fn_to_numbered = fn_to_numbered(enum_cases.as_slice());
+    let fn_to_numbered = fn_to_numbered(enum_cases.as_slice())?;
 
-    let from_db_value = match fn_from_db_value(enum_cases.as_slice()) {
-        Ok(result) => result,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    let from_db_value =  fn_from_db_value(enum_cases.as_slice())?;
 
     let sql_db_type = enum_type.get_compliant_with_db_type();
 
@@ -42,7 +38,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
     let render_sql_writing = super::utils::render_sql_writing();
 
-    quote! {
+    let result = quote! {
 
         impl #enum_name{
 
@@ -114,32 +110,34 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_
 
 
     }
-    .into()
+    .into();
+
+    Ok(result)
 }
 
-pub fn fn_to_str(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
+pub fn fn_to_str(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(enum_cases.len());
 
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
-        let no = enum_case.get_case_value();
+        let no = enum_case.get_case_value()?;
         result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
     }
 
-    result
+    Ok(result)
 }
 
-pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Vec<TokenStream> {
+pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>,  syn::Error>{
     let mut result = Vec::with_capacity(enum_cases.len());
 
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
-        let no = enum_case.get_case_value();
+        let no = enum_case.get_case_value()?;
         let no: TokenStream = no.parse().unwrap();
         result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
     }
 
-    result
+    Ok(result)
 }
 
 fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error> {
@@ -157,7 +155,7 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Er
 
         let model = enum_case.model.as_ref().unwrap().get_name_ident();
 
-        let no = enum_case.get_case_value();
+        let no = enum_case.get_case_value()?;
         let no: TokenStream = no.parse().unwrap();
 
         result.push(quote! (#no => Self::#name_ident(#model::from_str(model)),));

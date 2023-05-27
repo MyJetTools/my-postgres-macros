@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream;
-use types_reader::{attribute_params::ParamValue, PropertyType, StructProperty};
+use types_reader::{ParamValue, PropertyType, StructProperty};
 
 use quote::quote;
 
@@ -16,9 +16,9 @@ pub fn fn_fill_where(
 
     for struct_property in struct_properties {
         let prop_name_ident = struct_property.get_field_name_ident();
-        let metadata = struct_property.get_field_metadata();
+        let metadata = struct_property.get_field_metadata()?;
 
-        let db_field_name = struct_property.get_db_field_name_as_string();
+        let db_field_name = struct_property.get_db_field_name_as_string()?;
 
         let push_and = if no > 0 {
             Some(quote! {
@@ -73,7 +73,7 @@ fn fill_op(
         .get_single_or_named_param("operator", "op")
     {
         let op_value = extract_and_verify_operation(op_value, struct_property)?;
-        let op = op_value.as_str();
+        let op = op_value.get_str_value()?;
 
         return Ok(quote! {
             sql.push_str(#op);
@@ -88,22 +88,23 @@ fn fill_op(
 }
 
 fn extract_and_verify_operation<'s>(
-    op_value: ParamValue<'s>,
+    op_value: &'s ParamValue,
     prop: &'s StructProperty,
-) -> Result<ParamValue<'s>, syn::Error> {
-    if op_value.as_str() == "="
-        || op_value.as_str() == "!="
-        || op_value.as_str() == "<"
-        || op_value.as_str() == "<="
-        || op_value.as_str() == ">"
-        || op_value.as_str() == ">="
-        || op_value.as_str() == "<>"
+) -> Result<&'s ParamValue, syn::Error> {
+    let value = op_value.get_str_value()?;
+    if value == "="
+        || value == "!="
+        || value == "<"
+        || value == "<="
+        || value == ">"
+        || value == ">="
+        || value == "<>"
     {
         return Ok(op_value);
     }
 
     return Err(syn::Error::new_spanned(
         prop.field,
-        format!("Invalid operator {}", op_value.as_str()),
+        format!("Invalid operator {}", value),
     ));
 }

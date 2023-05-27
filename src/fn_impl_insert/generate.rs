@@ -4,18 +4,12 @@ use types_reader::StructProperty;
 
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
-pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
+pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
     let name = &ast.ident;
 
-    let fields = match StructProperty::read(ast) {
-        Ok(fields) => fields,
-        Err(e) => return e.into_compile_error().into(),
-    };
+    let fields = StructProperty::read(ast)?;
 
-    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
-        Ok(result) => result,
-        Err(err) => return err,
-    };
+    let fields = crate::postgres_struct_ext::filter_fields(fields)?;
 
     let fields_amount = fields.len();
 
@@ -24,9 +18,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         Err(err) => vec![err.to_compile_error()],
     };
 
-    let get_field_value = fn_get_field_value(&fields);
+    let get_field_value = fn_get_field_value(&fields)?;
 
-    quote! {
+    let result = quote! {
         impl<'s> my_postgres::sql_insert::SqlInsertModel<'s> for #name{
 
             fn get_fields_amount()->usize{
@@ -50,7 +44,9 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
 
     }
-    .into()
+    .into();
+
+    Ok(result)
 }
 
 pub fn fn_get_field_name(
@@ -58,18 +54,20 @@ pub fn fn_get_field_name(
 ) -> Result<Vec<proc_macro2::TokenStream>, syn::Error> {
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
-        let field_name = field.get_db_field_name_as_string();
+        let field_name = field.get_db_field_name_as_string()?;
         result.push(quote! (#i=>#field_name,).into());
     }
     Ok(result)
 }
 
-pub fn fn_get_field_value(fields: &[StructProperty]) -> Vec<proc_macro2::TokenStream> {
+pub fn fn_get_field_value(
+    fields: &[StructProperty],
+) -> Result<Vec<proc_macro2::TokenStream>, syn::Error> {
     let mut result = Vec::new();
     for (i, field) in fields.iter().enumerate() {
-        let value = crate::render_field_value::render_field_value(field, true);
+        let value = crate::render_field_value::render_field_value(field, true)?;
 
         result.push(quote! (#i => #value,).into());
     }
-    result
+    Ok(result)
 }

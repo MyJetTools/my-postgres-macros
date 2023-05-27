@@ -4,20 +4,14 @@ use types_reader::{StructProperty, TypeName};
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
 use quote::quote;
 
-pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
+pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
     let type_name = TypeName::new(ast);
 
     let struct_name = type_name.get_type_name();
 
-    let fields = match StructProperty::read(ast) {
-        Ok(fields) => fields,
-        Err(e) => return e.into_compile_error().into(),
-    };
+    let fields = StructProperty::read(ast)?;
 
-    let fields = match crate::postgres_struct_ext::filter_fields(fields) {
-        Ok(result) => result,
-        Err(err) => return err,
-    };
+    let fields = crate::postgres_struct_ext::filter_fields(fields)?;
 
     let mut primary_key_amount = 0;
 
@@ -27,7 +21,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         }
     }
 
-    let get_field_value_case = super::fn_get_field_value::fn_get_field_value(fields.as_slice());
+    let get_field_value_case = super::fn_get_field_value::fn_get_field_value(fields.as_slice())?;
 
     let fields_amount = fields.len() - primary_key_amount;
 
@@ -46,7 +40,7 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
         None,
     );
 
-    quote! {
+    Ok(quote! {
 
         impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for #struct_name{
             fn get_fields_amount() -> usize{
@@ -63,5 +57,5 @@ pub fn generate(ast: &syn::DeriveInput) -> TokenStream {
 
         #where_impl
     }
-    .into()
+    .into())
 }

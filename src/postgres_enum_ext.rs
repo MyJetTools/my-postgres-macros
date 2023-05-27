@@ -3,17 +3,19 @@ use types_reader::EnumCase;
 const ENUM_CASE_ATTR: &str = "enum_case";
 
 pub trait PostgresEnumExt {
-    fn get_case_value(&self) -> String;
+    fn get_case_value(&self) -> Result<String, syn::Error>;
 }
 
 impl<'s> PostgresEnumExt for EnumCase<'s> {
-    fn get_case_value(&self) -> String {
-        match self
+    fn get_case_value(&self) -> Result<String, syn::Error> {
+        let result = match self
             .attrs
             .get_single_or_named_param(ENUM_CASE_ATTR, "value")
         {
-            Ok(result) => result.as_str().to_string(),
+            Ok(result) => result.get_str_value()?.to_string(),
             Err(_) => self.get_name_ident().to_string(),
-        }
+        };
+
+        Ok(result)
     }
 }

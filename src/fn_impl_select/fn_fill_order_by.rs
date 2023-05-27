@@ -37,13 +37,14 @@ pub fn fn_get_order_by_fields(
     if !order_by_desc.is_empty() {
         for field in order_by_desc {
             result.push(' ');
-            result.push_str(field.get_db_field_name_as_string().as_str());
+            let value = field.get_db_field_name_as_string()?;
+            result.push_str(value.as_str());
         }
         result.push_str(" DESC");
     } else if !order_by.is_empty() {
         for field in order_by {
             result.push(' ');
-            result.push_str(field.get_db_field_name_as_string().as_str());
+            result.push_str(field.get_db_field_name_as_string()?.as_str());
         }
     }
 
