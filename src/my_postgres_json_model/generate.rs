@@ -55,5 +55,13 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
                 sql.push_str("::text as json)");
             }
         }
+
+        impl my_postgres::table_schema::SqlTypeProvider for #struct_name {
+            fn get_sql_type(
+                _metadata: Option<my_postgres::SqlValueMetadata>,
+            ) -> my_postgres::table_schema::TableColumnType {
+                my_postgres::table_schema::TableColumnType::Json
+            }
+        }
     }.into()
 }
