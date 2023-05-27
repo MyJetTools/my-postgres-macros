@@ -94,7 +94,7 @@ fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStr
         let model = case.model.as_ref().unwrap().get_name_ident();
 
         result.extend(quote! {
-            #case_value => Self::#case_ident(#model::from_str(model))?,
+            #case_value => Self::#case_ident(#model::from_str(model)),
         });
     }
     Ok(result)
