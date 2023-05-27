@@ -65,8 +65,14 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
 
     fn get_primary_key_id(&self) -> Result<Option<u8>, syn::Error> {
         if let Some(value) = self.attrs.try_get_attr(ATTR_PRIMARY_KEY) {
-            let value = value.get_single_param()?;
-            return Ok(Some(value.get_value("must be value from 0..255".into())?));
+            match value.try_get_single_param() {
+                Some(value) => {
+                    return Ok(Some(value.get_value("must be value from 0..255".into())?));
+                }
+                None => {
+                    return Ok(None);
+                }
+            }
         }
 
         Ok(None)
