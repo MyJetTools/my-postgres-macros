@@ -12,7 +12,7 @@ impl<'s> PostgresEnumExt for EnumCase<'s> {
             .attrs
             .get_single_or_named_param(ENUM_CASE_ATTR, "value")
         {
-            Ok(result) => result.get_any_value_as_string()?.to_string(),
+            Ok(result) => result.get_any_value_as_str()?.to_string(),
             Err(_) => self.get_name_ident().to_string(),
         };
 

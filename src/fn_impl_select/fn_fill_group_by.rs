@@ -24,7 +24,7 @@ pub fn get_group_by_fields(
     group_by_str.push_str(" GROUP BY");
     for prop in group_by {
         group_by_str.push(' ');
-        group_by_str.push_str(prop.as_str());
+        group_by_str.push_str(prop);
     }
 
     Ok(quote! { Some(#group_by_str) }.into())

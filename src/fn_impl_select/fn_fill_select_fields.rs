@@ -22,7 +22,7 @@ pub fn fn_fill_select_fields(
         no += 1;
 
         if let Ok(sql) = prop.attrs.get_single_or_named_param("sql", "sql") {
-            let attr_value = sql.get_str_value()?;
+            let attr_value = sql.unwrap_as_string_value()?.as_str();
             result.push(quote! {
                 sql.push_str(#attr_value);
             });
@@ -51,7 +51,7 @@ pub fn fn_fill_select_fields(
             }
 
             if let Some(model_field) = prop.get_model_db_field_name_as_string() {
-                let model_field = format!(",{}", model_field.get_str_value()?);
+                let model_field = format!(",{}", model_field.unwrap_as_string_value()?.as_str());
                 result.push(
                     quote! {
                         sql.push_str(#model_field);

@@ -1,3 +1,4 @@
+use quote::ToTokens;
 use types_reader::{ParamValue, PropertyType, StructProperty};
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
@@ -24,7 +25,7 @@ pub trait PostgresStructPropertyExt {
 
     fn get_db_field_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error>;
 
-    fn get_db_field_name_as_string(&self) -> Result<String, syn::Error>;
+    fn get_db_field_name_as_string(&self) -> Result<&str, syn::Error>;
 
     fn get_model_db_field_name_as_string(&self) -> Option<&ParamValue>;
 
@@ -105,7 +106,7 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
     fn get_db_field_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
         if let Ok(attr) = self.attrs.get_attr(ATTR_DB_FIELD_NAME) {
             if let Ok(result) = attr.get_from_single_or_named("name") {
-                let name = result.get_str_value_token()?;
+                let name = result.get_any_value_as_str()?.to_token_stream();
                 return Ok(name);
             }
         }
@@ -115,15 +116,15 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         Ok(quote::quote!(#name))
     }
 
-    fn get_db_field_name_as_string(&self) -> Result<String, syn::Error> {
+    fn get_db_field_name_as_string(&self) -> Result<&str, syn::Error> {
         if let Ok(attr) = self
             .attrs
             .get_single_or_named_param(ATTR_DB_FIELD_NAME, "name")
         {
-            return Ok(attr.get_str_value()?.to_string());
+            return Ok(attr.unwrap_as_string_value()?);
         }
 
-        return Ok(self.name.to_string());
+        Ok(self.name.as_str())
     }
 
     fn get_model_db_field_name_as_string(&self) -> Option<&ParamValue> {
@@ -152,11 +153,17 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
 
             let index_name = attr
                 .get_named_param("index_name")?
-                .get_str_value()?
+                .unwrap_as_string_value()?
                 .to_string();
-            let is_unique = attr.get_named_param("is_unique")?.get_bool_value()?;
+            let is_unique = attr
+                .get_named_param("is_unique")?
+                .unwrap_as_bool_value()?
+                .get_value();
 
-            let order = attr.get_named_param("order")?.get_str_value()?.to_string();
+            let order = attr
+                .get_named_param("order")?
+                .unwrap_as_single_value()?
+                .as_str();
             if order != "DESC" && order != "ASC" {
                 return Err(syn::Error::new_spanned(
                     attr.get_token_stream(),
@@ -168,8 +175,8 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
                 id,
                 index_name,
                 is_unique,
-                order,
-                name: self.get_db_field_name_as_string()?,
+                order: order.to_string(),
+                name: self.get_db_field_name_as_string()?.to_string(),
             })
         }
 
@@ -186,14 +193,14 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
         }
 
         let model_field_name = if let Some(model_field_name) = model_field_name {
-            let model_field_name = model_field_name.get_str_value()?;
+            let model_field_name = model_field_name.unwrap_as_string_value()?.as_str();
             quote::quote!(Some(#model_field_name))
         } else {
             quote::quote!(None)
         };
 
         let sql_type = if let Ok(sql_type) = sql_type {
-            let sql_type = sql_type.get_str_value()?;
+            let sql_type = sql_type.unwrap_as_string_value()?.as_str();
             quote::quote!(Some(#sql_type))
         } else {
             quote::quote!(None)
@@ -224,7 +231,7 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, sy
 
         if is_date_time {
             if let Ok(attr) = itm.get_sql_type() {
-                let attr = attr.get_str_value().unwrap();
+                let attr = attr.unwrap_as_string_value()?.as_str();
                 if attr != "timestamp" && attr != "bigint" {
                     let result = syn::Error::new_spanned(
                         itm.field,

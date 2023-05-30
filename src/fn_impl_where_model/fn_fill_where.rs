@@ -73,7 +73,7 @@ fn fill_op(
         .get_single_or_named_param("operator", "op")
     {
         let op_value = extract_and_verify_operation(op_value, struct_property)?;
-        let op = op_value.get_str_value()?;
+        let op = op_value.unwrap_as_string_value()?.as_str();
 
         return Ok(quote! {
             sql.push_str(#op);
@@ -91,7 +91,7 @@ fn extract_and_verify_operation<'s>(
     op_value: &'s ParamValue,
     prop: &'s StructProperty,
 ) -> Result<&'s ParamValue, syn::Error> {
-    let value = op_value.get_str_value()?;
+    let value = op_value.unwrap_as_string_value()?.as_str();
     if value == "="
         || value == "!="
         || value == "<"
