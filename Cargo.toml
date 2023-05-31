@@ -1,6 +1,6 @@
 [package]
 name = "my-postgres-macros"
-version = "0.4.3"
+version = "0.4.4"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,7 +13,7 @@ debug-table-schema = []
 proc-macro = true
 
 [dependencies]
-types-reader = { branch = "main", git = "https://github.com/MyJetTools/types-reader.git" }
+types-reader = { tag = "0.3.0", git = "https://github.com/MyJetTools/types-reader.git" }
 
 syn = { version = "*", features = ["extra-traits"] }
 quote = "*"
