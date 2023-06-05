@@ -20,6 +20,8 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
 
     let get_field_value = fn_get_field_value(&fields)?;
 
+    let e_tag_methods = crate::generate_e_tag_methods();
+
     let result = quote! {
         impl<'s> my_postgres::sql_insert::SqlInsertModel<'s> for #name{
 
@@ -40,6 +42,8 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
                     _=>panic!("no such field with number {}", no)
                 }
             }
+
+            #e_tag_methods
 
         }
 

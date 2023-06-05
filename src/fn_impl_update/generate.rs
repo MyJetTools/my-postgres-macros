@@ -40,6 +40,8 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
         None,
     );
 
+    let e_tag_methods = crate::generate_e_tag_methods();
+
     Ok(quote! {
 
         impl<'s> my_postgres::sql_update::SqlUpdateModel<'s> for #struct_name{
@@ -53,6 +55,7 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
                 }
 
             }
+            #e_tag_methods
         }
 
         #where_impl

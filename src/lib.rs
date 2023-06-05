@@ -7,6 +7,7 @@ mod fn_impl_insert;
 mod fn_impl_select;
 mod fn_impl_update;
 mod fn_impl_where_model;
+mod generate_e_tag_methods;
 mod render_field_value;
 mod table_schema;
 
@@ -18,6 +19,8 @@ mod postgres_enum_ext;
 mod postgres_struct_ext;
 
 use syn;
+
+use generate_e_tag_methods::*;
 
 #[proc_macro_derive(
     SelectDbEntity,
