@@ -21,6 +21,9 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
         }
     }
 
+    let e_tag = crate::postgres_struct_ext::get_e_tag(&fields);
+    let e_tag_methods = crate::generate_e_tag_methods(e_tag);
+
     let get_field_value_case = super::fn_get_field_value::fn_get_field_value(fields.as_slice())?;
 
     let fields_amount = fields.len() - primary_key_amount;
@@ -39,8 +42,6 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
         None,
         None,
     );
-
-    let e_tag_methods = crate::generate_e_tag_methods();
 
     Ok(quote! {
 

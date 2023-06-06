@@ -1,6 +1,8 @@
 use quote::ToTokens;
 use types_reader::{ParamValue, PropertyType, StructProperty};
 
+use crate::generate_e_tag_methods::ETagData;
+
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
 pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
 //pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
@@ -16,7 +18,7 @@ pub struct IndexAttr {
     pub order: String,
 }
 
-pub trait PostgresStructPropertyExt {
+pub trait PostgresStructPropertyExt<'s> {
     fn is_primary_key(&self) -> bool;
 
     fn get_primary_key_id(&self) -> Result<Option<u8>, syn::Error>;
@@ -43,9 +45,11 @@ pub trait PostgresStructPropertyExt {
     fn has_ignore_table_column(&self) -> bool;
 
     fn get_index_attrs(&self) -> Result<Option<Vec<IndexAttr>>, syn::Error>;
+
+    fn get_e_tag(&'s self) -> Result<Option<ETagData<'s>>, syn::Error>;
 }
 
-impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
+impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
     fn sql_value_to_mask(&self) -> bool {
         if self.ty.is_string() {
             return true;
@@ -213,6 +217,19 @@ impl<'s> PostgresStructPropertyExt for StructProperty<'s> {
             })
         }))
     }
+
+    fn get_e_tag(&'s self) -> Result<Option<ETagData<'s>>, syn::Error> {
+        if !self.attrs.has_attr("e_tag") {
+            return Ok(None);
+        }
+
+        let result = ETagData {
+            field_name: self.get_field_name_ident(),
+            column_name: self.get_db_field_name_as_string()?,
+        };
+
+        Ok(Some(result))
+    }
 }
 
 pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, syn::Error> {
@@ -254,4 +271,16 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, sy
     }
 
     return Ok(result);
+}
+
+pub fn get_e_tag<'s>(fields: &'s [StructProperty]) -> Option<ETagData<'s>> {
+    for field in fields {
+        if let Ok(e_tag) = field.get_e_tag() {
+            if e_tag.is_some() {
+                return e_tag;
+            }
+        }
+    }
+
+    None
 }

@@ -20,7 +20,9 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
 
     let get_field_value = fn_get_field_value(&fields)?;
 
-    let e_tag_methods = crate::generate_e_tag_methods();
+    let e_tag = crate::postgres_struct_ext::get_e_tag(&fields);
+
+    let e_tag_methods = crate::generate_e_tag_methods(e_tag);
 
     let result = quote! {
         impl<'s> my_postgres::sql_insert::SqlInsertModel<'s> for #name{
