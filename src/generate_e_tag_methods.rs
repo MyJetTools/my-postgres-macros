@@ -19,11 +19,11 @@ pub fn generate_e_tag_methods(e_tag_data: Option<ETagData>) -> proc_macro2::Toke
         };
 
         get_e_tag_value_body = quote::quote! {
-            Some(*self.#field_name)
+            Some(self.#field_name)
         };
 
         set_e_tag_value_body = quote::quote! {
-            let reference = &self.#field_name;
+            let reference = &self.#field_name as *const i64;
 
             unsafe {
                 let mutable_reference = reference as *mut i64;
