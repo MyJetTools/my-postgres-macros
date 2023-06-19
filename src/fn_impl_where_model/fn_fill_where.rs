@@ -10,14 +10,13 @@ pub fn fn_fill_where(
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
 
-    let mut no = 0;
+    let mut no: usize = 0;
 
     for struct_property in struct_properties {
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = struct_property.get_field_metadata()?;
 
         let db_field_name = struct_property.get_db_field_name_as_string()?;
-        let op = fill_op(quote!(self.#prop_name_ident), struct_property)?;
 
         if let PropertyType::OptionOf(_) = &struct_property.ty {
             /*
