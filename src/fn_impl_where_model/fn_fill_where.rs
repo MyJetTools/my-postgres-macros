@@ -1,4 +1,3 @@
-use proc_macro2::TokenStream;
 use types_reader::{ParamValue, PropertyType, StructProperty};
 
 use quote::quote;
