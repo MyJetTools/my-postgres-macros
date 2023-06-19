@@ -39,10 +39,10 @@ pub fn fn_fill_where(
         lines.push(quote! {
            #no => Some(WhereFieldData{
                 field_name: #db_field_name,
-                op: #op,
+                op: todo!("Implement"),
                 value: todo!("Implement"),
                 meta_data: #metadata
-            })
+            }),
         });
 
         no += 1;
