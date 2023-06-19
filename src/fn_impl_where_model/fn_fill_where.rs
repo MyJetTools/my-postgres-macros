@@ -71,7 +71,7 @@ fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream,
         let op = op_value.unwrap_as_string_value()?.as_str();
 
         return Ok(quote! {
-            Some(sql.push_str(#op))
+            Some(#op)
         }
         .into());
     } else {
