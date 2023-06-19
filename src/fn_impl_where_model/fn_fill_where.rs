@@ -18,9 +18,11 @@ pub fn fn_fill_where(
 
         let db_field_name = struct_property.get_db_field_name_as_string()?;
 
+        let op = fill_op(struct_property)?;
+
         if let PropertyType::OptionOf(_) = &struct_property.ty {
             /*
-            let op = fill_op(quote!(value), struct_property)?;
+
 
             lines.push(quote! {
                 if let Some(value) = &self.#prop_name_ident{
@@ -38,7 +40,7 @@ pub fn fn_fill_where(
         lines.push(quote! {
            #no => Some(WhereFieldData{
                 field_name: #db_field_name,
-                op: todo!("Implement"),
+                op: #op,
                 value: todo!("Implement"),
                 meta_data: #metadata
             }),
@@ -60,10 +62,7 @@ pub fn fn_fill_where(
     Ok(result)
 }
 
-fn fill_op(
-    property: TokenStream,
-    struct_property: &StructProperty,
-) -> Result<proc_macro2::TokenStream, syn::Error> {
+fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream, syn::Error> {
     if let Ok(op_value) = struct_property
         .attrs
         .get_single_or_named_param("operator", "op")
@@ -72,13 +71,13 @@ fn fill_op(
         let op = op_value.unwrap_as_string_value()?.as_str();
 
         return Ok(quote! {
-            sql.push_str(#op);
+            Some(sql.push_str(#op))
         }
         .into());
     } else {
         return Ok(quote! {
-            sql.push_str(#property.get_default_operator());
-        }
+        None
+         }
         .into());
     }
 }
