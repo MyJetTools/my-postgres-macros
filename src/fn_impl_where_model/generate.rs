@@ -81,7 +81,7 @@ pub fn generate_implementation(
 
     let result = quote! {
        impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
-        fn get_where_field_name_data(&self, no: usize) -> Option<WhereFieldData<'s>>{
+        fn get_where_field_name_data(&self, no: usize) -> Option<my_postgres::sql_where::WhereFieldData<'s>>{
             todo!("Implement")
         }
         #limit
