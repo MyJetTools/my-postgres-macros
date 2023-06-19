@@ -12,25 +12,15 @@ pub fn fn_fill_where(
 
     let mut no = 0;
 
-    lines.push(quote!(let mut no = 0;));
-
     for struct_property in struct_properties {
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = struct_property.get_field_metadata()?;
 
         let db_field_name = struct_property.get_db_field_name_as_string()?;
-
-        let push_and = if no > 0 {
-            Some(quote! {
-                if no > 0{
-                    sql.push_str(" AND ");
-                }
-            })
-        } else {
-            None
-        };
+        let op = fill_op(quote!(self.#prop_name_ident), struct_property)?;
 
         if let PropertyType::OptionOf(_) = &struct_property.ty {
+            /*
             let op = fill_op(quote!(value), struct_property)?;
 
             lines.push(quote! {
@@ -42,23 +32,30 @@ pub fn fn_fill_where(
                     no+=1;
                 }
             });
+             */
         } else {
-            let op = fill_op(quote!(self.#prop_name_ident), struct_property)?;
-            lines.push(quote! {
-                #push_and
-                sql.push_str(#db_field_name);
-                #op
-                self.#prop_name_ident.write(sql, params, &#metadata);
-                no+=1;
-            });
         }
+
+        lines.push(quote! {
+           #no => WhereFieldData{
+                field_name: #db_field_name,
+                op: #op,
+                value: todo!("Implement"),
+                meta_data: #metadata
+            }
+        });
 
         no += 1;
     }
 
+    lines.push(quote::quote!(_ => None));
+
     let result = quote! {
-        use my_postgres::SqlWhereValueWriter;
-        #(#lines)*
+        use my_postgres::sql_where::WhereFieldData;
+        match no{
+            #(#lines)*,
+        }
+
     };
 
     Ok(result)
