@@ -41,7 +41,7 @@ pub fn fn_fill_where(
            #no => Some(WhereFieldData{
                 field_name: #db_field_name,
                 op: #op,
-                value: todo!("Implement"),
+                value: &self.prop_name_ident,
                 meta_data: #metadata
             }),
         });
