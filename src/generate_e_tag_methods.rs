@@ -37,7 +37,7 @@ pub fn generate_e_tag_methods(e_tag_data: Option<ETagData>) -> proc_macro2::Toke
     }
 
     quote::quote! {
-        fn get_e_tag_field_name() -> Option<&'static str>{
+        fn get_e_tag_column_name() -> Option<&'static str>{
             #get_e_tag_field_name_body
         }
         fn get_e_tag_value(&self) -> Option<i64>{
