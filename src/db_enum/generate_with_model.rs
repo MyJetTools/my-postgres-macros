@@ -26,6 +26,8 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
 
     let select_part = super::utils::render_select_part();
 
+    let fn_is_none = super::utils::render_fn_is_none();
+
     let from_db_result = if type_name.to_string() == sql_db_type.to_string() {
         quote! {
             Self::from_db_value(result, model.as_str())
@@ -91,6 +93,8 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
             fn get_default_operator(&self) -> &str{
                 "="
             }
+
+            #fn_is_none
         }        
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
