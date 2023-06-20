@@ -48,3 +48,24 @@ pub fn render_fn_is_none() -> proc_macro2::TokenStream {
         }
     }
 }
+
+pub fn render_fn_is_none_optional() -> proc_macro2::TokenStream {
+    quote::quote! {
+        fn is_none(&self) -> bool{
+            self.is_none()
+        }
+    }
+}
+
+pub fn render_fn_get_default_operator_optional() -> proc_macro2::TokenStream {
+    quote::quote! {
+        fn get_default_operator(&self) -> &str{
+            if self.is_some() {
+                "="
+            } else {
+                " IS "
+            }
+        }
+
+    }
+}
