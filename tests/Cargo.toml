@@ -1,0 +1,22 @@
+[package]
+name = "my-postgres-tests"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+my-postgres-macros = { path = "../" }
+my-postgres = { branch = "main", git = "https://github.com/MyJetTools/my-postgres.git", features = [
+    "with-tls",
+] }
+
+rust-extensions = { tag = "0.1.3", git = "https://github.com/MyJetTools/rust-extensions.git" }
+my-logger = { tag = "0.2.0", git = "https://github.com/MyJetTools/my-logger.git" }
+
+tokio = { version = "*", features = ["full"] }
+tokio-util = "*"
+tokio-postgres = { version = "*", features = ["with-chrono-0_4"] }
+
+serde = { version = "*", features = ["derive"] }
+serde_json = "*"

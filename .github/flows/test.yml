@@ -1,0 +1,22 @@
+name: Test our build
+
+on:
+  push:
+    branches: [ main, rc ]
+  pull_request:
+    branches: [ main, rc ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Test out our build     
+        run: |
+          cd tests
+          cargo test
