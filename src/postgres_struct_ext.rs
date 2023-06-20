@@ -34,7 +34,7 @@ pub trait PostgresStructPropertyExt<'s> {
     fn has_json_attr(&self) -> bool;
 
     fn has_ignore_attr(&self) -> bool;
-    fn has_ignore_if_null_attr(&self) -> bool;
+    fn has_ignore_if_none_attr(&self) -> bool;
 
     fn is_line_no(&self) -> bool;
 
@@ -91,8 +91,8 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         self.attrs.get_single_or_named_param(ATTR_SQL_TYPE, "name")
     }
 
-    fn has_ignore_if_null_attr(&self) -> bool {
-        self.attrs.has_attr("ignore_if_null")
+    fn has_ignore_if_none_attr(&self) -> bool {
+        self.attrs.has_attr("ignore_if_none")
     }
 
     fn has_ignore_table_column(&self) -> bool {

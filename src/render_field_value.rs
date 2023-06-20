@@ -54,7 +54,7 @@ fn fill_option_of_value(
 
     let metadata = struct_property.get_field_metadata()?;
 
-    let else_case: TokenStream = if struct_property.has_ignore_if_null_attr() {
+    let else_case: TokenStream = if struct_property.has_ignore_if_none_attr() {
         if is_update {
             quote!(my_postgres::SqlUpdateValueWrapper::Ignore).into()
         } else {

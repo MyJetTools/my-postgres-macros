@@ -1,4 +1,4 @@
-use types_reader::{ParamValue, PropertyType, StructProperty};
+use types_reader::{ParamValue, StructProperty};
 
 use quote::quote;
 
@@ -19,28 +19,14 @@ pub fn fn_fill_where(
 
         let op = fill_op(struct_property)?;
 
-        if let PropertyType::OptionOf(_) = &struct_property.ty {
-            /*
-
-
-            lines.push(quote! {
-                if let Some(value) = &self.#prop_name_ident{
-                    #push_and
-                    sql.push_str(#db_field_name);
-                    #op
-                    value.write(sql, params, &#metadata);
-                    no+=1;
-                }
-            });
-             */
-        } else {
-        }
+        let ignore_if_none = struct_property.has_ignore_if_none_attr();
 
         lines.push(quote! {
            #no => Some(WhereFieldData{
                 field_name: #db_field_name,
                 op: #op,
                 value: &self.#prop_name_ident,
+                ignore_if_none: #ignore_if_none,
                 meta_data: #metadata
             }),
         });
