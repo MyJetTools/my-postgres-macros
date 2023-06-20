@@ -13,6 +13,11 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
 
     let fn_is_none = super::utils::render_fn_is_none();
 
+    let fn_is_none_opt = super::utils::render_fn_is_none_optional();
+
+    let fn_get_default_operator_opt = super::utils::render_fn_get_default_operator_optional();
+
+
     let result = quote! {
 
         impl #enum_name{
@@ -67,6 +72,25 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
             }
 
             #fn_is_none
+        }
+
+        impl<'s> my_postgres::SqlWhereValueWriter<'s> for Option<#enum_name>{
+            fn write(
+                &'s self,
+                sql: &mut String,
+                params: &mut Vec<my_postgres::SqlValue<'s>>,
+                metadata: &Option<my_postgres::SqlValueMetadata>,
+            ) {
+                if let Some(value) = self {
+                    sql.push_str(value.to_str());
+                } else {
+                    sql.push_str("NULL");
+                }
+            }
+
+            #fn_get_default_operator_opt
+            
+            #fn_is_none_opt
         }
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
