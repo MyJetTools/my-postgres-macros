@@ -40,3 +40,11 @@ pub fn render_select_part() -> proc_macro2::TokenStream {
         }
     }
 }
+
+pub fn render_fn_is_none() -> proc_macro2::TokenStream {
+    quote::quote! {
+        fn is_none(&self) -> bool{
+            false
+        }
+    }
+}

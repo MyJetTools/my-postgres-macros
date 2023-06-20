@@ -83,6 +83,8 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
         }
     };
 
+    let fn_is_none = super::utils::render_fn_is_none();
+
     quote! {
 
         impl #enum_name{
@@ -135,6 +137,8 @@ pub fn generate(ast: &syn::DeriveInput, enum_type: EnumType) -> proc_macro::Toke
             fn get_default_operator(&self) -> &str{
                 "="
             }
+
+            #fn_is_none
         }
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{

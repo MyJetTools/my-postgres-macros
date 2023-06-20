@@ -11,6 +11,8 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
 
     let fn_from_str = generate_fn_from_str(&enum_cases)?;
 
+    let fn_is_none = super::utils::render_fn_is_none();
+
     let result = quote! {
 
         impl #enum_name{
@@ -63,6 +65,8 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
             fn get_default_operator(&self) -> &str{
                "="
             }
+
+            #fn_is_none
         }
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
