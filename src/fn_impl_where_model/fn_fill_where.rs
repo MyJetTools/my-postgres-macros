@@ -21,11 +21,26 @@ pub fn fn_fill_where(
 
         let ignore_if_none = struct_property.has_ignore_if_none_attr();
 
+        let value = if struct_property.ty.is_option() {
+            quote! {
+                if let Some(value) = &self.#prop_name_ident{
+                    Some(value)
+                }else{
+                    None
+                }
+
+            }
+        } else {
+            quote! {
+                Some(&self.#prop_name_ident)
+            }
+        };
+
         lines.push(quote! {
            #no => Some(WhereFieldData{
                 field_name: #db_field_name,
                 op: #op,
-                value: &self.#prop_name_ident,
+                value: #value,
                 ignore_if_none: #ignore_if_none,
                 meta_data: #metadata
             }),
