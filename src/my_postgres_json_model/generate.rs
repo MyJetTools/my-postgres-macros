@@ -18,12 +18,9 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
         }
 
-        impl my_postgres::sql_select::SelectPartValue for #struct_name {
-            fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
-                sql.push_str(field_name);
-                sql.push_str(" #>> '{}' as \"");
-                sql.push_str(field_name);
-                sql.push('"');
+        impl my_postgres::sql_select::SelectValueProvider for #struct_name {
+            fn fill_select_part(sql: &mut my_postgres::sql::SelectBuilder, field_name: &'static str, metadata: &Option<my_postgres::SqlValueMetadata>) {
+                sql.push(my_postgres::sql::SelectFieldValue::Json(field_name));
             }
         }
 
@@ -42,17 +39,14 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
         }
 
-        impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #struct_name {
-            fn write(
+        impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #struct_name {
+            fn get_update_value(
                 &'s self,
-                sql: &mut String,
-                params: &mut Vec<my_postgres::SqlValue<'s>>,
+                params: &mut my_postgres::sql::SqlValues<'s>,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
-            ) {
-                params.push(my_postgres::SqlValue::ValueAsString(self.to_string()));
-                sql.push_str("cast($");
-                sql.push_str(params.len().to_string().as_str());
-                sql.push_str("::text as json)");
+            )->my_postgres::sql::SqlUpdateValue<'s> {
+                let index = params.push(self.to_string());
+                my_postgres::sql::SqlUpdateValue::Json(index)
             }
         }
 

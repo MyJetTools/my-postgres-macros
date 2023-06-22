@@ -26,7 +26,6 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
 
     let select_part = super::utils::render_select_part();
 
-    let fn_is_none = super::utils::render_fn_is_none();
 
     let from_db_result = if type_name.to_string() == sql_db_type.to_string() {
         quote! {
@@ -38,7 +37,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
         }
     };
 
-    let render_sql_writing = super::utils::render_sql_writing();
+    let update_value_provider_fn_body = super::utils::render_update_value_provider_fn_body();
 
     let result = quote! {
 
@@ -63,39 +62,23 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
                 }
             }
 
-            pub fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
+            pub fn fill_select_part(sql: &mut my_postgres::sql::SelectBuilder, field_name: &'static str, metadata: &Option<my_postgres::SqlValueMetadata>) {
                #select_part
             }
 
         }
 
-        impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #enum_name{
-            fn write(
+        impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #enum_name{
+            fn get_update_value(
                 &'s self,
-                sql: &mut String,
-                params: &mut Vec<my_postgres::SqlValue<'s>>,
+                params: &mut my_postgres::sql::SqlValues<'s>,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
-            ) {
-                #render_sql_writing
+            )->my_postgres::sql::SqlUpdateValue<'s> {
+                #update_value_provider_fn_body
             }
         }
 
-        impl<'s> my_postgres::SqlWhereValueWriter<'s> for #enum_name{
-            fn write(
-                &'s self,
-                sql: &mut String,
-                params: &mut Vec<my_postgres::SqlValue<'s>>,
-                metadata: &Option<my_postgres::SqlValueMetadata>,
-            ) {
-                #render_sql_writing
-            }
-
-            fn get_default_operator(&self) -> &str{
-                "="
-            }
-
-            #fn_is_none
-        }        
+       
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
             fn from_db_row(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
@@ -122,9 +105,17 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
 pub fn fn_to_str(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(enum_cases.len());
 
+    let mut no = 0;
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
-        let no = enum_case.get_case_value()?;
+
+        no = match enum_case.get_case_number_value()?{
+            Some(value) => value,
+            None => no+1,
+        };
+        
+        let no = no.to_string();
+
         result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
     }
 
@@ -134,10 +125,17 @@ pub fn fn_to_str(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error
 pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>,  syn::Error>{
     let mut result = Vec::with_capacity(enum_cases.len());
 
+    let mut no= 0;
+
     for enum_case in enum_cases {
         let enum_case_name = enum_case.get_name_ident();
-        let no = enum_case.get_case_value()?;
-        let no: TokenStream = no.parse().unwrap();
+        no = match enum_case.get_case_number_value()?{
+            Some(value) => value,
+            None => no+1,
+        };
+        
+        let no = proc_macro2::Literal::i64_unsuffixed(no);
+
         result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
     }
 
@@ -146,6 +144,7 @@ pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>,  syn:
 
 fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(enum_cases.len());
+    let mut no= 0;
 
     for enum_case in enum_cases {
         let name_ident = enum_case.get_name_ident();
@@ -159,9 +158,12 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Er
 
         let model = enum_case.model.as_ref().unwrap().get_name_ident();
 
-        let no = enum_case.get_case_value()?;
-        let no: TokenStream = no.parse().unwrap();
-
+        no = match enum_case.get_case_number_value()?{
+            Some(value) => value,
+            None => no+1,
+        };
+        
+        let no = proc_macro2::Literal::i64_unsuffixed(no);
         result.push(quote! (#no => Self::#name_ident(#model::from_str(model)),));
     }
 

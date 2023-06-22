@@ -2,13 +2,12 @@ extern crate proc_macro;
 use db_enum::EnumType;
 use proc_macro::TokenStream;
 
+mod e_tag;
 mod fn_impl_bulk_select;
 mod fn_impl_insert;
 mod fn_impl_select;
 mod fn_impl_update;
 mod fn_impl_where_model;
-mod generate_e_tag_methods;
-mod render_field_value;
 mod table_schema;
 
 mod db_enum;
@@ -19,8 +18,6 @@ mod postgres_enum_ext;
 mod postgres_struct_ext;
 
 use syn;
-
-use generate_e_tag_methods::*;
 
 #[proc_macro_derive(
     SelectDbEntity,
@@ -109,49 +106,81 @@ pub fn postgres_update_model(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(DbEnumAsU8, attributes(enum_case))]
 pub fn db_enum_as_u8(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::U8)
+
+    match crate::db_enum::generate(&ast, EnumType::U8) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsI8, attributes(enum_case))]
 pub fn db_enum_as_i8(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::I8)
+
+    match crate::db_enum::generate(&ast, EnumType::I8) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsU16, attributes(enum_case))]
 pub fn db_enum_as_u16(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::U16)
+
+    match crate::db_enum::generate(&ast, EnumType::U16) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsI16, attributes(enum_case))]
 pub fn db_enum_as_i16(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::I16)
+
+    match crate::db_enum::generate(&ast, EnumType::I16) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsU32, attributes(enum_case))]
 pub fn db_enum_as_u32(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::U32)
+
+    match crate::db_enum::generate(&ast, EnumType::U32) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsI32, attributes(enum_case))]
 pub fn db_enum_as_i32(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::I32)
+
+    match crate::db_enum::generate(&ast, EnumType::I32) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsU64, attributes(enum_case))]
 pub fn db_enum_as_u64(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::U64)
+
+    match crate::db_enum::generate(&ast, EnumType::U64) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsI64, attributes(enum_case))]
 pub fn db_enum_as_i64(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    crate::db_enum::generate(&ast, EnumType::I64)
+
+    match crate::db_enum::generate(&ast, EnumType::I64) {
+        Ok(cases) => cases,
+        Err(e) => return e.to_compile_error().into(),
+    }
 }
 
 #[proc_macro_derive(DbEnumAsString, attributes(enum_case))]

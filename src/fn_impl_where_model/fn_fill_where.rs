@@ -4,8 +4,8 @@ use quote::quote;
 
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
-pub fn fn_fill_where(
-    struct_properties: &[StructProperty],
+pub fn fn_fill_where<'s>(
+    struct_properties: impl Iterator<Item = &'s StructProperty<'s>>,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut lines: Vec<proc_macro2::TokenStream> = Vec::new();
 

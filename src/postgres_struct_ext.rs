@@ -1,7 +1,7 @@
 use quote::ToTokens;
 use types_reader::{ParamValue, PropertyType, StructProperty};
 
-use crate::generate_e_tag_methods::ETagData;
+use crate::e_tag::ETagData;
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
 pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
@@ -47,9 +47,97 @@ pub trait PostgresStructPropertyExt<'s> {
     fn get_index_attrs(&self) -> Result<Option<Vec<IndexAttr>>, syn::Error>;
 
     fn get_e_tag(&'s self) -> Result<Option<ETagData<'s>>, syn::Error>;
+
+    fn get_ty(&self) -> &PropertyType;
+
+    fn get_field_name_ident(&self) -> &syn::Ident;
+    fn render_field_value(&self, is_update: bool) -> Result<proc_macro2::TokenStream, syn::Error> {
+        match &self.get_ty() {
+            types_reader::PropertyType::OptionOf(_) => return self.fill_option_of_value(is_update),
+            types_reader::PropertyType::Struct(..) => return self.get_value(is_update),
+            _ => return self.get_value(is_update),
+        }
+    }
+
+    fn get_value(&self, is_update: bool) -> Result<proc_macro2::TokenStream, syn::Error> {
+        let name = self.get_field_name_ident();
+
+        let metadata = self.get_field_metadata()?;
+
+        let result = if is_update {
+            quote::quote! {
+                my_postgres::sql_update::SqlUpdateModelValue{
+                    value: Some(&self.#name),
+                    metadata: #metadata
+                }
+            }
+            .into()
+        } else {
+            quote::quote! {
+                my_postgres::SqlWhereValueWrapper::Value {
+                    value: &self.#name,
+                    metadata: #metadata
+                }
+            }
+            .into()
+        };
+
+        Ok(result)
+    }
+
+    fn fill_option_of_value(
+        &self,
+        is_update: bool,
+    ) -> Result<proc_macro2::TokenStream, syn::Error> {
+        let prop_name = self.get_field_name_ident();
+
+        let metadata = self.get_field_metadata()?;
+
+        let else_case: proc_macro2::TokenStream = if self.has_ignore_if_none_attr() {
+            if is_update {
+                quote::quote!(my_postgres::sql_update::SqlUpdateModelValue::Ignore).into()
+            } else {
+                quote::quote!(my_postgres::sql_update::SqlUpdateModelValue::Ignore).into()
+            }
+        } else {
+            if is_update {
+                quote::quote!(my_postgres::sql_update::SqlUpdateModelValue::Null).into()
+            } else {
+                quote::quote!(my_postgres::sql_update::SqlUpdateModelValue::Null).into()
+            }
+        };
+
+        let result = if is_update {
+            quote::quote! {
+               if let Some(value) = &self.#prop_name{
+                  my_postgres::sql_update::SqlUpdateModelValue {value: Some(value), metadata: #metadata}
+               }else{
+                my_postgres::sql_update::SqlUpdateModelValue {value: None, metadata: #metadata}
+               }
+            }
+        } else {
+            quote::quote! {
+               if let Some(value) = &self.#prop_name{
+                  my_postgres::SqlWhereValueWrapper::Value {value, metadata: #metadata}
+               }else{
+                    #else_case
+               }
+            }
+        };
+
+        Ok(result)
+    }
 }
 
 impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
+    fn get_field_name_ident(&self) -> &syn::Ident {
+        self.get_field_name_ident()
+    }
+
+    fn get_ty(&self) -> &PropertyType {
+        &self.ty
+    }
+
     fn sql_value_to_mask(&self) -> bool {
         if self.ty.is_string() {
             return true;
@@ -132,7 +220,10 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
     }
 
     fn get_model_db_field_name_as_string(&self) -> Option<&ParamValue> {
-        if let Ok(attr) = self.attrs.get_named_param(ATTR_DB_FIELD_NAME, "name") {
+        if let Ok(attr) = self
+            .attrs
+            .get_named_param(ATTR_DB_FIELD_NAME, "model_field_name")
+        {
             return Some(attr);
         }
 
@@ -196,7 +287,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
             return Ok(quote::quote!(None));
         }
 
-        let model_field_name = if let Some(model_field_name) = model_field_name {
+        let related_column_name = if let Some(model_field_name) = model_field_name {
             let model_field_name = model_field_name.unwrap_as_string_value()?.as_str();
             quote::quote!(Some(#model_field_name))
         } else {
@@ -213,7 +304,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(quote::quote!({
             Some(my_postgres::SqlValueMetadata{
                 sql_type: #sql_type,
-                related_field_name: #model_field_name
+                related_column_name: #related_column_name
             })
         }))
     }
@@ -271,16 +362,4 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, sy
     }
 
     return Ok(result);
-}
-
-pub fn get_e_tag<'s>(fields: &'s [StructProperty]) -> Option<ETagData<'s>> {
-    for field in fields {
-        if let Ok(e_tag) = field.get_e_tag() {
-            if e_tag.is_some() {
-                return e_tag;
-            }
-        }
-    }
-
-    None
 }

@@ -1,8 +1,25 @@
-use proc_macro2::Ident;
+use types_reader::StructProperty;
 
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 pub struct ETagData<'s> {
     pub column_name: &'s str,
-    pub field_name: &'s Ident,
+    pub field_name: &'s proc_macro2::Ident,
+}
+
+pub trait GetETag<'s> {
+    fn get_items(&'s self) -> &'s [StructProperty<'s>];
+
+    fn get_e_tag(&'s self) -> Option<ETagData<'s>> {
+        for field in self.get_items() {
+            if let Ok(e_tag) = field.get_e_tag() {
+                if e_tag.is_some() {
+                    return e_tag;
+                }
+            }
+        }
+
+        None
+    }
 }
 
 pub fn generate_e_tag_methods(e_tag_data: Option<ETagData>) -> proc_macro2::TokenStream {

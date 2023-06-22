@@ -24,7 +24,7 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::
         }
     }
 
-    let result = generate_implementation(&type_name, fields.as_slice(), limit, offset);
+    let result = generate_implementation(&type_name, fields.iter(), limit, offset)?;
 
     Ok(quote! {
         #result
@@ -32,12 +32,12 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::
     .into())
 }
 
-pub fn generate_implementation(
+pub fn generate_implementation<'s>(
     type_name: &TypeName,
-    fields: &[StructProperty],
+    fields: impl Iterator<Item = &'s StructProperty<'s>>,
     limit: Option<StructProperty>,
     offset: Option<StructProperty>,
-) -> proc_macro2::TokenStream {
+) -> Result<proc_macro2::TokenStream, syn::Error> {
     let struct_name = type_name.get_type_name();
 
     let limit: TokenStream = if let Some(limit) = &limit {
@@ -74,10 +74,7 @@ pub fn generate_implementation(
         .into()
     };
 
-    let where_data = match super::fn_fill_where::fn_fill_where(fields) {
-        Ok(result) => result,
-        Err(err) => err.to_compile_error(),
-    };
+    let where_data = super::fn_fill_where::fn_fill_where(fields)?;
 
     let result = quote! {
        impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
@@ -89,5 +86,5 @@ pub fn generate_implementation(
        }
     };
 
-    result.into()
+    Ok(result.into())
 }

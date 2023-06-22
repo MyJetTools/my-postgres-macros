@@ -30,39 +30,35 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
                 }
             }
 
-            fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
-                sql.push_str(field_name);
+            fn fill_select_part(sql: &mut my_postgres::sql::SelectBuilder, field_name: &'static str, metadata: &Option<my_postgres::SqlValueMetadata>) {
+                sql.push(my_postgres::sql::SelectFieldValue::Field(field_name));
+            }
+        }
+
+        impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #enum_name{
+            fn get_update_value(
+                &'s self,
+                params: &mut my_postgres::sql::SqlValues<'s>,
+                metadata: &Option<my_postgres::SqlValueMetadata>,
+            )->my_postgres::sql::SqlUpdateValue<'s> {
+                let index = params.push(self.to_str());
+                my_postgres::sql::SqlUpdateValue::Index(index, None)
             }
 
         }
 
-        impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #enum_name{
-            fn write(
+        impl<'s> my_postgres::SqlWhereValueProvider<'s> for #enum_name{
+            fn get_where_value(
                 &'s self,
-                sql: &mut String,
-                params: &mut Vec<my_postgres::SqlValue<'s>>,
-                metadata: &Option<my_postgres::SqlValueMetadata>,
-            ) {
-                sql.push('\'');
-                sql.push_str(self.to_str());
-                sql.push('\'');
+                params: &mut my_postgres::sql::SqlValues<'s>,
+                _metadata: &Option<my_postgres::SqlValueMetadata>,
+            )-> my_postgres::sql::SqlWhereValue<'s>{
+                let index = params.push(self.to_str());
+                my_postgres::sql::SqlWhereValue::Index(index)
             }
 
-        }
 
-        impl<'s> my_postgres::SqlWhereValueWriter<'s> for #enum_name{
-            fn write(
-                &'s self,
-                sql: &mut String,
-                params: &mut Vec<my_postgres::SqlValue<'s>>,
-                metadata: &Option<my_postgres::SqlValueMetadata>,
-            ) {
-                sql.push('\'');
-                sql.push_str(self.to_str());
-                sql.push('\'');
-            }
-
-            fn get_default_operator(&self) -> &str{
+            fn get_default_operator(&self) -> &'static str{
                "="
             }
 
@@ -102,7 +98,7 @@ fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStr
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value()?;
+        let case_value = case.get_case_string_value()?;
 
         result.extend(quote! {
             #case_value => Self::#case_ident,
@@ -116,7 +112,7 @@ fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStrea
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value()?;
+        let case_value = case.get_case_string_value()?;
 
         result.extend(quote! {
             Self::#case_ident => #case_value,

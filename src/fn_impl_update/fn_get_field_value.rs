@@ -1,24 +1,18 @@
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
 use proc_macro2::TokenStream;
 use quote::quote;
-use types_reader::StructProperty;
 
-pub fn fn_get_field_value(fields: &[StructProperty]) -> Result<Vec<TokenStream>, syn::Error> {
-    let mut result = Vec::with_capacity(fields.len());
+use super::update_fields::UpdateFields;
+
+pub fn fn_get_field_value(fields: &UpdateFields) -> Result<Vec<TokenStream>, syn::Error> {
+    let mut result = Vec::with_capacity(fields.get_fields_amount());
 
     let mut i: usize = 0;
-    for field in fields {
-        if field.is_primary_key() {
-            continue;
-        }
-
-        let db_field_name = field.get_db_field_name_as_string()?;
-
-        let value = crate::render_field_value::render_field_value(field, true)?;
-
+    for field in fields.get_fields_with_no_primary_key() {
+        let sql_update_value = field.render_field_value(true)?;
         result.push(
             quote! {
-                #i => my_postgres::sql_update::SqlUpdateValue{ name: #db_field_name, value: #value},
+                #i => #sql_update_value,
             }
             .into(),
         );

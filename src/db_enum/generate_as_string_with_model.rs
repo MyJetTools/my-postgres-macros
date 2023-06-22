@@ -13,7 +13,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
 
     let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
 
-    let render_sql_writing = super::utils::render_sql_writing();
+    let update_value_provider_fn_body = super::utils::render_update_value_provider_fn_body();
 
     let select_part = super::utils::render_select_part();
 
@@ -34,7 +34,7 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
                 }
             }
 
-            pub fn fill_select_part(sql: &mut String, field_name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) {
+            pub fn fill_select_part(sql: &mut my_postgres::sql::SelectBuilder, field_name: &'static str, metadata: &Option<my_postgres::SqlValueMetadata>) {
                 #select_part
             }
         }
@@ -58,14 +58,13 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
                 }
             }
 
-            impl<'s> my_postgres::SqlUpdateValueWriter<'s> for #enum_name{
-                fn write(
+            impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #enum_name{
+                fn get_update_value(
                     &'s self,
-                    sql: &mut String,
-                    params: &mut Vec<my_postgres::SqlValue<'s>>,
+                    params: &mut my_postgres::sql::SqlValues<'s>,
                     metadata: &Option<my_postgres::SqlValueMetadata>,
-                ) {
-                    #render_sql_writing
+                )->my_postgres::sql::SqlUpdateValue<'s> {
+                    #update_value_provider_fn_body
                 }
 
             }
@@ -90,7 +89,7 @@ fn generate_fn_from_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStr
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value()?;
+        let case_value = case.get_case_string_value()?;
 
         if case.model.is_none() {
             return Err(syn::Error::new_spanned(
@@ -113,7 +112,7 @@ fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStrea
     for case in enum_cases {
         let case_ident = &case.get_name_ident();
 
-        let case_value = case.get_case_value()?;
+        let case_value = case.get_case_string_value()?;
 
         result.extend(quote! {
             Self::#case_ident(model) => (#case_value, model.to_string()),
