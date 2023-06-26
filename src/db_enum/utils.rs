@@ -18,8 +18,8 @@ pub fn render_reading_db_row_metadata_model() -> proc_macro2::TokenStream {
 pub fn render_update_value_provider_fn_body() -> proc_macro2::TokenStream {
     quote::quote! {
         let (name, model) = self.to_str();
-        let index_name = params.push(name);
-        let index_model = params.push(model);
+        let index_name = params.push_static_str(name);
+        let index_model = params.push(model.into());
         my_postgres::sql::SqlUpdateValue::Index(index_name, Some(index_model))
     }
 }

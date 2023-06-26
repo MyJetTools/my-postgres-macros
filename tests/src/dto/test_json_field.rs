@@ -66,7 +66,7 @@ pub struct WhereModel {
 #[cfg(test)]
 mod tests {
 
-    use my_postgres::{sql::SelectBuilder, sql_insert::SqlInsertModel, UpdateConflictType};
+    use my_postgres::{sql::SelectBuilder, UpdateConflictType};
     use rust_extensions::date_time::DateTimeAsMicroseconds;
 
     use super::{TestJsonField, WhereModel};
@@ -102,9 +102,9 @@ mod tests {
             d: 2.22,
         };
 
-        let (sql, _) = entity.build_insert_sql("test");
+        let sql = my_postgres::sql::build_insert_sql(&entity, "test");
 
-        println!("{}", sql);
+        println!("{}", sql.sql);
     }
 
     #[test]
@@ -123,13 +123,13 @@ mod tests {
             d: 2.22,
         };
 
-        let (sql, _) = TestJsonField::build_insert_or_update_sql(
+        let sql = my_postgres::sql::build_insert_or_update_sql(
+            &entity,
             "test",
             &UpdateConflictType::OnPrimaryKeyConstraint("pk_name".into()),
-            &entity,
         );
 
-        println!("{}", sql);
+        println!("{}", sql.sql);
     }
 
     #[test]
@@ -137,8 +137,8 @@ mod tests {
         let where_model = WhereModel { limit: 10 };
 
         let select_builder = SelectBuilder::from_select_model::<TestJsonField>();
-        let (sql, _) = select_builder.build_select_sql("test", Some(&where_model));
+        let sql = select_builder.build_select_sql("test", Some(&where_model));
 
-        println!("{}", sql);
+        println!("{}", sql.sql);
     }
 }

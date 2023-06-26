@@ -26,7 +26,7 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
     let e_tag_methods = crate::e_tag::generate_e_tag_methods(e_tag);
 
     let result = quote! {
-        impl<'s> my_postgres::sql_insert::SqlInsertModel<'s> for #name{
+        impl my_postgres::sql_insert::SqlInsertModel for #name{
 
             fn get_fields_amount()->usize{
                 #fields_amount
@@ -39,7 +39,7 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
                 }
             }
 
-            fn get_field_value(&'s self, no: usize) -> my_postgres::sql_update::SqlUpdateModelValue<'s>{
+            fn get_field_value(&self, no: usize) -> my_postgres::sql_update::SqlUpdateModelValue{
                 match no{
                     #(#get_field_value)*
                     _=>panic!("no such field with number {}", no)

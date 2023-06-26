@@ -35,25 +35,25 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
             }
         }
 
-        impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #enum_name{
+        impl my_postgres::sql_update::SqlUpdateValueProvider for #enum_name{
             fn get_update_value(
-                &'s self,
-                params: &mut my_postgres::sql::SqlValues<'s>,
+                &self,
+                params: &mut my_postgres::sql::SqlValues,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
-            )->my_postgres::sql::SqlUpdateValue<'s> {
-                let index = params.push(self.to_str());
+            )->my_postgres::sql::SqlUpdateValue {
+                let index = params.push_static_str(self.to_str());
                 my_postgres::sql::SqlUpdateValue::Index(index, None)
             }
 
         }
 
-        impl<'s> my_postgres::SqlWhereValueProvider<'s> for #enum_name{
+        impl my_postgres::SqlWhereValueProvider for #enum_name{
             fn get_where_value(
-                &'s self,
-                params: &mut my_postgres::sql::SqlValues<'s>,
+                &self,
+                params: &mut my_postgres::sql::SqlValues,
                 _metadata: &Option<my_postgres::SqlValueMetadata>,
-            )-> my_postgres::sql::SqlWhereValue<'s>{
-                let index = params.push(self.to_str());
+            )-> my_postgres::sql::SqlWhereValue{
+                let index = params.push_static_str(self.to_str());
                 my_postgres::sql::SqlWhereValue::Index(index)
             }
 

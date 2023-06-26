@@ -72,16 +72,7 @@ pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     InsertDbEntity,
-    attributes(
-        db_field_name,
-        ignore_if_none,
-        ignore,
-        bigint,
-        json,
-        sql_type,
-        primary_key,
-        e_tag,
-    )
+    attributes(db_field_name, ignore, bigint, json, sql_type, primary_key, e_tag,)
 )]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -93,7 +84,7 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     UpdateDbEntity,
-    attributes(db_field_name, primary_key, ignore_if_none, ignore, sql_type, e_tag,)
+    attributes(db_field_name, primary_key, ignore, sql_type, e_tag,)
 )]
 pub fn postgres_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

@@ -62,7 +62,7 @@ mod tests {
         };
 
         let mut params = SqlValues::new();
-        let where_builder: my_postgres::sql::WhereBuilder<'_> =
+        let where_builder: my_postgres::sql::WhereBuilder =
             where_model.build_where_sql_part(&mut params);
 
         let result = where_builder.get(0).unwrap();
@@ -80,19 +80,19 @@ mod tests {
         assert_eq!(result.db_column_name, "date_time");
         assert_eq!(result.op, "=");
         assert_eq!(
-            result.value.unwrap_as_string_value().as_str(),
+            result.value.unwrap_as_string_value(),
             "2023-06-19T22:07:20.518741+00:00"
         );
 
         let result = where_builder.get(2).unwrap();
         assert_eq!(result.db_column_name, "i32");
         assert_eq!(result.op, ">");
-        assert_eq!(result.value.unwrap_as_non_string_value().as_str(), "1");
+        assert_eq!(result.value.unwrap_as_non_string_value(), "1");
 
         let result = where_builder.get(3).unwrap();
         assert_eq!(result.db_column_name, "opt_i32");
         assert_eq!(result.op, " IS ");
-        assert_eq!(result.value.unwrap_as_non_string_value().as_str(), "NULL");
+        assert_eq!(result.value.unwrap_as_non_string_value(), "NULL");
 
         let result = where_builder.get(4).unwrap();
         assert_eq!(result.db_column_name, "str_enum");
@@ -108,7 +108,7 @@ mod tests {
         let result = where_builder.get(5).unwrap();
         assert_eq!(result.db_column_name, "str_enum_opt");
         assert_eq!(result.op, " IS ");
-        assert_eq!(result.value.unwrap_as_non_string_value().as_str(), "NULL");
+        assert_eq!(result.value.unwrap_as_non_string_value(), "NULL");
 
         let result = where_builder.get(6).unwrap();
         assert_eq!(result.db_column_name, "str_enum_opt2");

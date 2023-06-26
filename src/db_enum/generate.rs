@@ -115,22 +115,22 @@ pub fn generate(
 
         }
 
-        impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #enum_name{
+        impl my_postgres::sql_update::SqlUpdateValueProvider for #enum_name{
             fn get_update_value(
-                &'s self,
-                params: &mut my_postgres::sql::SqlValues<'s>,
+                &self,
+                params: &mut my_postgres::sql::SqlValues,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
-            )->my_postgres::sql::SqlUpdateValue<'s> {
+            )->my_postgres::sql::SqlUpdateValue {
                 my_postgres::sql::SqlUpdateValue::NonStringValue(self.as_numbered_str().into())
             }
         }
 
-        impl<'s> my_postgres::SqlWhereValueProvider<'s> for #enum_name{
+        impl my_postgres::SqlWhereValueProvider for #enum_name{
             fn get_where_value(
-                &'s self,
-                _params: &mut my_postgres::sql::SqlValues<'s>,
+                &self,
+                _params: &mut my_postgres::sql::SqlValues,
                 _metadata: &Option<my_postgres::SqlValueMetadata>,
-            )-> my_postgres::sql::SqlWhereValue<'s> {
+            )-> my_postgres::sql::SqlWhereValue {
                 my_postgres::sql::SqlWhereValue::NonStringValue(self.as_numbered_str().into())
             }
 

@@ -58,12 +58,12 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
                 }
             }
 
-            impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #enum_name{
+            impl my_postgres::sql_update::SqlUpdateValueProvider for #enum_name{
                 fn get_update_value(
-                    &'s self,
-                    params: &mut my_postgres::sql::SqlValues<'s>,
+                    &self,
+                    params: &mut my_postgres::sql::SqlValues,
                     metadata: &Option<my_postgres::SqlValueMetadata>,
-                )->my_postgres::sql::SqlUpdateValue<'s> {
+                )->my_postgres::sql::SqlUpdateValue {
                     #update_value_provider_fn_body
                 }
 

@@ -77,8 +77,8 @@ pub fn generate_implementation<'s>(
     let where_data = super::fn_fill_where::fn_fill_where(fields)?;
 
     let result = quote! {
-       impl<'s> my_postgres::sql_where::SqlWhereModel<'s> for #struct_name{
-        fn get_where_field_name_data(&'s self, no: usize) -> Option<my_postgres::sql_where::WhereFieldData<'s>>{
+       impl my_postgres::sql_where::SqlWhereModel for #struct_name{
+        fn get_where_field_name_data(&self, no: usize) -> Option<my_postgres::sql_where::WhereFieldData>{
             #where_data
         }
         #limit

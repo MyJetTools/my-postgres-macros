@@ -39,13 +39,13 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
             }
         }
 
-        impl<'s> my_postgres::sql_update::SqlUpdateValueProvider<'s> for #struct_name {
+        impl my_postgres::sql_update::SqlUpdateValueProvider for #struct_name {
             fn get_update_value(
-                &'s self,
-                params: &mut my_postgres::sql::SqlValues<'s>,
+                &self,
+                params: &mut my_postgres::sql::SqlValues,
                 metadata: &Option<my_postgres::SqlValueMetadata>,
-            )->my_postgres::sql::SqlUpdateValue<'s> {
-                let index = params.push(self.to_string());
+            )->my_postgres::sql::SqlUpdateValue {
+                let index = params.push(self.to_string().into());
                 my_postgres::sql::SqlUpdateValue::Json(index)
             }
         }

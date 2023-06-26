@@ -35,10 +35,7 @@ pub struct MyStructure2 {
 #[cfg(test)]
 mod tests {
 
-    use my_postgres::{
-        sql::SelectBuilder, sql_insert::SqlInsertModel, sql_select::SelectEntity,
-        sql_update::SqlUpdateModel, UpdateConflictType,
-    };
+    use my_postgres::{sql::SelectBuilder, sql_select::SelectEntity, UpdateConflictType};
     use my_postgres_macros::WhereDbModel;
 
     use super::*;
@@ -50,24 +47,24 @@ mod tests {
 
     #[test]
     fn test_insert_case() {
-        let models = KeyValue {
+        let model = KeyValue {
             client_id: "client1".to_string(),
             key: "key1".to_string(),
             value: MyEnumWithModel::Case1(MyStructure { a: 1, b: true }),
         };
 
-        let (sql, params) = models.build_insert_sql("test_table_name");
+        let sql = my_postgres::sql::build_insert_sql(&model, "test_table_name");
 
         assert_eq!(
-            sql,
+            sql.sql,
             "INSERT INTO test_table_name(client_id,key,value,field_model) VALUES ($1,$2,$3,$4)"
         );
 
-        assert_eq!(params.len(), 4);
-        assert_eq!(params.get(0).unwrap().as_str(), "client1");
-        assert_eq!(params.get(1).unwrap().as_str(), "key1");
-        assert_eq!(params.get(2).unwrap().as_str(), "Test");
-        assert_eq!(params.get(3).unwrap().as_str(), "{\"a\":1,\"b\":true}");
+        assert_eq!(sql.values.len(), 4);
+        assert_eq!(sql.values.get(0).unwrap().as_str(), "client1");
+        assert_eq!(sql.values.get(1).unwrap().as_str(), "key1");
+        assert_eq!(sql.values.get(2).unwrap().as_str(), "Test");
+        assert_eq!(sql.values.get(3).unwrap().as_str(), "{\"a\":1,\"b\":true}");
     }
 
     #[test]
@@ -85,22 +82,22 @@ mod tests {
             },
         ];
 
-        let (sql, params) = KeyValue::build_bulk_insert_or_update_sql(
+        let sql = my_postgres::sql::build_bulk_insert_or_update_sql(
             "test",
             &UpdateConflictType::OnPrimaryKeyConstraint("pk_name".into()),
             &models,
         );
 
-        assert_eq!(sql, "INSERT INTO test(client_id,key,value,field_model) VALUES ($1,$2,$3,$4),($1,$5,$6,$7) ON CONFLICT ON CONSTRAINT pk_name DO UPDATE SET value=EXCLUDED.value,field_model=EXCLUDED.field_model");
+        assert_eq!(sql.sql, "INSERT INTO test(client_id,key,value,field_model) VALUES ($1,$2,$3,$4),($1,$5,$6,$7) ON CONFLICT ON CONSTRAINT pk_name DO UPDATE SET value=EXCLUDED.value,field_model=EXCLUDED.field_model");
 
-        assert_eq!(params.get(0).unwrap().as_str(), "client1");
-        assert_eq!(params.get(1).unwrap().as_str(), "key1");
-        assert_eq!(params.get(2).unwrap().as_str(), "Test");
-        assert_eq!(params.get(3).unwrap().as_str(), "{\"a\":1,\"b\":true}");
+        assert_eq!(sql.values.get(0).unwrap().as_str(), "client1");
+        assert_eq!(sql.values.get(1).unwrap().as_str(), "key1");
+        assert_eq!(sql.values.get(2).unwrap().as_str(), "Test");
+        assert_eq!(sql.values.get(3).unwrap().as_str(), "{\"a\":1,\"b\":true}");
 
-        assert_eq!(params.get(4).unwrap().as_str(), "key2");
-        assert_eq!(params.get(5).unwrap().as_str(), "Test2");
-        assert_eq!(params.get(6).unwrap().as_str(), "{\"c\":1,\"d\":true}");
+        assert_eq!(sql.values.get(4).unwrap().as_str(), "key2");
+        assert_eq!(sql.values.get(5).unwrap().as_str(), "Test2");
+        assert_eq!(sql.values.get(6).unwrap().as_str(), "{\"c\":1,\"d\":true}");
     }
 
     #[test]
@@ -120,13 +117,13 @@ mod tests {
     fn test_select_sql_with_no_where() {
         let select_builder = SelectBuilder::from_select_model::<KeyValue>();
 
-        let (sql, params) = select_builder.build_select_sql::<TestWhereModel>("table_name", None);
+        let sql = select_builder.build_select_sql::<TestWhereModel>("table_name", None);
 
         assert_eq!(
             "SELECT client_id,key,value,field_model FROM table_name",
-            sql
+            sql.sql
         );
-        assert_eq!(params.len(), 0);
+        assert_eq!(sql.values.len(), 0);
     }
 
     #[test]
@@ -135,13 +132,13 @@ mod tests {
 
         let select_builder = SelectBuilder::from_select_model::<KeyValue>();
 
-        let (sql, params) = select_builder.build_select_sql("table_name", Some(&where_model));
+        let sql = select_builder.build_select_sql("table_name", Some(&where_model));
 
         assert_eq!(
             "SELECT client_id,key,value,field_model FROM table_name WHERE a=6",
-            sql
+            sql.sql
         );
-        assert_eq!(params.len(), 0);
+        assert_eq!(sql.values.len(), 0);
     }
 
     #[test]
@@ -152,18 +149,18 @@ mod tests {
             value: MyEnumWithModel::Case1(MyStructure { a: 1, b: true }),
         };
 
-        let (sql, params) = entity.build_update_sql("test", Some(&entity));
+        let sql = my_postgres::sql::build_update_sql(&entity, "test");
 
         assert_eq!(
-            sql,
+            sql.sql,
             "UPDATE test SET (value,field_model)=($1,$2) WHERE client_id=$3 AND key=$4"
         );
 
-        assert_eq!(params.len(), 4);
+        assert_eq!(sql.values.len(), 4);
 
-        assert_eq!(params.get(0).unwrap().as_str(), "Test");
-        assert_eq!(params.get(1).unwrap().as_str(), "{\"a\":1,\"b\":true}");
-        assert_eq!(params.get(2).unwrap().as_str(), "client1");
-        assert_eq!(params.get(3).unwrap().as_str(), "key1");
+        assert_eq!(sql.values.get(0).unwrap().as_str(), "Test");
+        assert_eq!(sql.values.get(1).unwrap().as_str(), "{\"a\":1,\"b\":true}");
+        assert_eq!(sql.values.get(2).unwrap().as_str(), "client1");
+        assert_eq!(sql.values.get(3).unwrap().as_str(), "key1");
     }
 }

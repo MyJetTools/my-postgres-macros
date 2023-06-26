@@ -22,10 +22,7 @@ enum MyEnumAsString {
 #[cfg(test)]
 mod tests {
 
-    use my_postgres::{
-        sql::SelectBuilder, sql_insert::SqlInsertModel, sql_select::SelectEntity,
-        sql_update::SqlUpdateModel, UpdateConflictType,
-    };
+    use my_postgres::{sql::SelectBuilder, sql_select::SelectEntity, UpdateConflictType};
 
     use super::*;
 
@@ -42,16 +39,16 @@ mod tests {
             value: "value1".to_string(),
         };
 
-        let (sql, params) = models.build_insert_sql("test_table_name");
+        let sql = my_postgres::sql::build_insert_sql(&models, "test_table_name");
 
         assert_eq!(
-            sql,
+            sql.sql,
             "INSERT INTO test_table_name(client_id,key,value) VALUES (1,$1,$2)"
         );
 
-        assert_eq!(params.len(), 2);
-        assert_eq!(params.get(0).unwrap().as_str(), "key1");
-        assert_eq!(params.get(1).unwrap().as_str(), "value1");
+        assert_eq!(sql.values.len(), 2);
+        assert_eq!(sql.values.get(0).unwrap().as_str(), "key1");
+        assert_eq!(sql.values.get(1).unwrap().as_str(), "value1");
     }
 
     #[test]
@@ -69,32 +66,32 @@ mod tests {
             },
         ];
 
-        let (sql, params) = KeyValue::build_bulk_insert_or_update_sql(
+        let sql = my_postgres::sql::build_bulk_insert_or_update_sql(
             "test",
             &UpdateConflictType::OnPrimaryKeyConstraint("pk_name".into()),
             &models,
         );
 
         assert_eq!(
-            sql,
+            sql.sql,
             "INSERT INTO test(client_id,key,value) VALUES (1,$1,$2),(2,$3,$4) ON CONFLICT ON CONSTRAINT pk_name DO UPDATE SET value=EXCLUDED.value"
         );
 
-        assert_eq!(params.len(), 4);
+        assert_eq!(sql.values.len(), 4);
 
-        assert_eq!(params.get(0).unwrap().as_str(), "key1");
-        assert_eq!(params.get(1).unwrap().as_str(), "value1");
-        assert_eq!(params.get(2).unwrap().as_str(), "key2");
-        assert_eq!(params.get(3).unwrap().as_str(), "value2");
+        assert_eq!(sql.values.get(0).unwrap().as_str(), "key1");
+        assert_eq!(sql.values.get(1).unwrap().as_str(), "value1");
+        assert_eq!(sql.values.get(2).unwrap().as_str(), "key2");
+        assert_eq!(sql.values.get(3).unwrap().as_str(), "value2");
     }
 
     #[test]
     fn test_select_sql_with_no_where() {
         let select_builder = SelectBuilder::from_select_model::<KeyValue>();
-        let (sql, params) = select_builder.build_select_sql::<TestWhereModel>("table_name", None);
+        let sql = select_builder.build_select_sql::<TestWhereModel>("table_name", None);
 
-        assert_eq!("SELECT client_id,key,value FROM table_name", sql);
-        assert_eq!(params.len(), 0);
+        assert_eq!("SELECT client_id,key,value FROM table_name", sql.sql);
+        assert_eq!(sql.values.len(), 0);
     }
 
     #[test]
@@ -114,10 +111,13 @@ mod tests {
         let where_model = TestWhereModel { a: 6 };
 
         let select_builder = SelectBuilder::from_select_model::<KeyValue>();
-        let (sql, params) = select_builder.build_select_sql("table_name", Some(&where_model));
+        let sql = select_builder.build_select_sql("table_name", Some(&where_model));
 
-        assert_eq!("SELECT client_id,key,value FROM table_name WHERE a=6", sql);
-        assert_eq!(params.len(), 0);
+        assert_eq!(
+            "SELECT client_id,key,value FROM table_name WHERE a=6",
+            sql.sql
+        );
+        assert_eq!(sql.values.len(), 0);
     }
 
     #[test]
@@ -128,13 +128,16 @@ mod tests {
             value: "value1".to_string(),
         };
 
-        let (sql, params) = entity.build_update_sql("test", Some(&entity));
+        let sql = my_postgres::sql::build_update_sql(&entity, "test");
 
-        assert_eq!(sql, "UPDATE test SET value=$1 WHERE client_id=1 AND key=$2");
+        assert_eq!(
+            sql.sql,
+            "UPDATE test SET value=$1 WHERE client_id=1 AND key=$2"
+        );
 
-        assert_eq!(params.len(), 2);
+        assert_eq!(sql.values.len(), 2);
 
-        assert_eq!(params.get(0).unwrap().as_str(), "value1");
-        assert_eq!(params.get(1).unwrap().as_str(), "key1");
+        assert_eq!(sql.values.get(0).unwrap().as_str(), "value1");
+        assert_eq!(sql.values.get(1).unwrap().as_str(), "key1");
     }
 }
