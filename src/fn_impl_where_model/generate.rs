@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::{StructProperty, TypeName};
@@ -76,8 +78,14 @@ pub fn generate_implementation<'s>(
 
     let where_data = super::fn_fill_where::fn_fill_where(fields)?;
 
+    let generics = if let Some(generics) = type_name.generics {
+        TokenStream::from_str("<'s>").unwrap()
+    } else {
+        TokenStream::from_str("").unwrap()
+    };
+
     let result = quote! {
-       impl my_postgres::sql_where::SqlWhereModel for #struct_name{
+       impl #generics my_postgres::sql_where::SqlWhereModel for #struct_name{
         fn get_where_field_name_data(&self, no: usize) -> Option<my_postgres::sql_where::WhereFieldData>{
             #where_data
         }
