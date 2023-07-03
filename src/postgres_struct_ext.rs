@@ -257,7 +257,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
 
             let order = attr
                 .get_named_param("order")?
-                .unwrap_as_single_value()?
+                .unwrap_as_string_value()?
                 .as_str();
             if order != "DESC" && order != "ASC" {
                 return Err(syn::Error::new_spanned(
