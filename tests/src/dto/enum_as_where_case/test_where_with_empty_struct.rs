@@ -14,7 +14,7 @@ struct WhereAllModel {}
 
 #[derive(DbEnumAsI32, Copy, Clone)]
 pub enum TradingPlatformDto {
-    #[enum_case(value: 0)]
+    #[enum_case(id: 0)]
     MetaTrader4,
     #[enum_case(value: 1)]
     MetaTrader5,

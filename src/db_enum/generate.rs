@@ -63,6 +63,15 @@ pub fn generate(
     let enum_name = &ast.ident;
     let enum_cases = EnumCase::read(ast)?;
 
+    for enum_case in &enum_cases {
+        enum_case
+            .attrs
+            .check_for_unknown_params(|attr_name, params| match attr_name {
+                "enum_case" => params.check_for_unknown_params(&["id", "value"]),
+                _ => Ok(()),
+            })?;
+    }
+
     let to_func_name = enum_type.get_func_name();
 
     let type_name = enum_type.get_return_type_name();

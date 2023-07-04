@@ -12,13 +12,6 @@ pub fn fn_fill_where<'s>(
     let mut no: usize = 0;
 
     for struct_property in struct_properties {
-        struct_property
-            .attrs
-            .check_for_unknown_params(|attr_name, params| match attr_name {
-                "enum_case" => params.check_for_unknown_params(&["id", "value"]),
-                _ => Ok(()),
-            })?;
-
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = struct_property.get_field_metadata()?;
 
