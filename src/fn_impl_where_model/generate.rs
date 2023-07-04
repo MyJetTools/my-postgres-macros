@@ -16,13 +16,13 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::
 
     let mut fields = Vec::with_capacity(src_fields.len());
 
-    for field in src_fields {
-        if field.attrs.has_attr("limit") {
-            limit = Some(field);
-        } else if field.attrs.has_attr("offset") {
-            offset = Some(field);
+    for struct_prop in src_fields {
+        if struct_prop.attrs.has_attr("limit") {
+            limit = Some(struct_prop);
+        } else if struct_prop.attrs.has_attr("offset") {
+            offset = Some(struct_prop);
         } else {
-            fields.push(field);
+            fields.push(struct_prop);
         }
     }
 
