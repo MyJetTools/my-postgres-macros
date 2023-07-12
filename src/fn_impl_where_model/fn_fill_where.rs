@@ -94,6 +94,7 @@ fn extract_and_verify_operation<'s>(
         || value == ">"
         || value == ">="
         || value == "<>"
+        || value == "like"
     {
         return Ok(op_value);
     }
