@@ -43,7 +43,7 @@ fn impl_db_columns(
             if primary_keys.contains_key(&value) {
                 return Err(syn::Error::new_spanned(
                     field.field,
-                    format!("Primary key id {} is already used", value),
+                    format!("Primary key order id {} is already used", value),
                 ));
             }
             primary_keys.insert(value, field_name.clone());
@@ -151,47 +151,4 @@ fn get_sql_type(
     let meta_data = field.get_field_metadata()?;
 
     Ok(quote::quote! {#ty_token:: get_sql_type(#meta_data)})
-
-    /*
-    let result = match &ty {
-        types_reader::PropertyType::U8 => quote::quote!(TableColumnType::SmallInt),
-        types_reader::PropertyType::I8 => quote::quote!(TableColumnType::SmallInt),
-        types_reader::PropertyType::U16 => quote::quote!(TableColumnType::Integer),
-        types_reader::PropertyType::I16 => quote::quote!(TableColumnType::SmallInt),
-        types_reader::PropertyType::U32 => quote::quote!(TableColumnType::Integer),
-        types_reader::PropertyType::I32 => quote::quote!(TableColumnType::Integer),
-        types_reader::PropertyType::U64 => quote::quote!(TableColumnType::BigInt),
-        types_reader::PropertyType::I64 => quote::quote!(TableColumnType::BigInt),
-        types_reader::PropertyType::F32 => quote::quote!(TableColumnType::Real),
-        types_reader::PropertyType::F64 => quote::quote!(TableColumnType::Double),
-        types_reader::PropertyType::USize => quote::quote!(TableColumnType::BigInt),
-        types_reader::PropertyType::ISize => quote::quote!(TableColumnType::BigInt),
-        types_reader::PropertyType::String => quote::quote!(TableColumnType::Text),
-        types_reader::PropertyType::Str => quote::quote!(TableColumnType::Text),
-        types_reader::PropertyType::Bool => quote::quote!(TableColumnType::Boolean),
-        types_reader::PropertyType::DateTime => {
-            let sql_type = field.get_sql_type()?;
-
-            let sql_type = sql_type.as_str();
-
-            if sql_type == "timestamp" {
-                quote::quote!(TableColumnType::Timestamp)
-            } else if sql_type == "bigint" {
-                quote::quote!(TableColumnType::BigInt)
-            } else {
-                return Err(syn::Error::new_spanned(
-                    field.field,
-                    format!("Sql type must be 'timestamp' or 'bigint'"),
-                ));
-            }
-        }
-
-        types_reader::PropertyType::OptionOf(sub_type) => get_sql_type(field, &sub_type)?,
-        types_reader::PropertyType::VecOf(_) => quote::quote!(TableColumnType::Json),
-        types_reader::PropertyType::Struct(_, _) => quote::quote!(TableColumnType::Json),
-        types_reader::PropertyType::HashMap(_, _) => quote::quote!(TableColumnType::Json),
-    };
-
-    Ok(result)
-     */
 }

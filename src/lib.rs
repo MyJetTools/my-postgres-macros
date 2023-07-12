@@ -275,11 +275,6 @@ pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
     attributes(
         db_field_name,
         bigint,
-        operator,
-        ignore_if_none,
-        ignore,
-        limit,
-        offset,
         sql_type,
         ignore_table_column,
         primary_key,
