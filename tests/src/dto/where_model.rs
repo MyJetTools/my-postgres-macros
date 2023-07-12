@@ -27,6 +27,9 @@ pub struct TestWhereModel {
 
     #[limit]
     pub limit: usize,
+
+    #[operator("like")]
+    pub like_value: String,
 }
 
 #[derive(DbEnumAsString)]
@@ -59,6 +62,7 @@ mod tests {
             str_enum_opt: None,
             str_enum_opt_to_ignore: None,
             str_enum_opt2: Some(super::MyWhereStringEnum::Case2),
+            like_value: "test".to_string(),
         };
 
         let mut params = SqlValues::new();

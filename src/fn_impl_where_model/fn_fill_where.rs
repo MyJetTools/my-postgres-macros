@@ -70,6 +70,13 @@ fn fill_op(struct_property: &StructProperty) -> Result<proc_macro2::TokenStream,
         let op_value = extract_and_verify_operation(op_value, struct_property)?;
         let op = op_value.unwrap_as_string_value()?.as_str();
 
+        if op == "like" || op == "LIKE" {
+            return Ok(quote! {
+                Some(" like ")
+            }
+            .into());
+        }
+
         return Ok(quote! {
             Some(#op)
         }
@@ -95,6 +102,7 @@ fn extract_and_verify_operation<'s>(
         || value == ">="
         || value == "<>"
         || value == "like"
+        || value == "LIKE"
     {
         return Ok(op_value);
     }
