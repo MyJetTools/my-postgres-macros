@@ -14,6 +14,7 @@ pub struct TestJsonField {
     pub date: DateTimeAsMicroseconds,
 
     #[db_field_name("myTest")]
+    #[sql_type("jsonb")]
     pub test: MyStructure,
 
     pub my_enum_no_model: MyEnum,

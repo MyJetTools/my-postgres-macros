@@ -62,7 +62,7 @@ mod tests {
             str_enum_opt: None,
             str_enum_opt_to_ignore: None,
             str_enum_opt2: Some(super::MyWhereStringEnum::Case2),
-            like_value: "test".to_string(),
+            like_value: "%test%".to_string(),
         };
 
         let mut params = SqlValues::new();
