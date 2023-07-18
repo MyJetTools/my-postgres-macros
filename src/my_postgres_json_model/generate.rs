@@ -52,12 +52,14 @@ pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
 
         impl my_postgres::table_schema::SqlTypeProvider for #struct_name {
             fn get_sql_type(
-                metadata: Option<my_postgres::SqlValueMetadata>,
+                meta_data: Option<my_postgres::SqlValueMetadata>,
             ) -> my_postgres::table_schema::TableColumnType {
 
-                if let Some(metadata) = my_postgres::SqlValueMetadata{
-                    if meta_data.sql_type == "jsonb"{
-                        return my_postgres::table_schema::TableColumnType::Jsonb
+                if let Some(meta_data) = &meta_data{
+                    if let Some(sql_type) = meta_data.sql_type{
+                        if sql_type == "jsonb"{
+                            return my_postgres::table_schema::TableColumnType::Jsonb
+                        }
                     }
                 }
 
