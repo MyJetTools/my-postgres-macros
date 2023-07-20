@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, f32::consts::E};
 
 use proc_macro2::{Ident, TokenStream};
 
@@ -65,12 +65,18 @@ fn impl_db_columns(
             }
         }
 
+        let default_value = if let Some(default_value) = field.get_default_value()? {
+            quote::quote!(Some(#default_value))
+        } else {
+            quote::quote!(None)
+        };
+
         result.push(quote::quote! {
             TableColumn{
                 name: #field_name.to_string(),
                 sql_type: #sql_type,
                 is_nullable: #is_option,
-                default: None
+                default: #default_value
             }
         });
     }

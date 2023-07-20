@@ -34,6 +34,12 @@ pub struct MyStructure {
     pub b: bool,
 }
 
+#[derive(Serialize, Deserialize, MyPostgresJsonModel)]
+pub struct MyStructure2 {
+    pub c: i32,
+    pub d: bool,
+}
+
 #[derive(Serialize, Deserialize, DbEnumAsString)]
 pub enum MyEnum {
     #[enum_case("Test")]
@@ -47,7 +53,7 @@ pub enum MyEnumWithModel {
     #[enum_case("Test")]
     Case1(MyStructure),
     #[enum_case("Test2")]
-    Case2(MyStructure),
+    Case2(MyStructure2),
 }
 
 #[derive(Serialize, Deserialize, DbEnumAsU16WithModel)]

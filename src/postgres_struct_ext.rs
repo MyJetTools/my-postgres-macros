@@ -51,6 +51,11 @@ pub trait PostgresStructPropertyExt<'s> {
     fn get_ty(&self) -> &PropertyType;
 
     fn get_field_name_ident(&self) -> &syn::Ident;
+
+    fn get_default_if_null_value(&self) -> Result<Option<&str>, syn::Error>;
+
+    fn get_default_value(&self) -> Result<Option<&str>, syn::Error>;
+
     fn render_field_value(&self, is_update: bool) -> Result<proc_macro2::TokenStream, syn::Error> {
         match &self.get_ty() {
             types_reader::PropertyType::OptionOf(_) => return self.fill_option_of_value(is_update),
@@ -193,6 +198,28 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
 
     fn is_line_no(&self) -> bool {
         self.attrs.has_attr("line_no") || self.name == "line_no"
+    }
+
+    fn get_default_if_null_value(&self) -> Result<Option<&str>, syn::Error> {
+        if let Some(attr) = self.attrs.try_get_attr("default_if_null") {
+            let result = attr
+                .get_from_single_or_named("value")?
+                .get_any_value_as_str()?;
+            return Ok(Some(result));
+        }
+
+        return Ok(None);
+    }
+
+    fn get_default_value(&self) -> Result<Option<&str>, syn::Error> {
+        if let Some(attr) = self.attrs.try_get_attr("default_value") {
+            let result = attr
+                .get_from_single_or_named("value")?
+                .get_any_value_as_str()?;
+            return Ok(Some(result));
+        }
+
+        return Ok(None);
     }
 
     fn get_db_field_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
