@@ -66,7 +66,7 @@ fn impl_db_columns(
         }
 
         let default_value = if let Some(default_value) = field.get_default_value()? {
-            quote::quote!(Some(#default_value))
+            quote::quote!(Some(#default_value.into()))
         } else {
             quote::quote!(None)
         };
