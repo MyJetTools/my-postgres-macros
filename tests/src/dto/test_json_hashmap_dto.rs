@@ -3,6 +3,10 @@ use std::collections::HashMap;
 use my_postgres_macros::{InsertDbEntity, SelectDbEntity, UpdateDbEntity};
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 
+
+
+
+
 #[derive(SelectDbEntity, InsertDbEntity, UpdateDbEntity)]
 pub struct JsonHashMapDto {
     pub field: HashMap<String, String>,

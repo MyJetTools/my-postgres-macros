@@ -19,61 +19,6 @@ mod tests {
         pub to_be_ignored: String,
     }
 
-    impl TableSchemaModel {
-        fn get_columns() -> Vec<my_postgres::table_schema::TableColumn> {
-            use my_postgres::table_schema::*;
-            vec![
-                TableColumn {
-                    name: "primary_key_first".to_string(),
-                    sql_type: String::get_sql_type(None),
-                    is_nullable: false,
-                    default: None,
-                },
-                TableColumn {
-                    name: "primary_key_second".to_string(),
-                    sql_type: String::get_sql_type(None),
-                    is_nullable: false,
-                    default: None,
-                },
-                TableColumn {
-                    name: "string_column".to_string(),
-                    sql_type: String::get_sql_type(None),
-                    is_nullable: false,
-                    default: Some("default_value"),
-                },
-                TableColumn {
-                    name: "int_column".to_string(),
-                    sql_type: i32::get_sql_type(None),
-                    is_nullable: false,
-                    default: None,
-                },
-            ]
-        }
-        fn get_indexes(
-        ) -> Option<std::collections::HashMap<String, my_postgres::table_schema::IndexSchema>>
-        {
-            use my_postgres::table_schema::*;
-            let mut result = std::collections::HashMap::new();
-            result.insert(
-                "test_index".to_string(),
-                IndexSchema::new(
-                    true,
-                    vec![
-                        IndexField {
-                            name: "primary_key_second".into(),
-                            order: IndexOrder::Asc,
-                        },
-                        IndexField {
-                            name: "string_column".into(),
-                            order: IndexOrder::Desc,
-                        },
-                    ],
-                ),
-            );
-            Some(result)
-        }
-    }
-
     #[test]
     fn tests_primary_key_generation() {
         use my_postgres::table_schema::TableSchemaProvider;

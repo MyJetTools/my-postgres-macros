@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, f32::consts::E};
+use std::collections::BTreeMap;
 
 use proc_macro2::{Ident, TokenStream};
 
