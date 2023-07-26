@@ -31,6 +31,7 @@ use syn;
         group_by,
         primary_key,
         default_if_null,
+        wrap_column_name,
     )
 )]
 pub fn postgres_select_model(input: TokenStream) -> TokenStream {
@@ -62,6 +63,7 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
         offset,
         sql_type,
         default_if_null,
+        wrap_column_name,
     )
 )]
 pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
@@ -83,6 +85,7 @@ pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
         primary_key,
         e_tag,
         default_if_null,
+        wrap_column_name,
     )
 )]
 pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
@@ -95,7 +98,15 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     UpdateDbEntity,
-    attributes(db_field_name, primary_key, ignore, sql_type, e_tag, default_if_null,)
+    attributes(
+        db_field_name,
+        primary_key,
+        ignore,
+        sql_type,
+        e_tag,
+        default_if_null,
+        wrap_column_name,
+    )
 )]
 pub fn postgres_update_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -291,7 +302,8 @@ pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
         primary_key,
         db_index,
         default_if_null,
-        default_value
+        default_value,
+        wrap_column_name,
     )
 )]
 pub fn table_schema(input: TokenStream) -> TokenStream {

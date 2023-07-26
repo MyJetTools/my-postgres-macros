@@ -56,6 +56,8 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_default_value(&self) -> Result<Option<&str>, syn::Error>;
 
+    fn has_wrap_column_name(&self) -> bool;
+
     fn render_field_value(&self, is_update: bool) -> Result<proc_macro2::TokenStream, syn::Error> {
         match &self.get_ty() {
             types_reader::PropertyType::OptionOf(_) => return self.fill_option_of_value(is_update),
@@ -232,6 +234,11 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
 
         let name = self.name.as_str();
 
+        let name = if self.has_wrap_column_name() {
+            format!("\"{}\"", name)
+        } else {
+            name.to_string()
+        };
         Ok(quote::quote!(#name))
     }
 
@@ -347,6 +354,10 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         };
 
         Ok(Some(result))
+    }
+
+    fn has_wrap_column_name(&self) -> bool {
+        self.attrs.has_attr("wrap_column_name")
     }
 }
 
