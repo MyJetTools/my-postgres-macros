@@ -73,7 +73,7 @@ fn impl_db_columns(
 
         result.push(quote::quote! {
             TableColumn{
-                name: #field_name.to_string(),
+                name: #field_name.into(),
                 sql_type: #sql_type,
                 is_nullable: #is_option,
                 default: #default_value
