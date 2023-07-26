@@ -37,7 +37,7 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
                 #fields_amount
             }
 
-            fn get_column_name(no: usize) -> (&'static str, Option<&'static str>){
+            fn get_column_name(no: usize) -> (my_postgres::ColumnName, Option<my_postgres::ColumnName>){
                 #fn_get_column_name
             }
 
