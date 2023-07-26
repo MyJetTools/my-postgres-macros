@@ -64,6 +64,12 @@ mod tests {
         pub int_column: i32,
     }
 
+    impl TableSchemaWithRenamedColumnModel {
+        fn get_primary_key_columns_() -> Option<Vec<my_postgres::ColumnName>> {
+            Some(vec!["primary_key_first".into(), "the_second_column".into()])
+        }
+    }
+
     #[test]
     fn tests_primary_key_generation_with_renamed_column() {
         use my_postgres::table_schema::TableSchemaProvider;
