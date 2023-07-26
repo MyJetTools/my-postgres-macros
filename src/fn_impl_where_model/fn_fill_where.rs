@@ -38,7 +38,7 @@ pub fn fn_fill_where<'s>(
 
         lines.push(quote! {
            #no => Some(WhereFieldData{
-                field_name: #db_field_name,
+                column_name: #db_field_name,
                 op: #op,
                 value: #value,
                 ignore_if_none: #ignore_if_none,
