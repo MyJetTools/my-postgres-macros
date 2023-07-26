@@ -31,8 +31,8 @@ mod tests {
         let primary_key_columns = TableSchemaModel::PRIMARY_KEY_COLUMNS.unwrap();
         assert_eq!(primary_key_columns.len(), 2);
 
-        assert_eq!(primary_key_columns[0], "primary_key_first");
-        assert_eq!(primary_key_columns[1], "primary_key_second");
+        assert_eq!(primary_key_columns[0].name.as_str(), "primary_key_first");
+        assert_eq!(primary_key_columns[1].name.as_str(), "primary_key_second");
 
         let indexes = TableSchemaModel::get_indexes().unwrap();
         assert_eq!(indexes.len(), 1);
@@ -41,10 +41,13 @@ mod tests {
 
         assert!(test_index.is_unique);
 
-        assert_eq!(test_index.fields[0].name.as_str(), "primary_key_second");
+        assert_eq!(
+            test_index.fields[0].name.name.as_str(),
+            "primary_key_second"
+        );
         assert!(test_index.fields[0].order.is_the_same_to(&IndexOrder::Asc));
 
-        assert_eq!(test_index.fields[1].name.as_str(), "string_column");
+        assert_eq!(test_index.fields[1].name.name.as_str(), "string_column");
         assert!(test_index.fields[1].order.is_the_same_to(&IndexOrder::Desc));
     }
 
@@ -68,7 +71,7 @@ mod tests {
         let primary_key_columns = TableSchemaWithRenamedColumnModel::PRIMARY_KEY_COLUMNS.unwrap();
         assert_eq!(primary_key_columns.len(), 2);
 
-        assert_eq!(primary_key_columns[0], "primary_key_first");
-        assert_eq!(primary_key_columns[1], "the_second_column");
+        assert_eq!(primary_key_columns[0].name.as_str(), "primary_key_first");
+        assert_eq!(primary_key_columns[1].name.as_str(), "the_second_column");
     }
 }

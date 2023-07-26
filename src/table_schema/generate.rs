@@ -92,7 +92,7 @@ fn impl_db_columns(
         for (_, value) in primary_keys {
             result.push(value);
         }
-        quote::quote!(Some(&[#(#result.into()),*]))
+        quote::quote!(Some(Vec<#(#result.into()),*>))
     };
 
     let indexes = if indexes_list.is_empty() {
@@ -132,7 +132,11 @@ fn impl_db_columns(
     let result = quote::quote! {
 
         impl my_postgres::table_schema::TableSchemaProvider for #struct_name{
-            const PRIMARY_KEY_COLUMNS: Option<&'static [my_postgres::ColumnName]> = #primary_keys;
+  
+
+        fn get_primary_key_columns() -> Option<Vec<my_postgres:ColumnName>>{
+          #primary_keys
+        }
             fn get_columns() -> Vec<my_postgres::table_schema::TableColumn>{
                 use my_postgres::table_schema::*;
                 vec![#(#result),*]
