@@ -6,5 +6,6 @@ mod table_schema_tests;
 mod test_basic_cases;
 mod test_json_field;
 mod test_json_hashmap_dto;
+mod test_primary_key;
 mod where_model;
 pub use test_basic_cases::*;

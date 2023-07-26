@@ -168,7 +168,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
                     return Ok(Some(value.get_value("must be value from 0..255".into())?));
                 }
                 None => {
-                    return Ok(None);
+                    return Ok(Some(0));
                 }
             }
         }
