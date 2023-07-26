@@ -32,7 +32,7 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
                 #fields_amount
             }
 
-            fn get_column_name(no: usize) -> (&'static str, Option<&'static str>){
+            fn get_column_name(no: usize) -> (my_postgres::ColumnName, Option<my_postgres::ColumnName>){
                 match no{
                     #(#fn_get_column_name)*
                     _=>panic!("no such field with number {}", no)
