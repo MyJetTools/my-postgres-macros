@@ -28,7 +28,7 @@ mod tests {
 
         assert_eq!(columns.len(), 4);
 
-        let primary_key_columns = TableSchemaModel::PRIMARY_KEY_COLUMNS.unwrap();
+        let primary_key_columns = TableSchemaModel::get_primary_key_columns().unwrap();
         assert_eq!(primary_key_columns.len(), 2);
 
         assert_eq!(primary_key_columns[0].name.as_str(), "primary_key_first");
@@ -64,17 +64,12 @@ mod tests {
         pub int_column: i32,
     }
 
-    impl TableSchemaWithRenamedColumnModel {
-        fn get_primary_key_columns_() -> Option<Vec<my_postgres::ColumnName>> {
-            Some(vec!["primary_key_first".into(), "the_second_column".into()])
-        }
-    }
-
     #[test]
     fn tests_primary_key_generation_with_renamed_column() {
         use my_postgres::table_schema::TableSchemaProvider;
 
-        let primary_key_columns = TableSchemaWithRenamedColumnModel::PRIMARY_KEY_COLUMNS.unwrap();
+        let primary_key_columns =
+            TableSchemaWithRenamedColumnModel::get_primary_key_columns().unwrap();
         assert_eq!(primary_key_columns.len(), 2);
 
         assert_eq!(primary_key_columns[0].name.as_str(), "primary_key_first");
