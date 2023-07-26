@@ -70,7 +70,7 @@ mod tests {
             where_model.build_where_sql_part(&mut params);
 
         let result = where_builder.get(0).unwrap();
-        assert_eq!(result.db_column_name, "id");
+        assert_eq!(result.db_column_name.name.as_str(), "id");
         assert_eq!(result.op, "=");
         assert_eq!(
             params
@@ -81,7 +81,7 @@ mod tests {
         );
 
         let result = where_builder.get(1).unwrap();
-        assert_eq!(result.db_column_name, "date_time");
+        assert_eq!(result.db_column_name.name.as_str(), "date_time");
         assert_eq!(result.op, "=");
         assert_eq!(
             result.value.unwrap_as_string_value(),
@@ -89,17 +89,17 @@ mod tests {
         );
 
         let result = where_builder.get(2).unwrap();
-        assert_eq!(result.db_column_name, "i32");
+        assert_eq!(result.db_column_name.name.as_str(), "i32");
         assert_eq!(result.op, ">");
         assert_eq!(result.value.unwrap_as_non_string_value(), "1");
 
         let result = where_builder.get(3).unwrap();
-        assert_eq!(result.db_column_name, "opt_i32");
+        assert_eq!(result.db_column_name.name.as_str(), "opt_i32");
         assert_eq!(result.op, " IS ");
         assert_eq!(result.value.unwrap_as_non_string_value(), "NULL");
 
         let result = where_builder.get(4).unwrap();
-        assert_eq!(result.db_column_name, "str_enum");
+        assert_eq!(result.db_column_name.name.as_str(), "str_enum");
         assert_eq!(result.op, "=");
         assert_eq!(
             params
@@ -110,12 +110,12 @@ mod tests {
         );
 
         let result = where_builder.get(5).unwrap();
-        assert_eq!(result.db_column_name, "str_enum_opt");
+        assert_eq!(result.db_column_name.name.as_str(), "str_enum_opt");
         assert_eq!(result.op, " IS ");
         assert_eq!(result.value.unwrap_as_non_string_value(), "NULL");
 
         let result = where_builder.get(6).unwrap();
-        assert_eq!(result.db_column_name, "str_enum_opt2");
+        assert_eq!(result.db_column_name.name.as_str(), "str_enum_opt2");
         assert_eq!(result.op, "=");
         assert_eq!(
             params
