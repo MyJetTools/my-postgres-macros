@@ -12,6 +12,7 @@ mod tests {
         pub primary_key_second: String,
         #[db_index(id:1, index_name: "test_index", is_unique: true, order: "DESC")]
         #[default_value("default_value")]
+        #[wrap_column_name]
         pub string_column: String,
         pub int_column: i32,
 
