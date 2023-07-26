@@ -64,14 +64,14 @@ fn get_columns(fields: &UpdateFields) -> Result<proc_macro2::TokenStream, syn::E
         let related_name = match field.get_model_db_field_name_as_string() {
             Some(value) => {
                 let value = value.unwrap_as_string_value()?.as_str();
-                quote::quote!(Some(#value))
+                quote::quote!(Some(#value.into()))
             }
             None => {
                 quote::quote!(None)
             }
         };
 
-        line.push(quote::quote!(#no=>(#db_field_name, #related_name),));
+        line.push(quote::quote!(#no=>(#db_field_name.into(), #related_name),));
         if field.is_primary_key() {
             continue;
         }
