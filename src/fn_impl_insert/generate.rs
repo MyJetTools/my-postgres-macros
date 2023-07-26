@@ -67,17 +67,12 @@ pub fn fn_get_column_name(
             if let Some(model_field_name) = prop.get_model_db_field_name_as_string() {
                 let name = model_field_name.unwrap_as_string_value()?.as_str();
 
-                let name = if prop.has_wrap_column_name() {
-                    format!("\"{}\"", name)
-                } else {
-                    name.to_string()
-                };
-                quote::quote! {Some(#name)}
+                quote::quote! {Some(#name.into())}
             } else {
                 quote::quote!(None)
             };
 
-        result.push(quote! (#i=>(#field_name, #other_field_name),).into());
+        result.push(quote! (#i=>(#field_name.into(), #other_field_name),).into());
     }
     Ok(result)
 }

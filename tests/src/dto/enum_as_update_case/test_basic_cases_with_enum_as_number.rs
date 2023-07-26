@@ -5,7 +5,6 @@ use my_postgres_macros::{
 #[derive(SelectDbEntity, InsertDbEntity, UpdateDbEntity)]
 pub struct KeyValue {
     #[primary_key]
-    #[wrap_column_name]
     pub client_id: String,
     #[primary_key]
     pub key: String,
