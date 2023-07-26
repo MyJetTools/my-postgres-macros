@@ -21,7 +21,7 @@ pub struct IndexAttr {
 pub trait PostgresStructPropertyExt<'s> {
     fn is_primary_key(&self) -> bool;
 
-    fn get_primary_key_id(&self) -> Result<Option<u8>, syn::Error>;
+    fn get_primary_key_id(&self, last_id: u8) -> Result<Option<u8>, syn::Error>;
 
     fn get_sql_type(&self) -> Result<&ParamValue, syn::Error>;
 
@@ -161,14 +161,14 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         self.attrs.has_attr(ATTR_PRIMARY_KEY)
     }
 
-    fn get_primary_key_id(&self) -> Result<Option<u8>, syn::Error> {
+    fn get_primary_key_id(&self, last_id: u8) -> Result<Option<u8>, syn::Error> {
         if let Some(value) = self.attrs.try_get_attr(ATTR_PRIMARY_KEY) {
             match value.try_get_single_param() {
                 Some(value) => {
                     return Ok(Some(value.get_value("must be value from 0..255".into())?));
                 }
                 None => {
-                    return Ok(Some(0));
+                    return Ok(Some(last_id + 1));
                 }
             }
         }

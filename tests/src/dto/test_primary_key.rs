@@ -5,12 +5,17 @@ mod tests {
 
     #[derive(TableSchema)]
     pub struct AccountDbModel {
-        #[primary_key(0)]
+        #[primary_key]
         pub id: String,
+        #[primary_key]
         pub currency: String,
     }
+
+    #[test]
     fn test_partition_key() {
-        assert_eq!(AccountDbModel::PRIMARY_KEY_COLUMNS[0], "id");
-        assert_eq!(AccountDbModel::PRIMARY_KEY_COLUMNS[0], "id");
+        let primary_keys = AccountDbModel::PRIMARY_KEY_COLUMNS.unwrap();
+
+        assert_eq!(primary_keys.len(), 1);
+        assert_eq!(primary_keys.get(0).unwrap().name.as_str(), "id");
     }
 }

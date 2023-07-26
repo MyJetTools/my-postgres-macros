@@ -35,11 +35,14 @@ fn impl_db_columns(
 
     let mut indexes_list = BTreeMap::new();
 
+    let mut last_primary_key_id = 0;
+
     for field in fields {
         let field_name = field.get_db_field_name_as_string()?;
         let sql_type = get_sql_type(field, &field.ty)?;
-        let is_option = field.ty.is_option();
-        if let Some(value) = field.get_primary_key_id()? {
+        let is_option: bool = field.ty.is_option();
+
+        if let Some(value) = field.get_primary_key_id(last_primary_key_id)? {
             if primary_keys.contains_key(&value) {
                 return Err(syn::Error::new_spanned(
                     field.field,
@@ -47,6 +50,7 @@ fn impl_db_columns(
                 ));
             }
             primary_keys.insert(value, field_name.clone());
+            last_primary_key_id += 1;
         };
 
         if let Some(indexes) = field.get_index_attrs()? {
