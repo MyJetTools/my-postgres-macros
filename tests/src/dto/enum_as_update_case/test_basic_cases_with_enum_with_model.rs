@@ -9,7 +9,7 @@ pub struct KeyValue {
     pub client_id: String,
     #[primary_key]
     pub key: String,
-    #[db_field_name(model_field_name = "field_model")]
+    #[db_field_name(model_db_column_name = "field_model")]
     pub value: MyEnumWithModel,
 }
 

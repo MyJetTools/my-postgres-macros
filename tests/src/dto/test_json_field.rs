@@ -19,7 +19,7 @@ pub struct TestJsonField {
 
     pub my_enum_no_model: MyEnum,
 
-    #[db_field_name(model_field_name = "field_model")]
+    #[db_field_name(model_db_column_name = "field_model")]
     pub my_enum: MyEnumWithModel,
 
     pub b: bool,
