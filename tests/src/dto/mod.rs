@@ -1,3 +1,4 @@
+mod bulk_insert_cases;
 mod e_tag_tests;
 mod enum_as_update_case;
 mod enum_as_where_case;

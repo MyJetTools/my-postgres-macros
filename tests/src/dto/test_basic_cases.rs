@@ -79,7 +79,7 @@ mod tests {
     #[test]
     fn test_select_sql_with_no_where() {
         let select_builder = SelectBuilder::from_select_model::<KeyValue>();
-        let sql = select_builder.build_select_sql::<TestWhereModel>("table_name", None);
+        let sql = select_builder.to_sql_string::<TestWhereModel>("table_name", None);
 
         assert_eq!("SELECT client_id,key,value FROM table_name", sql.sql);
         assert_eq!(sql.values.len(), 0);
@@ -102,7 +102,7 @@ mod tests {
         let where_model = TestWhereModel { a: 6 };
 
         let select_builder = SelectBuilder::from_select_model::<KeyValue>();
-        let sql = select_builder.build_select_sql("table_name", Some(&where_model));
+        let sql = select_builder.to_sql_string("table_name", Some(&where_model));
 
         assert_eq!(
             "SELECT client_id,key,value FROM table_name WHERE a=6",

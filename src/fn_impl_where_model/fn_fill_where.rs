@@ -15,7 +15,7 @@ pub fn fn_fill_where<'s>(
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = struct_property.get_field_metadata()?;
 
-        let db_field_name = struct_property.get_db_field_name_as_string()?;
+        let db_field_name = struct_property.get_db_column_name_as_string()?;
 
         let op = fill_op(struct_property)?;
 

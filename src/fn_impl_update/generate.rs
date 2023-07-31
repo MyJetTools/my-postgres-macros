@@ -60,8 +60,8 @@ fn get_columns(fields: &UpdateFields) -> Result<proc_macro2::TokenStream, syn::E
     let mut line = Vec::with_capacity(fields.get_fields_amount());
     let mut no: usize = 0;
     for field in fields.get_fields_with_no_primary_key() {
-        let db_field_name = field.get_db_field_name_as_string()?;
-        let related_name = match field.get_model_db_field_name_as_string() {
+        let db_field_name = field.get_db_column_name_as_string()?;
+        let related_name = match field.get_model_db_column_name_as_string() {
             Some(value) => {
                 let value = value.unwrap_as_string_value()?.as_str();
                 quote::quote!(Some(#value.into()))

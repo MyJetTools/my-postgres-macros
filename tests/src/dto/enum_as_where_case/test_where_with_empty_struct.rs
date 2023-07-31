@@ -30,7 +30,7 @@ mod test {
     fn test_with_empty_where() {
         let sql = SelectBuilder::from_select_model::<KeyValue>();
 
-        let sql = sql.build_select_sql::<WhereAllModel>("test", None);
+        let sql = sql.to_sql_string::<WhereAllModel>("test", None);
 
         println!("{}", sql.sql);
     }

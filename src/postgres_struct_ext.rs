@@ -25,11 +25,11 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_sql_type(&self) -> Result<&ParamValue, syn::Error>;
 
-    fn get_db_field_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error>;
+    fn get_db_column_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error>;
 
-    fn get_db_field_name_as_string(&self) -> Result<&str, syn::Error>;
+    fn get_db_column_name_as_string(&self) -> Result<&str, syn::Error>;
 
-    fn get_model_db_field_name_as_string(&self) -> Option<&ParamValue>;
+    fn get_model_db_column_name_as_string(&self) -> Option<&ParamValue>;
 
     fn has_json_attr(&self) -> bool;
 
@@ -222,7 +222,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         return Ok(None);
     }
 
-    fn get_db_field_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
+    fn get_db_column_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
         if let Ok(attr) = self.attrs.get_attr(ATTR_DB_FIELD_NAME) {
             if let Ok(result) = attr.get_from_single_or_named("name") {
                 let name = result.get_any_value_as_str()?.to_token_stream();
@@ -235,7 +235,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(quote::quote!(#name))
     }
 
-    fn get_db_field_name_as_string(&self) -> Result<&str, syn::Error> {
+    fn get_db_column_name_as_string(&self) -> Result<&str, syn::Error> {
         if let Ok(attr) = self
             .attrs
             .get_single_or_named_param(ATTR_DB_FIELD_NAME, "name")
@@ -246,10 +246,10 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(self.name.as_str())
     }
 
-    fn get_model_db_field_name_as_string(&self) -> Option<&ParamValue> {
+    fn get_model_db_column_name_as_string(&self) -> Option<&ParamValue> {
         if let Ok(attr) = self
             .attrs
-            .get_named_param(ATTR_DB_FIELD_NAME, "model_field_name")
+            .get_named_param(ATTR_DB_FIELD_NAME, "model_db_column_name")
         {
             return Some(attr);
         }
@@ -298,7 +298,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
                 index_name,
                 is_unique,
                 order: order.to_string(),
-                name: self.get_db_field_name_as_string()?.to_string(),
+                name: self.get_db_column_name_as_string()?.to_string(),
             })
         }
 
@@ -306,7 +306,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
     }
 
     fn get_field_metadata(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
-        let model_field_name = self.get_model_db_field_name_as_string();
+        let model_field_name = self.get_model_db_column_name_as_string();
 
         let sql_type = self.get_sql_type();
 
@@ -343,7 +343,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
 
         let result = ETagData {
             field_name: self.get_field_name_ident(),
-            column_name: self.get_db_field_name_as_string()?,
+            column_name: self.get_db_column_name_as_string()?,
         };
 
         Ok(Some(result))

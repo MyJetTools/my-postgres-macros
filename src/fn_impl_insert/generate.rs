@@ -61,10 +61,10 @@ pub fn fn_get_column_name(
 ) -> Result<Vec<proc_macro2::TokenStream>, syn::Error> {
     let mut result = Vec::new();
     for (i, prop) in fields.iter().enumerate() {
-        let field_name = prop.get_db_field_name_as_string()?;
+        let field_name = prop.get_db_column_name_as_string()?;
 
         let other_field_name =
-            if let Some(model_field_name) = prop.get_model_db_field_name_as_string() {
+            if let Some(model_field_name) = prop.get_model_db_column_name_as_string() {
                 let name = model_field_name.unwrap_as_string_value()?.as_str();
 
                 quote::quote! {Some(#name.into())}

@@ -144,7 +144,7 @@ mod tests {
         let where_model = WhereModel { limit: 10 };
 
         let select_builder = SelectBuilder::from_select_model::<TestJsonField>();
-        let sql = select_builder.build_select_sql("test", Some(&where_model));
+        let sql = select_builder.to_sql_string("test", Some(&where_model));
 
         println!("{}", sql.sql);
     }

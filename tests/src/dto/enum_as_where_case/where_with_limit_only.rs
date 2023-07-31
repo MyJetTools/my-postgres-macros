@@ -47,7 +47,7 @@ mod tests {
             offset: 3,
         };
 
-        let sql = select_builder.build_select_sql("test", Some(&where_model));
+        let sql = select_builder.to_sql_string("test", Some(&where_model));
 
         println!("{}", sql.sql);
     }

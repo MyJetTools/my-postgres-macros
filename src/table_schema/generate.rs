@@ -38,7 +38,7 @@ fn impl_db_columns(
     let mut last_primary_key_id = 0;
 
     for field in fields {
-        let field_name = field.get_db_field_name_as_string()?;
+        let field_name = field.get_db_column_name_as_string()?;
         let sql_type = get_sql_type(field, &field.ty)?;
         let is_option: bool = field.ty.is_option();
 

@@ -19,7 +19,7 @@ pub fn fn_fill_select_fields(
                 sql.push_str(#attr_value);
             });
         } else {
-            let db_field_name = prop.get_db_field_name_as_token()?;
+            let db_field_name = prop.get_db_column_name_as_token()?;
 
             let metadata = prop.get_field_metadata()?;
 

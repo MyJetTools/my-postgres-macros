@@ -10,7 +10,7 @@ pub fn get_group_by_fields(
 
     for prop in fields {
         if prop.attrs.has_attr("group_by") {
-            group_by.push(prop.get_db_field_name_as_string()?);
+            group_by.push(prop.get_db_column_name_as_string()?);
             continue;
         }
     }
