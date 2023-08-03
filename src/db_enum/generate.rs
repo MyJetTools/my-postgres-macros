@@ -96,9 +96,16 @@ pub fn generate(
 
     let fn_is_none = super::utils::render_fn_is_none();
 
+    let default_value = super::utils::get_default_value(enum_name);
+
     let result = quote! {
 
         impl #enum_name{
+
+            pub fn get_default_value(&self)->&'static str{
+                #default_value
+            }
+
             pub fn #to_func_name(&self)->#type_name{
                 match self {
                     #(#to_typed_number),*

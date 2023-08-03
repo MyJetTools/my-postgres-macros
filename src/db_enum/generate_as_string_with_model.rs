@@ -17,9 +17,13 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
 
     let select_part = super::utils::render_select_part();
 
+
+
     let result = quote! {
 
         impl #enum_name{
+
+     
             pub fn to_str(&self)->(&'static str, String) {
                 match self{
                     #fn_to_str

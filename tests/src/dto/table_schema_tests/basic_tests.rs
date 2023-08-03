@@ -2,7 +2,7 @@
 mod tests {
 
     use my_postgres::table_schema::IndexOrder;
-    use my_postgres_macros::TableSchema;
+    use my_postgres_macros::{DbEnumAsI32, TableSchema};
     #[derive(TableSchema)]
     pub struct TableSchemaModel {
         #[primary_key(0)]
@@ -18,6 +18,17 @@ mod tests {
 
         #[ignore_table_column]
         pub to_be_ignored: String,
+
+        #[default_value(1)]
+        pub enum_field: MyEnum,
+    }
+
+    #[derive(DbEnumAsI32)]
+    pub enum MyEnum {
+        #[enum_case(0)]
+        Field1,
+        #[enum_case(1)]
+        Field2,
     }
 
     #[test]

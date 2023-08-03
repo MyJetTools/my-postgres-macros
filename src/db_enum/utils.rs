@@ -1,3 +1,5 @@
+use proc_macro2::Ident;
+
 pub fn render_reading_db_row_metadata_model() -> proc_macro2::TokenStream {
     quote::quote! {
 
@@ -41,5 +43,11 @@ pub fn render_fn_is_none() -> proc_macro2::TokenStream {
         fn is_none(&self) -> bool{
             false
         }
+    }
+}
+
+pub fn get_default_value(enum_name: &Ident) -> proc_macro2::TokenStream {
+    quote::quote! {
+        panic!("Default value is not for the enum [{}]", enum_name.to_str);
     }
 }

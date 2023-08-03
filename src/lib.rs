@@ -116,7 +116,7 @@ pub fn postgres_update_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU8, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsU8, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_u8(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -126,7 +126,7 @@ pub fn db_enum_as_u8(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI8, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsI8, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_i8(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -136,7 +136,7 @@ pub fn db_enum_as_i8(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU16, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsU16, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_u16(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -146,7 +146,7 @@ pub fn db_enum_as_u16(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI16, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsI16, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_i16(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -156,7 +156,7 @@ pub fn db_enum_as_i16(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU32, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsU32, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_u32(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -166,7 +166,7 @@ pub fn db_enum_as_u32(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI32, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsI32, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_i32(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -176,7 +176,7 @@ pub fn db_enum_as_i32(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU64, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsU64, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_u64(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -186,7 +186,7 @@ pub fn db_enum_as_u64(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI64, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsI64, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_i64(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
 
@@ -196,7 +196,7 @@ pub fn db_enum_as_i64(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsString, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(DbEnumAsString, attributes(enum_case, default_if_null, default_value,))]
 pub fn db_enum_as_string(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_as_string(&ast) {
@@ -205,7 +205,10 @@ pub fn db_enum_as_string(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU8WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsU8WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_u8_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::U8) {
@@ -214,7 +217,10 @@ pub fn db_enum_as_u8_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI8WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsI8WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_i8_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::I8) {
@@ -223,7 +229,10 @@ pub fn db_enum_as_i8_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU16WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsU16WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_u16_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::U16) {
@@ -232,7 +241,10 @@ pub fn db_enum_as_u16_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI16WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsI16WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_i16_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::I16) {
@@ -241,7 +253,10 @@ pub fn db_enum_as_i16_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU32WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsU32WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_u32_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::U32) {
@@ -250,7 +265,10 @@ pub fn db_enum_as_u32_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI32WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsI32WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_i32_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::I32) {
@@ -259,7 +277,10 @@ pub fn db_enum_as_i32_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsU64WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsU64WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_u64_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::U64) {
@@ -268,7 +289,10 @@ pub fn db_enum_as_u64_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsI64WithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsI64WithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_i64_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_with_model(&ast, EnumType::I64) {
@@ -277,7 +301,10 @@ pub fn db_enum_as_i64_with_model(input: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(DbEnumAsStringWithModel, attributes(enum_case, default_if_null,))]
+#[proc_macro_derive(
+    DbEnumAsStringWithModel,
+    attributes(enum_case, default_if_null, default_value,)
+)]
 pub fn db_enum_as_string_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     match crate::db_enum::generate_as_string_with_model(&ast) {
