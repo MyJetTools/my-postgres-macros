@@ -1,4 +1,6 @@
-use proc_macro2::Ident;
+use std::str::FromStr;
+
+use proc_macro2::{Ident, TokenStream};
 
 pub fn render_reading_db_row_metadata_model() -> proc_macro2::TokenStream {
     quote::quote! {
@@ -47,7 +49,14 @@ pub fn render_fn_is_none() -> proc_macro2::TokenStream {
 }
 
 pub fn get_default_value(enum_name: &Ident) -> proc_macro2::TokenStream {
-    quote::quote! {
-        panic!("Default value is not for the enum [{}]", enum_name.to_str);
-    }
+    let enum_name = enum_name.to_string();
+
+    TokenStream::from_str(
+        format!(
+            r#"panic!("Default value is not specified for the enum ["{}"]", #enum_name);"#,
+            enum_name
+        )
+        .as_str(),
+    )
+    .unwrap()
 }
