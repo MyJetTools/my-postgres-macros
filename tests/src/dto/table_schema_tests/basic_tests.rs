@@ -25,9 +25,9 @@ mod tests {
 
     #[derive(DbEnumAsI32)]
     pub enum MyEnum {
-        #[default_value]
         #[enum_case(0)]
         Field1,
+        #[default_value]
         #[enum_case(1)]
         Field2,
     }
@@ -38,7 +38,7 @@ mod tests {
 
         let columns = TableSchemaModel::get_columns();
 
-        assert_eq!(columns.len(), 4);
+        assert_eq!(columns.len(), 5);
 
         let primary_key_columns = TableSchemaModel::get_primary_key_columns().unwrap();
         assert_eq!(primary_key_columns.len(), 2);
