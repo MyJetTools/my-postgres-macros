@@ -96,7 +96,7 @@ pub fn generate(
 
     let fn_is_none = super::utils::render_fn_is_none();
 
-    let default_value = super::utils::get_default_value(enum_name);
+    let default_value = super::utils::get_default_value(enum_name, enum_cases.as_slice())?;
 
     let result = quote! {
 
