@@ -102,7 +102,7 @@ pub fn generate(
 
         impl #enum_name{
 
-            pub fn get_default_value(&self)->&'static str{
+            pub fn get_default_value()->&'static str{
                 #default_value
             }
 

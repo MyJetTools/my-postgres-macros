@@ -19,7 +19,7 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
 
         impl #enum_name{
 
-            pub fn get_default_value(&self)->&'static str{
+            pub fn get_default_value()->&'static str{
                 #default_value
             }
             
