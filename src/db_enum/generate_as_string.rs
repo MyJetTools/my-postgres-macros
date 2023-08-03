@@ -13,15 +13,13 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
 
     let fn_is_none = super::utils::render_fn_is_none();
 
-    let default_value = super::utils::get_default_value(enum_name, enum_cases.as_slice())?;
+    let default_value_reading = super::utils::get_default_value( enum_cases.as_slice())?;
 
     let result = quote! {
 
         impl #enum_name{
 
-            pub fn get_default_value()->&'static str{
-                #default_value
-            }
+            #default_value_reading
             
             pub fn to_str(&self)->&'static str {
                 match self{
