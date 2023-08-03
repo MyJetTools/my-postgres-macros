@@ -25,6 +25,7 @@ mod tests {
 
     #[derive(DbEnumAsI32)]
     pub enum MyEnum {
+        #[default_value]
         #[enum_case(0)]
         Field1,
         #[enum_case(1)]

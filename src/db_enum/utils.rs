@@ -57,7 +57,7 @@ pub fn get_default_value(
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
     for enum_case in enum_cases {
         if enum_case.attrs.has_attr("default_value") {
-            let value = enum_case.get_case_string_value()?;
+            let value = enum_case.get_case_any_string_value()?;
 
             return Ok(quote::quote!(#value));
         }
