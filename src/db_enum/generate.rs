@@ -118,7 +118,7 @@ pub fn generate(
                 }
             }
 
-            fn fill_select_part(sql: &mut  my_postgres::sql::SelectBuilder, field_name: &'static str, metadata: &Option<my_postgres::SqlValueMetadata>) {
+            pub fn fill_select_part(sql: &mut  my_postgres::sql::SelectBuilder, field_name: &'static str, metadata: &Option<my_postgres::SqlValueMetadata>) {
                 sql.push(my_postgres::sql::SelectFieldValue::Field(field_name));
             }
 
