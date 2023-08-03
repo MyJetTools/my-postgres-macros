@@ -53,7 +53,7 @@ pub fn get_default_value(enum_name: &Ident) -> proc_macro2::TokenStream {
 
     TokenStream::from_str(
         format!(
-            r#"panic!("Default value is not specified for the enum ["{}"]", #enum_name);"#,
+            r#"panic!("Default value is not specified for the enum [{}]");"#,
             enum_name
         )
         .as_str(),
