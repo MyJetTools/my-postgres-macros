@@ -19,7 +19,7 @@ mod tests {
         #[ignore_table_column]
         pub to_be_ignored: String,
 
-        #[default_value(1)]
+        #[default_value]
         pub enum_field: MyEnum,
     }
 

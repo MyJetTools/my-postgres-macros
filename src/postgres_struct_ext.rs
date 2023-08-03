@@ -10,6 +10,11 @@ pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
 pub const ATTR_SQL_TYPE: &str = "sql_type";
 pub const ATTR_JSON: &str = "json";
 
+pub enum DefaultValue {
+    Inherit,
+    Value(String),
+}
+
 pub struct IndexAttr {
     pub id: u8,
     pub index_name: String,
@@ -54,7 +59,7 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_default_if_null_value(&self) -> Result<Option<&str>, syn::Error>;
 
-    fn get_default_value(&self) -> Result<Option<&str>, syn::Error>;
+    fn get_default_value(&self) -> Result<Option<DefaultValue>, syn::Error>;
 
     fn render_field_value(&self, is_update: bool) -> Result<proc_macro2::TokenStream, syn::Error> {
         match &self.get_ty() {
@@ -211,12 +216,17 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         return Ok(None);
     }
 
-    fn get_default_value(&self) -> Result<Option<&str>, syn::Error> {
+    fn get_default_value(&self) -> Result<Option<DefaultValue>, syn::Error> {
         if let Some(attr) = self.attrs.try_get_attr("default_value") {
-            let result = attr
-                .get_from_single_or_named("value")?
-                .get_any_value_as_str()?;
-            return Ok(Some(result));
+            let result = attr.try_get_from_single_or_named("value");
+
+            match result {
+                Some(value) => {
+                    let result = value.get_any_value_as_str()?;
+                    return Ok(Some(DefaultValue::Value(result.to_string())));
+                }
+                None => return Ok(Some(DefaultValue::Inherit)),
+            }
         }
 
         return Ok(None);

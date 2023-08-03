@@ -70,7 +70,16 @@ fn impl_db_columns(
         }
 
         let default_value = if let Some(default_value) = field.get_default_value()? {
-            quote::quote!(Some(#default_value.into()))
+            match default_value{
+                crate::postgres_struct_ext::DefaultValue::Inherit => {
+                    let type_name = field.ty.get_token_stream();
+                    quote::quote!(#type_name::get_default_value())
+                },
+                crate::postgres_struct_ext::DefaultValue::Value(default_value) => {
+                    quote::quote!(Some(#default_value.into()))
+                },
+            }
+            
         } else {
             quote::quote!(None)
         };
