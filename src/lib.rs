@@ -85,6 +85,7 @@ pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
         primary_key,
         e_tag,
         default_if_null,
+        ignore_if_none,
         wrap_column_name,
     )
 )]
@@ -105,6 +106,7 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
         sql_type,
         e_tag,
         default_if_null,
+        ignore_if_none,
         wrap_column_name,
     )
 )]
