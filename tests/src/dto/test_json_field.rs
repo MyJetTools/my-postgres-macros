@@ -73,7 +73,10 @@ pub struct WhereModel {
 #[cfg(test)]
 mod tests {
 
-    use my_postgres::{sql::SelectBuilder, UpdateConflictType};
+    use my_postgres::{
+        sql::{SelectBuilder, UpsertColumns},
+        UpdateConflictType,
+    };
     use rust_extensions::date_time::DateTimeAsMicroseconds;
 
     use super::{TestJsonField, WhereModel};
@@ -109,7 +112,8 @@ mod tests {
             d: 2.22,
         };
 
-        let sql = my_postgres::sql::build_insert_sql(&entity, "test");
+        let sql =
+            my_postgres::sql::build_insert_sql(&entity, "test", &mut UpsertColumns::as_none());
 
         println!("{}", sql.sql);
     }

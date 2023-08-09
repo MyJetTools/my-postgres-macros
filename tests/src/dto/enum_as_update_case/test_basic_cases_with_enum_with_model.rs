@@ -35,7 +35,11 @@ pub struct MyStructure2 {
 #[cfg(test)]
 mod tests {
 
-    use my_postgres::{sql::SelectBuilder, sql_select::SelectEntity, UpdateConflictType};
+    use my_postgres::{
+        sql::{SelectBuilder, UpsertColumns},
+        sql_select::SelectEntity,
+        UpdateConflictType,
+    };
     use my_postgres_macros::WhereDbModel;
 
     use super::*;
@@ -53,7 +57,11 @@ mod tests {
             value: MyEnumWithModel::Case1(MyStructure { a: 1, b: true }),
         };
 
-        let sql = my_postgres::sql::build_insert_sql(&model, "test_table_name");
+        let sql = my_postgres::sql::build_insert_sql(
+            &model,
+            "test_table_name",
+            &mut UpsertColumns::as_none(),
+        );
 
         assert_eq!(
             sql.sql,

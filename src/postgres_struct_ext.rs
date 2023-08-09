@@ -74,10 +74,13 @@ pub trait PostgresStructPropertyExt<'s> {
 
         let metadata = self.get_field_metadata()?;
 
+        let ignore_if_none = self.has_ignore_if_none_attr();
+
         let result = if is_update {
             quote::quote! {
                 my_postgres::sql_update::SqlUpdateModelValue{
                     value: Some(&self.#name),
+                    ignore_if_none: #ignore_if_none,
                     metadata: #metadata
                 }
             }
@@ -118,11 +121,13 @@ pub trait PostgresStructPropertyExt<'s> {
         };
 
         let result = if is_update {
+            let ignore_if_none = self.has_ignore_if_none_attr();
+
             quote::quote! {
                if let Some(value) = &self.#prop_name{
-                  my_postgres::sql_update::SqlUpdateModelValue {value: Some(value), metadata: #metadata}
+                  my_postgres::sql_update::SqlUpdateModelValue {value: Some(value), ignore_if_none:#ignore_if_none, metadata: #metadata}
                }else{
-                my_postgres::sql_update::SqlUpdateModelValue {value: None, metadata: #metadata}
+                my_postgres::sql_update::SqlUpdateModelValue {value: None, ignore_if_none:#ignore_if_none, metadata: #metadata}
                }
             }
         } else {

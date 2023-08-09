@@ -22,7 +22,11 @@ pub enum MyEnumAsString {
 #[cfg(test)]
 mod tests {
 
-    use my_postgres::{sql::SelectBuilder, sql_select::SelectEntity, UpdateConflictType};
+    use my_postgres::{
+        sql::{SelectBuilder, UpsertColumns},
+        sql_select::SelectEntity,
+        UpdateConflictType,
+    };
 
     use super::*;
 
@@ -39,7 +43,11 @@ mod tests {
             value: MyEnumAsString::Case1,
         };
 
-        let sql = my_postgres::sql::build_insert_sql(&model, "test_table_name");
+        let sql = my_postgres::sql::build_insert_sql(
+            &model,
+            "test_table_name",
+            &mut UpsertColumns::as_none(),
+        );
 
         assert_eq!(
             sql.sql,

@@ -3,10 +3,6 @@ use std::collections::HashMap;
 use my_postgres_macros::{InsertDbEntity, SelectDbEntity, UpdateDbEntity};
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 
-
-
-
-
 #[derive(SelectDbEntity, InsertDbEntity, UpdateDbEntity)]
 pub struct JsonHashMapDto {
     pub field: HashMap<String, String>,
@@ -27,6 +23,8 @@ pub struct MyJsonStruct {
 
 #[cfg(test)]
 mod tests {
+
+    use my_postgres::sql::UpsertColumns;
 
     use super::*;
 
@@ -58,7 +56,11 @@ mod tests {
             my_dt,
         };
 
-        let sql = my_postgres::sql::build_insert_sql(&dto, "test_table_name");
+        let sql = my_postgres::sql::build_insert_sql(
+            &dto,
+            "test_table_name",
+            &mut UpsertColumns::as_none(),
+        );
 
         assert_eq!(sql.sql,
         "INSERT INTO test_table_name(field,opt_field,field_vec,opt_vec,json_field,opt_json_field,my_dt) VALUES (cast($1::text as json),NULL,cast($2::text as json),NULL,cast($3::text as json),NULL,'2023-06-19T22:07:20.518741+00:00')");
@@ -99,7 +101,11 @@ mod tests {
             my_dt,
         };
 
-        let sql = my_postgres::sql::build_insert_sql(&dto, "test_table_name");
+        let sql = my_postgres::sql::build_insert_sql(
+            &dto,
+            "test_table_name",
+            &mut UpsertColumns::as_none(),
+        );
 
         assert_eq!(sql.sql,
         "INSERT INTO test_table_name(field,opt_field,field_vec,opt_vec,json_field,opt_json_field,my_dt) VALUES (cast($1::text as json),cast($1::text as json),cast($2::text as json),cast($3::text as json),cast($4::text as json),cast($5::text as json),'2023-06-19T22:07:20.518741+00:00')");
