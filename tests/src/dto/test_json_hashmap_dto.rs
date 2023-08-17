@@ -24,7 +24,7 @@ pub struct MyJsonStruct {
 #[cfg(test)]
 mod tests {
 
-    use my_postgres::sql::UpsertColumns;
+    use my_postgres::sql::UsedColumns;
 
     use super::*;
 
@@ -59,7 +59,7 @@ mod tests {
         let sql = my_postgres::sql::build_insert_sql(
             &dto,
             "test_table_name",
-            &mut UpsertColumns::as_none(),
+            &mut UsedColumns::as_none(),
         );
 
         assert_eq!(sql.sql,
@@ -104,7 +104,7 @@ mod tests {
         let sql = my_postgres::sql::build_insert_sql(
             &dto,
             "test_table_name",
-            &mut UpsertColumns::as_none(),
+            &mut UsedColumns::as_none(),
         );
 
         assert_eq!(sql.sql,

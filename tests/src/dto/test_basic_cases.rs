@@ -13,7 +13,7 @@ pub struct KeyValue {
 mod tests {
 
     use my_postgres::{
-        sql::{SelectBuilder, UpsertColumns},
+        sql::{SelectBuilder, UsedColumns},
         sql_select::SelectEntity,
         UpdateConflictType,
     };
@@ -36,7 +36,7 @@ mod tests {
         let sql = my_postgres::sql::build_insert_sql(
             &model,
             "test_table_name",
-            &mut UpsertColumns::as_none(),
+            &mut UsedColumns::as_none(),
         );
 
         assert_eq!(

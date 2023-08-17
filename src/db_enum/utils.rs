@@ -21,22 +21,15 @@ pub fn render_reading_db_row_metadata_model() -> proc_macro2::TokenStream {
 
 pub fn render_update_value_provider_fn_body() -> proc_macro2::TokenStream {
     quote::quote! {
-        let (name, model) = self.to_str();
-        let index_name = params.push_static_str(name);
-        let index_model = params.push(model.into());
-        my_postgres::sql::SqlUpdateValue::Index(index_name, Some(index_model))
+        let value = self.to_str();
+        let index = params.push(value.into());
+        my_postgres::sql::SqlUpdateValue::Index(index)
     }
 }
 
 pub fn render_select_part() -> proc_macro2::TokenStream {
     quote::quote! {
         sql.push(my_postgres::sql::SelectFieldValue::Field(field_name));
-
-        if let Some(metadata) = metadata {
-            if let Some(field_name) = metadata.related_column_name{
-                sql.push(my_postgres::sql::SelectFieldValue::Field(field_name));
-            }
-        }
     }
 }
 

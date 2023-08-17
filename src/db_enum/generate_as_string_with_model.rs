@@ -11,12 +11,10 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
 
     let fn_from_str =  generate_fn_from_str(&enum_cases)?;
 
-    let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
 
     let update_value_provider_fn_body = super::utils::render_update_value_provider_fn_body();
 
     let select_part = super::utils::render_select_part();
-
 
 
     let result = quote! {
@@ -24,14 +22,15 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
         impl #enum_name{
 
      
-            pub fn to_str(&self)->(&'static str, String) {
+            pub fn to_str(&self)->String {
                 match self{
                     #fn_to_str
                 }
             }
 
 
-            pub fn from_str(name: &str, model: &str)->Self{
+            pub fn from_str(src: &str)->Self{
+                let (name, model) = my_postgres::utils::get_case_and_model(src);
                 match name {
                     #fn_from_str
                   _ => panic!("Invalid value {}", name)
@@ -45,20 +44,15 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
 
             impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
                 fn from_db_row(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
-                    let name: String = row.get(name);
-
-                    #reading_db_model_from_metadata
-
-                    Self::from_str(name.as_str(), model.as_str())
+                    let value: String = row.get(name);
+                    Self::from_str(value.as_str())
                 }
 
                 fn from_db_row_opt(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
-                    let name: Option<String> = row.get(name);
-                    let name = name?;
+                    let value: Option<String> = row.get(name);
+                    let value = value?;
 
-                    #reading_db_model_from_metadata
-
-                    Some(Self::from_str(name.as_str(), model.as_str()))
+                    Some(Self::from_str(value.as_str()))
                 }
             }
 
@@ -119,7 +113,7 @@ fn generate_fn_to_str(enum_cases: &[EnumCase]) -> Result<proc_macro2::TokenStrea
         let case_value = case.get_case_string_value()?;
 
         result.extend(quote! {
-            Self::#case_ident(model) => (#case_value, model.to_string()),
+            Self::#case_ident(model) => my_postgres::utils::compile_enum_with_model(#case_value, model.to_string().as_str()),
         });
     }
     Ok(result)

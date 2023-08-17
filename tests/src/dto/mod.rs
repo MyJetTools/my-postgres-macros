@@ -10,3 +10,4 @@ mod test_json_hashmap_dto;
 mod test_primary_key;
 mod where_model;
 pub use test_basic_cases::*;
+mod tests_real_cases;

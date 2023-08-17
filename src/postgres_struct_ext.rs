@@ -34,8 +34,6 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_db_column_name_as_string(&self) -> Result<&str, syn::Error>;
 
-    fn get_model_db_column_name_as_string(&self) -> Option<&ParamValue>;
-
     fn has_json_attr(&self) -> bool;
 
     fn has_ignore_attr(&self) -> bool;
@@ -261,17 +259,6 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(self.name.as_str())
     }
 
-    fn get_model_db_column_name_as_string(&self) -> Option<&ParamValue> {
-        if let Ok(attr) = self
-            .attrs
-            .get_named_param(ATTR_DB_FIELD_NAME, "model_db_column_name")
-        {
-            return Some(attr);
-        }
-
-        return None;
-    }
-
     fn get_index_attrs(&self) -> Result<Option<Vec<IndexAttr>>, syn::Error> {
         let attrs = self.attrs.try_get_attrs("db_index");
 
@@ -321,20 +308,11 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
     }
 
     fn get_field_metadata(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
-        let model_field_name = self.get_model_db_column_name_as_string();
-
         let sql_type = self.get_sql_type();
 
-        if model_field_name.is_none() && sql_type.is_err() {
+        if sql_type.is_err() {
             return Ok(quote::quote!(None));
         }
-
-        let related_column_name = if let Some(model_field_name) = model_field_name {
-            let model_field_name = model_field_name.unwrap_as_string_value()?.as_str();
-            quote::quote!(Some(#model_field_name))
-        } else {
-            quote::quote!(None)
-        };
 
         let sql_type = if let Ok(sql_type) = sql_type {
             let sql_type = sql_type.unwrap_as_string_value()?.as_str();
@@ -346,7 +324,6 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(quote::quote!({
             Some(my_postgres::SqlValueMetadata{
                 sql_type: #sql_type,
-                related_column_name: #related_column_name
             })
         }))
     }

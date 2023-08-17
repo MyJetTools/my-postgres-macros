@@ -16,7 +16,7 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
 
     let fn_to_str = fn_to_str(enum_cases.as_slice())?;
 
-    let fn_to_numbered = fn_to_numbered(enum_cases.as_slice())?;
+   
 
     let from_db_value =  fn_from_db_value(enum_cases.as_slice())?;
 
@@ -43,22 +43,19 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
 
         impl #enum_name{
 
-            pub fn to_str(&self)->(&'static str, String) {
+            pub fn to_str(&self)->String {
                 match self{
                 #(#fn_to_str),*
                 }
             }
 
-            pub fn to_numbered(&self)->(#type_name, String) {
-                match self{
-                #(#fn_to_numbered),*
-                }
-            }
+  
 
-            pub fn from_db_value(src: #type_name, model: &str)->Self{
-                match src{
+            pub fn from_db_value(value: &str)->Self{
+                let (case, model) = my_postgres::utils::get_case_and_model(value);
+                match case{
                   #(#from_db_value)*
-                  _ => panic!("Invalid value {}", src)
+                  _ => panic!("Invalid value {}", value)
                 }
             }
 
@@ -82,16 +79,13 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
 
         impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
             fn from_db_row(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
-                let result: #sql_db_type = row.get(name);
-                #reading_db_model_from_metadata
-                #from_db_result
+                let value: String = row.get(name);
+                Self::from_db_value(value.as_str())
             }
 
             fn from_db_row_opt(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
-                let result: Option<#sql_db_type> = row.get(name);
-                let result = result?;
-                #reading_db_model_from_metadata
-                Some(#from_db_result)
+                let value: Option<String> = row.get(name);
+                Self::from_db_value(value?.as_str()).into()
             }
         }
 
@@ -116,7 +110,7 @@ pub fn fn_to_str(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error
         
         let no = no.to_string();
 
-        result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
+        result.push(quote!(Self::#enum_case_name(model) => my_postgres::utils::compile_enum_with_model(#no, model.to_string().as_str())).into());
     }
 
     Ok(result)
@@ -163,9 +157,18 @@ fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Er
             None => no+1,
         };
         
-        let no = proc_macro2::Literal::i64_unsuffixed(no);
+        let no = no.to_string();
         result.push(quote! (#no => Self::#name_ident(#model::from_str(model)),));
     }
 
     Ok(result)
 }
+
+
+/*
+          pub fn to_numbered(&self)->(#type_name, String) {
+                match self{
+                #(#fn_to_numbered),*
+                }
+            }
+*/

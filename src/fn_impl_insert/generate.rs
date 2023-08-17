@@ -32,7 +32,7 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
                 #fields_amount
             }
 
-            fn get_column_name(no: usize) -> (my_postgres::ColumnName, Option<my_postgres::ColumnName>){
+            fn get_column_name(no: usize) -> my_postgres::ColumnName{
                 match no{
                     #(#fn_get_column_name)*
                     _=>panic!("no such field with number {}", no)
@@ -63,16 +63,7 @@ pub fn fn_get_column_name(
     for (i, prop) in fields.iter().enumerate() {
         let field_name = prop.get_db_column_name_as_string()?;
 
-        let other_field_name =
-            if let Some(model_field_name) = prop.get_model_db_column_name_as_string() {
-                let name = model_field_name.unwrap_as_string_value()?.as_str();
-
-                quote::quote! {Some(#name.into())}
-            } else {
-                quote::quote!(None)
-            };
-
-        result.push(quote! (#i=>(#field_name.into(), #other_field_name),).into());
+        result.push(quote! (#i=>#field_name.into(),).into());
     }
     Ok(result)
 }

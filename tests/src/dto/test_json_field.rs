@@ -19,7 +19,6 @@ pub struct TestJsonField {
 
     pub my_enum_no_model: MyEnum,
 
-    #[db_field_name(model_db_column_name = "field_model")]
     pub my_enum: MyEnumWithModel,
 
     pub b: bool,
@@ -74,7 +73,7 @@ pub struct WhereModel {
 mod tests {
 
     use my_postgres::{
-        sql::{SelectBuilder, UpsertColumns},
+        sql::{SelectBuilder, UsedColumns},
         UpdateConflictType,
     };
     use rust_extensions::date_time::DateTimeAsMicroseconds;
@@ -112,8 +111,7 @@ mod tests {
             d: 2.22,
         };
 
-        let sql =
-            my_postgres::sql::build_insert_sql(&entity, "test", &mut UpsertColumns::as_none());
+        let sql = my_postgres::sql::build_insert_sql(&entity, "test", &mut UsedColumns::as_none());
 
         println!("{}", sql.sql);
     }

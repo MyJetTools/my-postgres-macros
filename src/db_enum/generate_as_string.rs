@@ -47,7 +47,7 @@ pub fn generate_as_string(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStr
                 metadata: &Option<my_postgres::SqlValueMetadata>,
             )->my_postgres::sql::SqlUpdateValue {
                 let index = params.push_static_str(self.to_str());
-                my_postgres::sql::SqlUpdateValue::Index(index, None)
+                my_postgres::sql::SqlUpdateValue::Index(index)
             }
 
         }
