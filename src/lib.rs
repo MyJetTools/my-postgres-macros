@@ -213,7 +213,7 @@ pub fn db_enum_as_string(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_u8_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::U8) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }
@@ -225,7 +225,7 @@ pub fn db_enum_as_u8_with_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_i8_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::I8) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }
@@ -237,7 +237,7 @@ pub fn db_enum_as_i8_with_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_u16_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::U16) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }
@@ -249,7 +249,7 @@ pub fn db_enum_as_u16_with_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_i16_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::I16) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }
@@ -261,7 +261,7 @@ pub fn db_enum_as_i16_with_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_u32_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::U32) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }
@@ -273,7 +273,7 @@ pub fn db_enum_as_u32_with_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_i32_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::I32) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }
@@ -285,7 +285,7 @@ pub fn db_enum_as_i32_with_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_u64_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::U64) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }
@@ -297,7 +297,7 @@ pub fn db_enum_as_u64_with_model(input: TokenStream) -> TokenStream {
 )]
 pub fn db_enum_as_i64_with_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    match crate::db_enum::generate_with_model(&ast, EnumType::I64) {
+    match crate::db_enum::generate_with_model(&ast) {
         Ok(result) => result.into(),
         Err(err) => err.to_compile_error().into(),
     }

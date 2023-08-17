@@ -4,15 +4,13 @@ use types_reader::EnumCase;
 
 use crate::postgres_enum_ext::PostgresEnumExt;
 
-use super::EnumType;
 
-pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Result<TokenStream, syn::Error> {
+pub fn generate_with_model(ast: &syn::DeriveInput) -> Result<TokenStream, syn::Error> {
     let enum_name = &ast.ident;
 
     let enum_cases = EnumCase::read(ast)?;
 
 
-    let type_name = enum_type.get_return_type_name();
 
     let fn_to_str = fn_to_str(enum_cases.as_slice())?;
 
@@ -20,22 +18,11 @@ pub fn generate_with_model(ast: &syn::DeriveInput, enum_type: EnumType) -> Resul
 
     let from_db_value =  fn_from_db_value(enum_cases.as_slice())?;
 
-    let sql_db_type = enum_type.get_compliant_with_db_type();
 
-    let reading_db_model_from_metadata = super::utils::render_reading_db_row_metadata_model();
 
     let select_part = super::utils::render_select_part();
 
 
-    let from_db_result = if type_name.to_string() == sql_db_type.to_string() {
-        quote! {
-            Self::from_db_value(result, model.as_str())
-        }
-    } else {
-        quote! {
-            Self::from_db_value(result as #type_name, model.as_str())
-        }
-    };
 
     let update_value_provider_fn_body = super::utils::render_update_value_provider_fn_body();
 
@@ -116,25 +103,6 @@ pub fn fn_to_str(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error
     Ok(result)
 }
 
-pub fn fn_to_numbered(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>,  syn::Error>{
-    let mut result = Vec::with_capacity(enum_cases.len());
-
-    let mut no= 0;
-
-    for enum_case in enum_cases {
-        let enum_case_name = enum_case.get_name_ident();
-        no = match enum_case.get_case_number_value()?{
-            Some(value) => value,
-            None => no+1,
-        };
-        
-        let no = proc_macro2::Literal::i64_unsuffixed(no);
-
-        result.push(quote!(Self::#enum_case_name(model) => (#no, model.to_string())).into());
-    }
-
-    Ok(result)
-}
 
 fn fn_from_db_value(enum_cases: &[EnumCase]) -> Result<Vec<TokenStream>, syn::Error> {
     let mut result = Vec::with_capacity(enum_cases.len());
