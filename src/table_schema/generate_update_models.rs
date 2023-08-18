@@ -22,7 +22,7 @@ pub fn generate_update_models<'s>(
             let name = field.get_field_name_ident();
             let ty = field.ty.get_token_stream();
             fields.push(quote::quote! {
-                #name: #ty,
+                pub #name: #ty,
             });
         }
 
@@ -30,7 +30,7 @@ pub fn generate_update_models<'s>(
             let name = field.get_field_name_ident();
             let ty = field.ty.get_token_stream();
             fields.push(quote::quote! {
-                #name: #ty,
+                pub #name: #ty,
             });
         }
 

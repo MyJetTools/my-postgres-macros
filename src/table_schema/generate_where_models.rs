@@ -4,7 +4,7 @@ use proc_macro2::TokenStream;
 
 use types_reader::StructProperty;
 
-use crate::postgres_struct_ext::PostgresStructPropertyExt;
+use crate::postgres_struct_ext::{GenerateAdditionalWhereStruct, PostgresStructPropertyExt};
 
 pub fn generate_where_models<'s>(
     fields: &'s [&'s StructProperty],
@@ -36,16 +36,10 @@ pub fn generate_where_models<'s>(
         let mut fields = Vec::new();
 
         for (model, field) in models {
-            let ty = model.field_ty;
-
             if let Some(operator_from) = model.operator_from.as_ref() {
                 fields.push(quote::quote! {
                     #[operator(#operator_from)]
                 });
-
-                let field_name =
-                    TokenStream::from_str(format!("{}_from", model.field_name.as_str()).as_str())
-                        .unwrap();
 
                 generate_additional_attributes(&mut fields, field)?;
 
@@ -53,30 +47,20 @@ pub fn generate_where_models<'s>(
 
                 generate_db_column_name_attribute(&mut fields, db_column_name);
 
-                fields.push(quote::quote! {
-                    #field_name: #ty,
-                });
+                push_field(&mut fields, &model, Some("_from"));
 
                 if let Some(operator_to) = model.operator_to.as_ref() {
                     fields.push(quote::quote! {
                         #[operator(#operator_to)]
                     });
 
-                    let field_name =
-                        TokenStream::from_str(format!("{}_to", model.field_name.as_str()).as_str())
-                            .unwrap();
-
                     generate_additional_attributes(&mut fields, field)?;
 
                     generate_db_column_name_attribute(&mut fields, db_column_name);
 
-                    fields.push(quote::quote! {
-                        #field_name: #ty,
-                    });
+                    push_field(&mut fields, &model, Some("_to"));
                 }
             } else {
-                let field_name = TokenStream::from_str(model.field_name.as_str()).unwrap();
-
                 if let Some(operator) = model.operator.as_ref() {
                     fields.push(quote::quote! {
                         #[operator(#operator)]
@@ -89,15 +73,7 @@ pub fn generate_where_models<'s>(
 
                 generate_additional_attributes(&mut fields, field)?;
 
-                if model.generate_as_str {
-                    fields.push(quote::quote! {
-                        #field_name: &'s str,
-                    });
-                } else {
-                    fields.push(quote::quote! {
-                        #field_name: #ty,
-                    });
-                }
+                push_field(&mut fields, &model, None);
             }
         }
 
@@ -154,6 +130,31 @@ fn generate_struct(
             pub struct #struct_name{
                 #(#fields)*
             }
+        });
+    }
+}
+
+fn push_field(
+    fields: &mut Vec<TokenStream>,
+    model: &GenerateAdditionalWhereStruct,
+    add_suffix: Option<&'static str>,
+) {
+    let field_name = if let Some(add_suffix) = add_suffix {
+        TokenStream::from_str(format!("{}{}", model.field_name.as_str(), add_suffix).as_str())
+            .unwrap()
+    } else {
+        TokenStream::from_str(model.field_name.as_str()).unwrap()
+    };
+
+    let ty = &model.field_ty;
+
+    if model.generate_as_str {
+        fields.push(quote::quote! {
+            pub #field_name: &'s str,
+        });
+    } else {
+        fields.push(quote::quote! {
+            pub #field_name: #ty,
         });
     }
 }
