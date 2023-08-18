@@ -38,6 +38,7 @@ pub struct GenerateAdditionalWhereStruct {
     pub operator: Option<String>,
     pub operator_from: Option<String>,
     pub operator_to: Option<String>,
+    pub generate_as_str: bool,
 }
 
 pub trait PostgresStructPropertyExt<'s> {
@@ -447,28 +448,28 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
 
         let mut result = Vec::new();
 
-        for param in params {
-            let struct_name = param
+        for param_list in params {
+            let struct_name = param_list
                 .get_from_single_or_named("name")?
                 .unwrap_as_string_value()?
                 .as_str()
                 .to_string();
 
-            let operator = param.try_get_named_param("operator");
+            let operator = param_list.try_get_named_param("operator");
 
             let operator = match operator {
                 Some(value) => Some(value.unwrap_as_string_value()?.as_str().to_string()),
                 None => None,
             };
 
-            let operator_from = param.try_get_named_param("operator_from");
+            let operator_from = param_list.try_get_named_param("operator_from");
 
             let operator_from = match operator_from {
                 Some(value) => Some(value.unwrap_as_string_value()?.as_str().to_string()),
                 None => None,
             };
 
-            let operator_to = param.try_get_named_param("operator_to");
+            let operator_to = param_list.try_get_named_param("operator_to");
 
             let operator_to = match operator_to {
                 Some(value) => Some(value.unwrap_as_string_value()?.as_str().to_string()),
@@ -482,6 +483,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
                 operator,
                 operator_from,
                 operator_to,
+                generate_as_str: param_list.has_param("as_str"),
             };
 
             result.push(itm)

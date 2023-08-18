@@ -1,6 +1,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use proc_macro2::TokenStream;
+
 use types_reader::StructProperty;
 
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
@@ -30,7 +31,7 @@ pub fn generate_where_models<'s>(
     let mut result = Vec::new();
 
     for (struct_name, models) in found_fields {
-        let struct_name = TokenStream::from_str(struct_name.as_str()).unwrap();
+        let has_reference = models.iter().any(|(model, _)| model.generate_as_str);
 
         let mut fields = Vec::new();
 
@@ -88,18 +89,19 @@ pub fn generate_where_models<'s>(
 
                 generate_additional_attributes(&mut fields, field)?;
 
-                fields.push(quote::quote! {
-                    #field_name: #ty,
-                });
+                if model.generate_as_str {
+                    fields.push(quote::quote! {
+                        #field_name: &'s str,
+                    });
+                } else {
+                    fields.push(quote::quote! {
+                        #field_name: #ty,
+                    });
+                }
             }
         }
 
-        result.push(quote::quote! {
-            #[derive(my_postgres_macros::WhereDbModel)]
-            pub struct #struct_name{
-                #(#fields)*
-            }
-        });
+        generate_struct(&mut result, struct_name.as_str(), has_reference, &fields);
     }
 
     let result = quote::quote! {
@@ -129,4 +131,29 @@ fn generate_db_column_name_attribute(fields: &mut Vec<TokenStream>, db_column_na
     fields.push(quote::quote! {
         #[db_column_name(#db_column_name)]
     })
+}
+
+fn generate_struct(
+    result: &mut Vec<TokenStream>,
+    struct_name: &str,
+    has_reference: bool,
+    fields: &[TokenStream],
+) {
+    let struct_name = TokenStream::from_str(struct_name).unwrap();
+
+    if has_reference {
+        result.push(quote::quote! {
+            #[derive(my_postgres_macros::WhereDbModel)]
+            pub struct #struct_name<'s>{
+                #(#fields)*
+            }
+        });
+    } else {
+        result.push(quote::quote! {
+            #[derive(my_postgres_macros::WhereDbModel)]
+            pub struct #struct_name{
+                #(#fields)*
+            }
+        });
+    }
 }

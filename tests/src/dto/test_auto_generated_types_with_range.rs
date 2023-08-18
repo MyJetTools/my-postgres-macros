@@ -4,8 +4,8 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 #[derive(TableSchema)]
 pub struct MyTableModel {
-    #[generate_where_model(name:"ByTraderIdAndDateWhereModel")]
-    #[db_column_name("my_trader_id")]
+    #[generate_where_model(name:"ByTraderIdAndDateWhereModel", as_str)]
+    #[db_column_name(name:"my_trader_id")]
     pub trader_id: String,
 
     #[sql_type("timestamp")]
@@ -16,7 +16,7 @@ pub struct MyTableModel {
 #[test]
 fn test_where_auto_generator_with_operator() {
     let where_model = ByTraderIdAndDateWhereModel {
-        trader_id: "test".to_string(),
+        trader_id: "test",
         date_from: DateTimeAsMicroseconds::parse_iso_string("2023-06-19T22:07:20.518741+00:00")
             .unwrap(),
         date_to: DateTimeAsMicroseconds::parse_iso_string("2023-06-19T22:07:20.518741+00:00")
