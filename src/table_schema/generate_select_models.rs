@@ -3,11 +3,7 @@ use std::{collections::HashMap, str::FromStr};
 use proc_macro2::TokenStream;
 use types_reader::StructProperty;
 
-use crate::{
-    fn_impl_update::{generate_derive_model, UpdateFields},
-    postgres_struct_ext::PostgresStructPropertyExt,
-    struct_name::StructName,
-};
+use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
 pub fn generate_select_models<'s>(
     fields: &'s [&'s StructProperty],
