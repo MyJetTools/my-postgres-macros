@@ -139,6 +139,22 @@ fn push_field(
     model: &GenerateAdditionalWhereStruct,
     add_suffix: Option<&'static str>,
 ) {
+    let mut ty = if model.generate_as_str {
+        "&'s str".to_string()
+    } else {
+        model.field_ty.to_string()
+    };
+
+    if model.generate_as_vec {
+        ty = format!("Vec<{}>", ty);
+    }
+
+    if model.generate_as_opt {
+        ty = format!("Option<{}>", ty);
+    }
+
+    let ty = TokenStream::from_str(ty.as_str()).unwrap();
+
     let field_name = if let Some(add_suffix) = add_suffix {
         TokenStream::from_str(format!("{}{}", model.field_name.as_str(), add_suffix).as_str())
             .unwrap()
@@ -146,27 +162,11 @@ fn push_field(
         TokenStream::from_str(model.field_name.as_str()).unwrap()
     };
 
-    let ty = &model.field_ty;
-
-    if model.generate_as_vec {
-        if model.generate_as_str {
-            fields.push(quote::quote! {
-                pub #field_name: Vec<&'s str>,
-            });
-        } else {
-            fields.push(quote::quote! {
-                pub #field_name: Vec<#ty>,
-            });
-        }
-    } else {
-        if model.generate_as_str {
-            fields.push(quote::quote! {
-                pub #field_name: &'s str,
-            });
-        } else {
-            fields.push(quote::quote! {
-                pub #field_name: #ty,
-            });
-        }
+    if model.ignore_if_none {
+        fields.push(quote::quote!(#[ignore_if_none]));
     }
+
+    fields.push(quote::quote! {
+        pub #field_name: #ty,
+    });
 }

@@ -40,6 +40,8 @@ pub struct GenerateAdditionalWhereStruct {
     pub operator_to: Option<String>,
     pub generate_as_str: bool,
     pub generate_as_vec: bool,
+    pub generate_as_opt: bool,
+    pub ignore_if_none: bool,
 }
 
 pub struct GenerateAdditionalSelectStruct {
@@ -497,6 +499,8 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
                 operator_to,
                 generate_as_str: param_list.has_param("as_str"),
                 generate_as_vec: param_list.has_param("as_vec"),
+                generate_as_opt: param_list.has_param("as_option"),
+                ignore_if_none: param_list.has_param("ignore_if_none"),
             };
 
             result.push(itm)

@@ -5,7 +5,7 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 #[derive(TableSchema)]
 pub struct MyTableModel {
     #[generate_select_model("MySelectDto")]
-    #[generate_where_model(name:"ByTraderIdAndDateWhereModel", as_str)]
+    #[generate_where_model(name:"ByTraderIdAndDateWhereModel", as_str=true)]
     #[db_column_name(name:"my_trader_id")]
     pub trader_id: String,
 
