@@ -34,7 +34,7 @@ impl<'s> UpdateFields<'s> {
         let mut hash_map = HashMap::new();
 
         for prop in fields {
-            if let Some(generate_update_models) = prop.get_generate_additional_update_model()? {
+            if let Some(generate_update_models) = prop.get_generate_additional_update_models()? {
                 for generate_update_model in generate_update_models {
                     if !hash_map.contains_key(generate_update_model.struct_name.as_str()) {
                         hash_map.insert(generate_update_model.struct_name.to_string(), Vec::new());

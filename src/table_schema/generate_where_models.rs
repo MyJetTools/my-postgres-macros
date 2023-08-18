@@ -12,7 +12,7 @@ pub fn generate_where_models<'s>(
     let mut found_fields = HashMap::new();
 
     for field in fields {
-        let where_models = field.get_generate_additional_where_model()?;
+        let where_models = field.get_generate_additional_where_models()?;
 
         if let Some(where_models) = where_models {
             for where_model in where_models {
@@ -45,7 +45,10 @@ pub fn generate_where_models<'s>(
 
                 let db_column_name = field.get_db_column_name_as_string()?;
 
-                generate_db_column_name_attribute(&mut fields, db_column_name);
+                super::attr_generators::generate_db_column_name_attribute(
+                    &mut fields,
+                    db_column_name,
+                );
 
                 push_field(&mut fields, &model, Some("_from"));
 
@@ -56,7 +59,10 @@ pub fn generate_where_models<'s>(
 
                     generate_additional_attributes(&mut fields, field)?;
 
-                    generate_db_column_name_attribute(&mut fields, db_column_name);
+                    super::attr_generators::generate_db_column_name_attribute(
+                        &mut fields,
+                        db_column_name,
+                    );
 
                     push_field(&mut fields, &model, Some("_to"));
                 }
@@ -68,7 +74,10 @@ pub fn generate_where_models<'s>(
                 }
 
                 if let Some(db_column_name) = field.try_get_db_column_name_as_string()? {
-                    generate_db_column_name_attribute(&mut fields, db_column_name);
+                    super::attr_generators::generate_db_column_name_attribute(
+                        &mut fields,
+                        db_column_name,
+                    );
                 }
 
                 generate_additional_attributes(&mut fields, field)?;
@@ -81,7 +90,6 @@ pub fn generate_where_models<'s>(
     }
 
     let result = quote::quote! {
-
         #(#result)*
     };
 
@@ -95,18 +103,10 @@ fn generate_additional_attributes(
     if let Some(sql_type) = field.try_get_sql_type() {
         let sql_type = sql_type.unwrap_as_string_value()?;
         let sql_type = sql_type.as_str();
-        fields.push(quote::quote! {
-            #[sql_type(#sql_type)]
-        })
+        super::attr_generators::generate_sql_type(fields, sql_type);
     }
 
     Ok(())
-}
-
-fn generate_db_column_name_attribute(fields: &mut Vec<TokenStream>, db_column_name: &str) {
-    fields.push(quote::quote! {
-        #[db_column_name(#db_column_name)]
-    })
 }
 
 fn generate_struct(

@@ -41,6 +41,12 @@ pub struct GenerateAdditionalWhereStruct {
     pub generate_as_str: bool,
 }
 
+pub struct GenerateAdditionalSelectStruct {
+    pub struct_name: String,
+    pub field_name: String,
+    pub field_ty: TokenStream,
+}
+
 pub trait PostgresStructPropertyExt<'s> {
     fn is_primary_key(&self) -> bool;
 
@@ -81,13 +87,18 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_default_value(&self) -> Result<Option<DefaultValue>, syn::Error>;
 
-    fn get_generate_additional_update_model(
+    fn get_generate_additional_update_models(
         &self,
     ) -> Result<Option<Vec<GenerateAdditionalUpdateStruct>>, syn::Error>;
 
-    fn get_generate_additional_where_model(
+    fn get_generate_additional_where_models(
         &self,
     ) -> Result<Option<Vec<GenerateAdditionalWhereStruct>>, syn::Error>;
+
+    fn get_generate_additional_select_models(
+        &self,
+    ) -> Result<Option<Vec<GenerateAdditionalSelectStruct>>, syn::Error>;
+
     fn render_field_value(&self, is_update: bool) -> Result<proc_macro2::TokenStream, syn::Error> {
         match &self.get_ty() {
             types_reader::PropertyType::OptionOf(_) => return self.fill_option_of_value(is_update),
@@ -386,7 +397,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(Some(result))
     }
 
-    fn get_generate_additional_update_model(
+    fn get_generate_additional_update_models(
         &self,
     ) -> Result<Option<Vec<GenerateAdditionalUpdateStruct>>, syn::Error> {
         let params = self.attrs.try_get_attrs("generate_update_model");
@@ -435,7 +446,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(Some(result))
     }
 
-    fn get_generate_additional_where_model(
+    fn get_generate_additional_where_models(
         &self,
     ) -> Result<Option<Vec<GenerateAdditionalWhereStruct>>, syn::Error> {
         let params = self.attrs.try_get_attrs("generate_where_model");
@@ -484,6 +495,38 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
                 operator_from,
                 operator_to,
                 generate_as_str: param_list.has_param("as_str"),
+            };
+
+            result.push(itm)
+        }
+
+        Ok(Some(result))
+    }
+
+    fn get_generate_additional_select_models(
+        &self,
+    ) -> Result<Option<Vec<GenerateAdditionalSelectStruct>>, syn::Error> {
+        let params = self.attrs.try_get_attrs("generate_select_model");
+
+        if params.is_none() {
+            return Ok(None);
+        }
+
+        let params = params.unwrap();
+
+        let mut result = Vec::new();
+
+        for param_list in params {
+            let struct_name = param_list
+                .get_from_single_or_named("name")?
+                .unwrap_as_string_value()?
+                .as_str()
+                .to_string();
+
+            let itm = GenerateAdditionalSelectStruct {
+                struct_name,
+                field_name: self.name.to_string(),
+                field_ty: self.ty.get_token_stream(),
             };
 
             result.push(itm)

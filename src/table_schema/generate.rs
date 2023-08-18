@@ -15,11 +15,15 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::
 
     let db_columns = impl_db_columns(struct_name, &fields)?;
 
+    let select_models = super::generate_select_models(&fields)?;
+
     let update_models = super::generate_update_models(&fields)?;
     let where_models = super::generate_where_models(&fields)?;
 
     let result =quote::quote!{
         #db_columns
+
+        #select_models
     
         #update_models
 

@@ -334,6 +334,7 @@ pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
         default_value,
         wrap_column_name,
         db_column_name,
+        generate_select_model,
         generate_update_model,
         generate_where_model,
     )
