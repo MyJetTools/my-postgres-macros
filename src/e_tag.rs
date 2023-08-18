@@ -7,7 +7,7 @@ pub struct ETagData<'s> {
 }
 
 pub trait GetETag<'s> {
-    fn get_items(&'s self) -> &'s [StructProperty<'s>];
+    fn get_items(&'s self) -> Vec<&'s StructProperty<'s>>;
 
     fn get_e_tag(&'s self) -> Option<ETagData<'s>> {
         for field in self.get_items() {

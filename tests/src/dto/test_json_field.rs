@@ -13,7 +13,7 @@ pub struct TestJsonField {
     #[sql_type("timestamp")]
     pub date: DateTimeAsMicroseconds,
 
-    #[db_field_name("myTest")]
+    #[db_column_name("myTest")]
     #[sql_type("jsonb")]
     pub test: MyStructure,
 

@@ -6,23 +6,27 @@ use types_reader::{PropertyType, StructProperty};
 
 use crate::postgres_struct_ext::PostgresStructPropertyExt;
 
-pub fn generate(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
+pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::Error> {
     let struct_name = &ast.ident;
 
-    let fields = match StructProperty::read(ast) {
-        Ok(fields) => fields,
-        Err(e) => return e.into_compile_error().into(),
-    };
+    let fields = StructProperty::read(ast)?;
 
     let fields = super::utils::filter_table_schema_fields(&fields);
-    let db_columns = match impl_db_columns(struct_name, &fields) {
-        Ok(db_columns) => db_columns,
-        Err(err) => {
-            return err.into_compile_error().into();
-        }
-    };
 
-    quote::quote!(#db_columns).into()
+    let db_columns = impl_db_columns(struct_name, &fields)?;
+
+    let update_models = super::generate_update_models(&fields)?;
+    let where_models = super::generate_where_models(&fields)?;
+
+    let result =quote::quote!{
+        #db_columns
+    
+        #update_models
+
+        #where_models
+    }.into();
+
+    Ok(result)
 }
 
 fn impl_db_columns(

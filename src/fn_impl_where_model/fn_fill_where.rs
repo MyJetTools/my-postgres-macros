@@ -15,7 +15,7 @@ pub fn fn_fill_where<'s>(
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = struct_property.get_field_metadata()?;
 
-        let db_field_name = struct_property.get_db_column_name_as_string()?;
+        let db_column_name = struct_property.get_db_column_name_as_string()?;
 
         let op = fill_op(struct_property)?;
 
@@ -38,7 +38,7 @@ pub fn fn_fill_where<'s>(
 
         lines.push(quote! {
            #no => Some(WhereFieldData{
-                column_name: #db_field_name.into(),
+                column_name: #db_column_name.into(),
                 op: #op,
                 value: #value,
                 ignore_if_none: #ignore_if_none,

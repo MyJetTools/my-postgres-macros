@@ -68,7 +68,7 @@ mod tests {
         #[primary_key(0)]
         pub primary_key_first: String,
         #[primary_key(1)]
-        #[db_field_name("the_second_column")]
+        #[db_column_name("the_second_column")]
         #[db_index(id:0, index_name: "test_index", is_unique: true, order: "ASC")]
         pub primary_key_second: String,
         #[db_index(id:1, index_name: "test_index", is_unique: true, order: "ASC")]

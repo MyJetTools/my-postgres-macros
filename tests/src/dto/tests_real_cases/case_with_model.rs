@@ -5,14 +5,17 @@ use serde::*;
 #[derive(SelectDbEntity, InsertDbEntity, UpdateDbEntity, TableSchema)]
 pub struct TraderAccountUpdateLogDto {
     #[primary_key(0)]
+    #[generate_update_model(name:"UpdateBrokerDto", param_type:"where")]
+    #[generate_where_model("ByAccountIdWhereModel")]
     pub account_id: String,
-
+    #[generate_where_model("ByAccountIdWhereModel")]
     pub client_id: String,
 
     #[order_by_desc]
     #[sql_type("timestamp")]
     pub created_date: DateTimeAsMicroseconds,
 
+    #[generate_update_model(name:"UpdateBrokerDto", param_type:"update")]
     pub broker: BrokerDto,
     pub trading_platform: TradingPlatformDto,
 

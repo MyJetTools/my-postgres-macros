@@ -21,7 +21,11 @@ impl<'s> InsertFields<'s> {
 }
 
 impl<'s> GetETag<'s> for InsertFields<'s> {
-    fn get_items(&'s self) -> &'s [StructProperty<'s>] {
-        self.items.as_slice()
+    fn get_items(&'s self) -> Vec<&'s StructProperty<'s>> {
+        let mut result = Vec::with_capacity(self.items.len());
+        for field in &self.items {
+            result.push(field)
+        }
+        result
     }
 }

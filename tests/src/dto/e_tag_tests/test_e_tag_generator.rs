@@ -9,7 +9,7 @@ pub struct TestETagDto {
     #[sql_type("timestamp")]
     pub date: DateTimeAsMicroseconds,
 
-    #[db_field_name("etag")]
+    #[db_column_name("etag")]
     #[e_tag]
     pub e_tag: i64,
 }

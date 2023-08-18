@@ -19,7 +19,7 @@ pub fn fn_fill_select_fields(
                 sql.push_str(#attr_value);
             });
         } else {
-            let db_field_name = prop.get_db_column_name_as_token()?;
+            let db_column_name = prop.get_db_column_name_as_token()?;
 
             let metadata = prop.get_field_metadata()?;
 
@@ -28,7 +28,7 @@ pub fn fn_fill_select_fields(
 
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, #db_field_name, &#metadata);
+                        #type_ident::fill_select_part(sql, #db_column_name, &#metadata);
                     }
                     .into(),
                 );
@@ -36,7 +36,7 @@ pub fn fn_fill_select_fields(
                 let type_ident = prop.ty.get_token_stream();
                 result.push(
                     quote! {
-                        #type_ident::fill_select_part(sql, #db_field_name, &#metadata);
+                        #type_ident::fill_select_part(sql, #db_column_name, &#metadata);
                     }
                     .into(),
                 );

@@ -10,4 +10,6 @@ mod test_json_hashmap_dto;
 mod test_primary_key;
 mod where_model;
 pub use test_basic_cases::*;
+mod test_auto_generated_types_with_operator;
+mod test_auto_generated_types_with_range;
 mod tests_real_cases;

@@ -1,8 +1,8 @@
-use std::str::FromStr;
-
 use proc_macro2::TokenStream;
 use quote::quote;
 use types_reader::{StructProperty, TypeName};
+
+use crate::struct_name::StructName;
 
 pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::Error> {
     let type_name = TypeName::new(ast);
@@ -26,7 +26,12 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::
         }
     }
 
-    let result = generate_implementation(&type_name, fields.iter(), limit, offset)?;
+    let result = generate_implementation(
+        StructName::TypeName(&type_name),
+        fields.iter(),
+        limit,
+        offset,
+    )?;
 
     Ok(quote! {
         #result
@@ -35,12 +40,12 @@ pub fn generate(ast: &syn::DeriveInput) -> Result<proc_macro::TokenStream, syn::
 }
 
 pub fn generate_implementation<'s>(
-    type_name: &TypeName,
+    type_name: StructName<'s>,
     fields: impl Iterator<Item = &'s StructProperty<'s>>,
     limit: Option<StructProperty>,
     offset: Option<StructProperty>,
 ) -> Result<proc_macro2::TokenStream, syn::Error> {
-    let struct_name = type_name.get_type_name();
+    let struct_name = type_name.get_struct_name();
 
     let limit: TokenStream = if let Some(limit) = &limit {
         let name = limit.get_field_name_ident();
@@ -78,11 +83,7 @@ pub fn generate_implementation<'s>(
 
     let where_data = super::fn_fill_where::fn_fill_where(fields)?;
 
-    let generics = if let Some(generics) = type_name.generics {
-        TokenStream::from_str("<'s>").unwrap()
-    } else {
-        TokenStream::from_str("").unwrap()
-    };
+    let generics = type_name.get_generic();
 
     let result = quote! {
        impl #generics my_postgres::sql_where::SqlWhereModel for #struct_name{

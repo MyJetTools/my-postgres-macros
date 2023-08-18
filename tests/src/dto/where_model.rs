@@ -3,7 +3,7 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 #[derive(WhereDbModel)]
 pub struct TestWhereModel {
-    #[db_field_name("id")]
+    #[db_column_name("id")]
     pub name: String,
 
     #[sql_type("timestamp")]

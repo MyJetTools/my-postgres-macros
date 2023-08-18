@@ -8,7 +8,7 @@ pub fn fn_get_field_value(fields: &UpdateFields) -> Result<Vec<TokenStream>, syn
     let mut result = Vec::with_capacity(fields.get_fields_amount());
 
     let mut i: usize = 0;
-    for field in fields.get_fields_with_no_primary_key() {
+    for field in fields.get_update_fields() {
         let sql_update_value = field.render_field_value(true)?;
         result.push(
             quote! {

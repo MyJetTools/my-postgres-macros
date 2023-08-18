@@ -5,7 +5,6 @@ const ENUM_CASE_ATTR: &str = "enum_case";
 pub trait PostgresEnumExt {
     fn get_case_string_value(&self) -> Result<String, syn::Error>;
     fn get_case_number_value(&self) -> Result<Option<i64>, syn::Error>;
-
     fn get_case_any_string_value(&self) -> Result<String, syn::Error>;
 }
 

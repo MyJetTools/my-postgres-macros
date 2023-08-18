@@ -17,12 +17,13 @@ mod my_postgres_json_model;
 mod postgres_enum_ext;
 mod postgres_struct_ext;
 
+mod struct_name;
 use syn;
 
 #[proc_macro_derive(
     SelectDbEntity,
     attributes(
-        db_field_name,
+        db_column_name,
         line_no,
         sql,
         sql_type,
@@ -44,7 +45,7 @@ pub fn postgres_select_model(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(
     BulkSelectDbEntity,
-    attributes(db_field_name, json, bigint, line_no, sql_type, default_if_null,)
+    attributes(db_column_name, json, bigint, line_no, sql_type, default_if_null,)
 )]
 pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -54,7 +55,7 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(
     WhereDbModel,
     attributes(
-        db_field_name,
+        db_column_name,
         bigint,
         operator,
         ignore_if_none,
@@ -77,7 +78,7 @@ pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(
     InsertDbEntity,
     attributes(
-        db_field_name,
+        db_column_name,
         ignore,
         bigint,
         json,
@@ -100,7 +101,7 @@ pub fn postgres_insert_model(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(
     UpdateDbEntity,
     attributes(
-        db_field_name,
+        db_column_name,
         primary_key,
         ignore,
         sql_type,
@@ -324,7 +325,6 @@ pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(
     TableSchema,
     attributes(
-        db_field_name,
         bigint,
         sql_type,
         ignore_table_column,
@@ -333,13 +333,21 @@ pub fn my_postgres_json_model(input: TokenStream) -> TokenStream {
         default_if_null,
         default_value,
         wrap_column_name,
+        db_column_name,
+        generate_update_model,
+        generate_where_model,
     )
 )]
 pub fn table_schema(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     let result = crate::table_schema::generate(&ast);
 
-    #[cfg(feature = "debug-table-schema")]
-    println!("{}", result);
-    result
+    match result {
+        Ok(result) => {
+            #[cfg(feature = "debug-table-schema")]
+            println!("{}", result);
+            result
+        }
+        Err(e) => e.into_compile_error().into(),
+    }
 }

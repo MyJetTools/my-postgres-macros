@@ -1,10 +1,11 @@
+use proc_macro2::TokenStream;
 use quote::ToTokens;
 use types_reader::{ParamValue, PropertyType, StructProperty};
 
 use crate::e_tag::ETagData;
 
 pub const ATTR_PRIMARY_KEY: &str = "primary_key";
-pub const ATTR_DB_FIELD_NAME: &str = "db_field_name";
+pub const ATTR_DB_COLUMN_NAME: &str = "db_column_name";
 //pub const ATTR_IGNORE_IF_NULL: &str = "ignore_if_null";
 
 pub const ATTR_SQL_TYPE: &str = "sql_type";
@@ -23,6 +24,22 @@ pub struct IndexAttr {
     pub order: String,
 }
 
+pub struct GenerateAdditionalUpdateStruct {
+    pub struct_name: String,
+    pub field_name: String,
+    pub field_ty: TokenStream,
+    pub is_where: bool,
+}
+
+pub struct GenerateAdditionalWhereStruct {
+    pub struct_name: String,
+    pub field_name: String,
+    pub field_ty: TokenStream,
+    pub operator: Option<String>,
+    pub operator_from: Option<String>,
+    pub operator_to: Option<String>,
+}
+
 pub trait PostgresStructPropertyExt<'s> {
     fn is_primary_key(&self) -> bool;
 
@@ -30,9 +47,13 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_sql_type(&self) -> Result<&ParamValue, syn::Error>;
 
+    fn try_get_sql_type(&self) -> Option<&ParamValue>;
+
     fn get_db_column_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error>;
 
     fn get_db_column_name_as_string(&self) -> Result<&str, syn::Error>;
+
+    fn try_get_db_column_name_as_string(&self) -> Result<Option<&str>, syn::Error>;
 
     fn has_json_attr(&self) -> bool;
 
@@ -59,6 +80,13 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_default_value(&self) -> Result<Option<DefaultValue>, syn::Error>;
 
+    fn get_generate_additional_update_model(
+        &self,
+    ) -> Result<Option<Vec<GenerateAdditionalUpdateStruct>>, syn::Error>;
+
+    fn get_generate_additional_where_model(
+        &self,
+    ) -> Result<Option<Vec<GenerateAdditionalWhereStruct>>, syn::Error>;
     fn render_field_value(&self, is_update: bool) -> Result<proc_macro2::TokenStream, syn::Error> {
         match &self.get_ty() {
             types_reader::PropertyType::OptionOf(_) => return self.fill_option_of_value(is_update),
@@ -192,6 +220,11 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         self.attrs.get_single_or_named_param(ATTR_SQL_TYPE, "name")
     }
 
+    fn try_get_sql_type(&self) -> Option<&ParamValue> {
+        self.attrs
+            .try_get_single_or_named_param(ATTR_SQL_TYPE, "name")
+    }
+
     fn has_ignore_if_none_attr(&self) -> bool {
         self.attrs.has_attr("ignore_if_none")
     }
@@ -236,7 +269,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
     }
 
     fn get_db_column_name_as_token(&self) -> Result<proc_macro2::TokenStream, syn::Error> {
-        if let Ok(attr) = self.attrs.get_attr(ATTR_DB_FIELD_NAME) {
+        if let Ok(attr) = self.attrs.get_attr(ATTR_DB_COLUMN_NAME) {
             if let Ok(result) = attr.get_from_single_or_named("name") {
                 let name = result.get_any_value_as_str()?.to_token_stream();
                 return Ok(name);
@@ -251,12 +284,23 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
     fn get_db_column_name_as_string(&self) -> Result<&str, syn::Error> {
         if let Ok(attr) = self
             .attrs
-            .get_single_or_named_param(ATTR_DB_FIELD_NAME, "name")
+            .get_single_or_named_param(ATTR_DB_COLUMN_NAME, "name")
         {
             return Ok(attr.unwrap_as_string_value()?);
         }
 
         Ok(self.name.as_str())
+    }
+
+    fn try_get_db_column_name_as_string(&self) -> Result<Option<&str>, syn::Error> {
+        if let Some(attr) = self
+            .attrs
+            .try_get_single_or_named_param(ATTR_DB_COLUMN_NAME, "name")
+        {
+            return Ok(Some(attr.unwrap_as_string_value()?));
+        }
+
+        Ok(None)
     }
 
     fn get_index_attrs(&self) -> Result<Option<Vec<IndexAttr>>, syn::Error> {
@@ -337,6 +381,111 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
             field_name: self.get_field_name_ident(),
             column_name: self.get_db_column_name_as_string()?,
         };
+
+        Ok(Some(result))
+    }
+
+    fn get_generate_additional_update_model(
+        &self,
+    ) -> Result<Option<Vec<GenerateAdditionalUpdateStruct>>, syn::Error> {
+        let params = self.attrs.try_get_attrs("generate_update_model");
+
+        if params.is_none() {
+            return Ok(None);
+        }
+
+        let params = params.unwrap();
+
+        let mut result = Vec::new();
+
+        for param in params {
+            let struct_name = param
+                .get_named_param("name")?
+                .unwrap_as_string_value()?
+                .as_str()
+                .to_string();
+
+            let is_where = param
+                .get_named_param("param_type")?
+                .unwrap_as_string_value()?
+                .as_str();
+
+            let is_where = match is_where {
+                "where" => true,
+                "update" => false,
+                _ => {
+                    return Err(syn::Error::new_spanned(
+                        param.get_token_stream(),
+                        "param_type must have 'where' or 'update' value",
+                    ));
+                }
+            };
+
+            let itm = GenerateAdditionalUpdateStruct {
+                struct_name,
+                field_name: self.name.to_string(),
+                field_ty: self.ty.get_token_stream(),
+                is_where,
+            };
+
+            result.push(itm)
+        }
+
+        Ok(Some(result))
+    }
+
+    fn get_generate_additional_where_model(
+        &self,
+    ) -> Result<Option<Vec<GenerateAdditionalWhereStruct>>, syn::Error> {
+        let params = self.attrs.try_get_attrs("generate_where_model");
+
+        if params.is_none() {
+            return Ok(None);
+        }
+
+        let params = params.unwrap();
+
+        let mut result = Vec::new();
+
+        for param in params {
+            let struct_name = param
+                .get_from_single_or_named("name")?
+                .unwrap_as_string_value()?
+                .as_str()
+                .to_string();
+
+            let operator = param.try_get_named_param("operator");
+
+            let operator = match operator {
+                Some(value) => Some(value.unwrap_as_string_value()?.as_str().to_string()),
+                None => None,
+            };
+
+            let operator_from = param.try_get_named_param("operator_from");
+
+            let operator_from = match operator_from {
+                Some(value) => Some(value.unwrap_as_string_value()?.as_str().to_string()),
+                None => None,
+            };
+
+            let operator_to = param.try_get_named_param("operator_to");
+
+            let operator_to = match operator_to {
+                Some(value) => Some(value.unwrap_as_string_value()?.as_str().to_string()),
+                None => None,
+            };
+
+            let itm = GenerateAdditionalWhereStruct {
+                struct_name,
+                field_name: self.name.to_string(),
+                field_ty: self.ty.get_token_stream(),
+                operator,
+                operator_from,
+                operator_to,
+            };
+
+            result.push(itm)
+        }
 
         Ok(Some(result))
     }
