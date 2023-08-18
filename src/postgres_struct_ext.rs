@@ -39,6 +39,7 @@ pub struct GenerateAdditionalWhereStruct {
     pub operator_from: Option<String>,
     pub operator_to: Option<String>,
     pub generate_as_str: bool,
+    pub generate_as_vec: bool,
 }
 
 pub struct GenerateAdditionalSelectStruct {
@@ -495,6 +496,7 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
                 operator_from,
                 operator_to,
                 generate_as_str: param_list.has_param("as_str"),
+                generate_as_vec: param_list.has_param("as_vec"),
             };
 
             result.push(itm)

@@ -148,13 +148,25 @@ fn push_field(
 
     let ty = &model.field_ty;
 
-    if model.generate_as_str {
-        fields.push(quote::quote! {
-            pub #field_name: &'s str,
-        });
+    if model.generate_as_vec {
+        if model.generate_as_str {
+            fields.push(quote::quote! {
+                pub #field_name: Vec<&'s str>,
+            });
+        } else {
+            fields.push(quote::quote! {
+                pub #field_name: Vec<#ty>,
+            });
+        }
     } else {
-        fields.push(quote::quote! {
-            pub #field_name: #ty,
-        });
+        if model.generate_as_str {
+            fields.push(quote::quote! {
+                pub #field_name: &'s str,
+            });
+        } else {
+            fields.push(quote::quote! {
+                pub #field_name: #ty,
+            });
+        }
     }
 }
