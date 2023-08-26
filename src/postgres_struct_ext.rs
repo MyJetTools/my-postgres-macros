@@ -557,20 +557,13 @@ pub fn filter_fields(src: Vec<StructProperty>) -> Result<Vec<StructProperty>, sy
         };
 
         if is_date_time {
-            if let Ok(attr) = itm.get_sql_type() {
-                let attr = attr.unwrap_as_string_value()?.as_str();
-                if attr != "timestamp" && attr != "bigint" {
-                    let result = syn::Error::new_spanned(
-                        itm.field,
-                        format!("Sql type must be 'timestamp' or 'bigint'"),
-                    );
+            let attr = itm.get_sql_type()?;
 
-                    return Err(result);
-                }
-            } else {
+            let attr = attr.unwrap_as_string_value()?.as_str();
+            if attr != "timestamp" && attr != "bigint" {
                 let result = syn::Error::new_spanned(
                     itm.field,
-                    format!("Please specify sql_type for {}", itm.name),
+                    format!("Sql type must be 'timestamp' or 'bigint'"),
                 );
 
                 return Err(result);
