@@ -40,14 +40,16 @@ pub fn fn_fill_where<'s>(
             db_column_name.insert(0, '"');
             db_column_name.push('"');
 
-            let no = 0;
+            let mut no = 0;
+            let last_one = inside_json.len() - 1;
 
-            for line in &inside_json {
-                if no >= inside_json.len() {
+            for line in inside_json {
+                if no == last_one {
                     db_column_name.push_str("->>");
                 } else {
                     db_column_name.push_str("->");
                 }
+                no += 1;
 
                 db_column_name.push('\'');
                 db_column_name.push_str(line);

@@ -31,7 +31,7 @@ pub struct TestWhereModel {
     #[operator("like")]
     pub like_value: String,
 
-    #[inside_json("field_name")]
+    #[inside_json("field_name.field_name2")]
     pub my_json_field: String,
 }
 
