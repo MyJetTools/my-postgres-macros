@@ -90,7 +90,7 @@ pub trait PostgresStructPropertyExt<'s> {
 
     fn get_default_value(&self) -> Result<Option<DefaultValue>, syn::Error>;
 
-    fn get_inside_json(&self) -> Result<Option<&str>, syn::Error>;
+    fn get_inside_json(&self) -> Result<Option<Vec<&str>>, syn::Error>;
 
     fn get_generate_additional_update_models(
         &self,
@@ -402,12 +402,12 @@ impl<'s> PostgresStructPropertyExt<'s> for StructProperty<'s> {
         Ok(Some(result))
     }
 
-    fn get_inside_json(&self) -> Result<Option<&str>, syn::Error> {
+    fn get_inside_json(&self) -> Result<Option<Vec<&str>>, syn::Error> {
         if let Some(attr) = self.attrs.try_get_attr("inside_json") {
             let value = attr.get_from_single_or_named("field")?;
 
             let value = value.unwrap_as_string_value()?.as_str();
-            return Ok(Some(value));
+            return Ok(Some(value.split('.').collect()));
         }
 
         return Ok(None);

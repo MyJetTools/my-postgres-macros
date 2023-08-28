@@ -37,7 +37,22 @@ pub fn fn_fill_where<'s>(
         };
 
         if let Some(inside_json) = struct_property.get_inside_json()? {
-            db_column_name = format!("\"{}\"->'{}'", db_column_name, inside_json);
+            db_column_name.insert(0, '"');
+            db_column_name.push('"');
+
+            let no = 0;
+
+            for line in &inside_json {
+                if no >= inside_json.len() {
+                    db_column_name.push_str("->>");
+                } else {
+                    db_column_name.push_str("->");
+                }
+
+                db_column_name.push('\'');
+                db_column_name.push_str(line);
+                db_column_name.push('\'');
+            }
         }
 
         lines.push(quote! {
