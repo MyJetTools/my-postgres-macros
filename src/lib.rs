@@ -65,6 +65,7 @@ pub fn postgres_bulk_select_model(input: TokenStream) -> TokenStream {
         sql_type,
         default_if_null,
         wrap_column_name,
+        inside_json
     )
 )]
 pub fn postgres_bulk_select_input_data(input: TokenStream) -> TokenStream {

@@ -15,7 +15,7 @@ pub fn fn_fill_where<'s>(
         let prop_name_ident = struct_property.get_field_name_ident();
         let metadata = struct_property.get_field_metadata()?;
 
-        let db_column_name = struct_property.get_db_column_name_as_string()?;
+        let mut db_column_name = struct_property.get_db_column_name_as_string()?.to_string();
 
         let op = fill_op(struct_property)?;
 
@@ -35,6 +35,10 @@ pub fn fn_fill_where<'s>(
                 Some(&self.#prop_name_ident)
             }
         };
+
+        if let Some(inside_json) = struct_property.get_inside_json()? {
+            db_column_name = format!("\"{}\"->'{}'", db_column_name, inside_json);
+        }
 
         lines.push(quote! {
            #no => Some(WhereFieldData{
