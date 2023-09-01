@@ -1,3 +1,4 @@
+use my_postgres::GroupBySum;
 use my_postgres_macros::*;
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 use serde::*;
@@ -61,6 +62,14 @@ pub enum TradingPlatformDto {
 pub enum BrokerDto {
     #[enum_case(0)]
     Welltrade,
+}
+
+#[derive(SelectDbEntity)]
+pub struct PendingPayoutsTotalAmountSelect {
+    pub withdrawal_amount: GroupBySum<f64>,
+
+    #[group_by]
+    pub withdrawal_currency: String,
 }
 
 #[cfg(test)]

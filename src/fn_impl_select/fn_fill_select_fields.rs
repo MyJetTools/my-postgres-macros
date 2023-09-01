@@ -24,7 +24,7 @@ pub fn fn_fill_select_fields(
             let metadata = prop.get_field_metadata()?;
 
             if let PropertyType::OptionOf(sub_type) = &prop.ty {
-                let type_ident = sub_type.get_token_stream();
+                let type_ident = sub_type.get_token_stream_with_generics();
 
                 result.push(
                     quote! {
@@ -33,7 +33,7 @@ pub fn fn_fill_select_fields(
                     .into(),
                 );
             } else {
-                let type_ident = prop.ty.get_token_stream();
+                let type_ident = prop.ty.get_token_stream_with_generics();
                 result.push(
                     quote! {
                         #type_ident::fill_select_part(sql, #db_column_name, &#metadata);
