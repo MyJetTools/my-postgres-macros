@@ -158,13 +158,13 @@ pub fn generate(
 
 
 
-        impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
-            fn from_db_row(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
+        impl<'s> my_postgres::sql_select::FromDbRow<'s, #enum_name> for #enum_name{
+            fn from_db_row(row: &'s my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
                 let result: #sql_db_type = row.get(name);
                 #from_db_result
             }
 
-            fn from_db_row_opt(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
+            fn from_db_row_opt(row: &'s my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
                 let result: Option<#sql_db_type> = row.get(name);
                 let result = result?;
                 Some(#from_db_result)

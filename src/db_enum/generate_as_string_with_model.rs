@@ -42,13 +42,13 @@ pub fn generate_as_string_with_model(ast: &syn::DeriveInput) -> Result<proc_macr
             }
         }
 
-            impl my_postgres::sql_select::FromDbRow<#enum_name> for #enum_name{
-                fn from_db_row(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
+            impl<'s> my_postgres::sql_select::FromDbRow<'s, #enum_name> for #enum_name{
+                fn from_db_row(row: &'s my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Self{
                     let value: String = row.get(name);
                     Self::from_str(value.as_str())
                 }
 
-                fn from_db_row_opt(row: &my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
+                fn from_db_row_opt(row: &'s my_postgres::DbRow, name: &str, metadata: &Option<my_postgres::SqlValueMetadata>) -> Option<Self>{
                     let value: Option<String> = row.get(name);
                     let value = value?;
 
